@@ -1,0 +1,38 @@
+# Build output
+build/
+.gradle/
+.kotlin/
+captures/
+*.apk
+*.aab
+*.hprof
+
+# IDE state (can hold local paths)
+.idea/
+*.iml
+.DS_Store
+
+# Machine-specific config: local.properties holds the SDK path, which contains the home folder
+local.properties
+
+# Signing and secrets
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+google-services.json
+.env
+*.env
+
+# Device runs: screenshots, logs and per-phone state stay local
+walk/
+device-logs/
+screenshots/
+*.logcat
+logcat*.txt
+
+# Downloaded on-device models (large; fetched at runtime, never committed)
+models/
+*.gguf
+*.tflite
+*.onnx
