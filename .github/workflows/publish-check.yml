@@ -1,0 +1,25 @@
+name: publish-check
+
+# Scans every push and pull request, history included, for secrets, non-noreply emails,
+# home-folder paths, claude.ai links and photo location data. The private name list stays
+# on the owner's machine (local hooks); this catches what bypasses them: web edits,
+# other clones, commits made with hooks skipped.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # The runner has no git identity; commit authors are still checked by --history
+      - run: git config user.email "ci@users.noreply.github.com"
+      - run: python3 tools/publish_check.py . --history
