@@ -106,4 +106,4 @@ How to read it:
 
 ## Reference apps
 
-Baselines and controls (SPEC D-27): boxorg, Flindex, a-personal-stuff, whohasmystuff, prepper, hot-stuff, StuffList, Homebox, plus Spot It, Nestmer and Store & Forget from their listings. The F-Droid ones are walked on the Snapdragon 845 phone.
+Baselines and controls (SPEC D-27): inventoried in [reference-apps.md](reference-apps.md) (2026-10-28), plus Spot It, Nestmer and Store & Forget from their listings.
