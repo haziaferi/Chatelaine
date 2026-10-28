@@ -54,7 +54,7 @@ The name: a chatelaine ran a household and carried its keys and small tools on a
 | D-33 | One app on one shared core. **Wardrobe** and **Pantry** are optional modules, off by default. A module = a preset set of custom fields on its tags + a few views of its own + its own purpose-map entries. Users can build their own packs with the same tools. |
 | D-34 | Purpose-map scoring axes (O-01), equal weights, ties shown as ties. **Choosing the purpose set:** A1 coverage (every reference-app function and every S1–S7 step lands in a purpose), A2 exclusivity, A3 balance, A4 fit to Chatelaine's intent, A5 potential improvement over the reference apps. **Choosing screens and homes:** B1 screen count (fewer is better), B2 one home per thing (repeats count against), B3 steps per scenario (taps from the homepage through S1–S7), B4 recall load (steps that ask the user to remember what the screen doesn't show). Reference apps are controls: a control that scores well means the axes are wrong. Layout axes are set per screen from stage 2. |
 | D-35 | The homepage is a master board: shortcuts on it (the two cards, object of the day) are not counted as repeats under B2. |
-| D-36 | Stage 0's KMP-build and change-file-sync spikes are replaced by a review of the existing setup of the owner's earlier app, which already builds on Android and Windows and syncs through a folder. Only the model spike on the Snapdragon 845 phone remains. |
+| D-36 | Stage 0's change-file-sync spike is replaced by a review of the sync of the owner's earlier app (done 2026-10-28, §5.6). The KMP spike **stays**: the review found the earlier app has no Compose and no runnable Windows app, so a Compose Multiplatform window running on Android and Windows must be proven. The model spike on the Snapdragon 845 phone also stays. |
 
 ## 2. Goals, non-goals, anti-goals
 
@@ -142,7 +142,9 @@ A photo belongs to an item or a place. A **place photo** of a settled area can h
 - Photos travel as files in the same folder, named by id.
 - Sync works with any folder-sync tool. The app doesn't talk to Syncthing itself.
 - A backup carries each value's sync stamps, and restoring it **merges** like any other device's changes: edits newer than the backup survive on both devices. Rolling everything back to a backup is a separate, deliberate action; it is recorded as a change, and the state it replaced stays in history *(builder's call, following the lesson from the owner's earlier app that a stamp-less backup overwrites every device)*.
-- The folder sync of the owner's earlier app (unpublished; per-device log segments, snapshots, merge engine in `:core`) is the owner's own code and the starting point for this design.
+- The folder sync of the owner's earlier app (unpublished) is the owner's own code and the starting point (review 2026-10-28). Its `:core` engine (ULID ids, hybrid logical clock stamps, field groups, merge with a permanent purge registry) is reused almost unchanged. Its folder layer (16 KiB per-device log segments, snapshots every 64, atomic writes, Syncthing conflict copies merged, waiting rows for missing parents, outbox, photos stored by SHA-256 under `blobs/`) is adapted: database and group sets passed in, sync tables moved into Chatelaine's schema, new row adapters for items, places, tags and photos.
+- Differences from the earlier app that Chatelaine needs: **one sync group per user-visible field** (the earlier app defaults to one group per row), and **every user-visible group keeps the losing value** (the earlier app discards it except for a few groups), so §5.6's history rule holds. Full-backup merge and the rollback action are new; the earlier app built only a settings backup.
+- Lessons adopted from the earlier app: ignore a replayed version no newer than the base; keep the device-id file out of Android Auto Backup; export through an outbox, not a stamp cursor; the purge registry is permanent (90-day tombstones resurrected rows in another of the owner's apps); a recovered database re-reads its own folder files.
 
 ### 5.7 Personal learning
 The user's sorted items act as labelled examples: a new item's nearest neighbours carry the user's own logic. Corrections always outrank model output. Nothing is trained or uploaded.
@@ -197,7 +199,7 @@ Each stage ends with a **done-when** check and, from stage 2 on, a walk on a rea
 
 | Stage | Holds | Done when | Unlocks |
 |---|---|---|---|
-| **0 Foundations** | SPEC; purpose map scored on the D-34 axes; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed on the Snapdragon 845 phone against D-29, then the Snapdragon 888 phone if needed; review of the KMP build and folder sync of the owner's earlier app for reuse (D-36) | Owner approves SPEC and purpose map; spike timings recorded in the SPEC | — |
+| **0 Foundations** | SPEC; purpose map scored on the D-34 axes; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed on the Snapdragon 845 phone against D-29, then the Snapdragon 888 phone if needed; Compose Multiplatform window running on Android and Windows (D-36) | Owner approves SPEC and purpose map; spike timings recorded in the SPEC | — |
 | **1 Data and safety** | Data model (items, places, tags with parents and kept-together, photos, states, custom fields, history); database; backup and export; change-file sync | Round-trip tests: export → import, two-device sync with conflicts, a corrupted database is kept, not deleted | — |
 | **2 Logging and tags** | Quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove; search including child tags | Owner-approved screens built; S1 passes | S1 |
 | **3 Places and photos** | Place tree; camera (phone only, D-28); item and place photos; settled-area path; place contents view; "in use / away"; move and bulk move | S5 passes; S7's move part passes | S5 |
@@ -244,7 +246,7 @@ Direction only (D-24, D-25); to be workshopped per screen:
 | anderslum/boxorg | MIT | TypeScript | Photo-first box interface (reference) |
 | sysadminsmedia/homebox | AGPL-3.0 | Go | Data model, QR labels (reference only) |
 | lcukerd/StuffList | none | Java | Look only, never copy |
-| The owner's earlier app (unpublished) | owner's own | Kotlin (KMP) | Folder sync engine, typed units, app lock, KMP layer split |
+| The owner's earlier app (unpublished) | owner's own, no licence file; code taken into Chatelaine is relicensed GPL-3.0 by the owner and recorded in `THIRD_PARTY.md` | Kotlin (KMP) | Sync engine and folder layer, version catalog, `:core`/`:data` split, typed units, app lock |
 
 Design references, not open source: Spot It (marked spots on a photo), Nestmer (visual map of rooms), Store & Forget (photo-first entry).
 
@@ -255,5 +257,6 @@ Design references, not open source: Spot It (marked spots on a photo), Nestmer (
 | 2026-10-27 | Name Chatelaine; GPL-3.0; public repo; publish check in hooks and CI |
 | 2026-10-28 | SPEC v0.1 drafted from the owner's answers (D-01..D-27, S1..S7) |
 | 2026-10-28 | Builder check answered: D-28..D-32; restore rule (§5.6) and open-vocabulary recognition (§6) as builder's calls; O-06 opened |
+| 2026-10-28 | Review of the owner's earlier app: D-36 amended (KMP spike restored), §5.6 sync reuse and differences, §12 relicensing note |
 | 2026-10-28 | D-34 purpose-map axes, D-35 homepage master board, D-36 spikes replaced by a review of the owner's earlier app; O-01 closed |
 | 2026-10-28 | D-33 Wardrobe and Pantry modules (stage 10); field types (§5.5); restore now merges by stamps, following the earlier app; O-07 |
