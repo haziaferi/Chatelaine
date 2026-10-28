@@ -52,6 +52,9 @@ The name: a chatelaine ran a household and carried its keys and small tools on a
 | D-31 | The phone app stays under about 150 MB; the speech model is downloaded on first use of dictation. The small recogniser and the text-similarity model ship with the app. Limits to be refined in later stages. |
 | D-32 | No existing inventory data to import; no importer in stage 1. |
 | D-33 | One app on one shared core. **Wardrobe** and **Pantry** are optional modules, off by default. A module = a preset set of custom fields on its tags + a few views of its own + its own purpose-map entries. Users can build their own packs with the same tools. |
+| D-34 | Purpose-map scoring axes (O-01), equal weights, ties shown as ties. **Choosing the purpose set:** A1 coverage (every reference-app function and every S1–S7 step lands in a purpose), A2 exclusivity, A3 balance, A4 fit to Chatelaine's intent, A5 potential improvement over the reference apps. **Choosing screens and homes:** B1 screen count (fewer is better), B2 one home per thing (repeats count against), B3 steps per scenario (taps from the homepage through S1–S7), B4 recall load (steps that ask the user to remember what the screen doesn't show). Reference apps are controls: a control that scores well means the axes are wrong. Layout axes are set per screen from stage 2. |
+| D-35 | The homepage is a master board: shortcuts on it (the two cards, object of the day) are not counted as repeats under B2. |
+| D-36 | Stage 0's KMP-build and change-file-sync spikes are replaced by a review of the existing setup of the owner's earlier app, which already builds on Android and Windows and syncs through a folder. Only the model spike on the Snapdragon 845 phone remains. |
 
 ## 2. Goals, non-goals, anti-goals
 
@@ -194,7 +197,7 @@ Each stage ends with a **done-when** check and, from stage 2 on, a walk on a rea
 
 | Stage | Holds | Done when | Unlocks |
 |---|---|---|---|
-| **0 Foundations** | SPEC; purpose map with scoring axes agreed with the owner; screen-by-purpose decisions; throwaway spikes: (a) small LLM and recognition model timed on the Snapdragon 845 phone, then the Snapdragon 888 phone if needed; (b) KMP project builds and runs on Android and Windows; (c) change-file sync between two folders | Owner approves SPEC and purpose map; spike timings recorded in the SPEC | — |
+| **0 Foundations** | SPEC; purpose map scored on the D-34 axes; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed on the Snapdragon 845 phone against D-29, then the Snapdragon 888 phone if needed; review of the KMP build and folder sync of the owner's earlier app for reuse (D-36) | Owner approves SPEC and purpose map; spike timings recorded in the SPEC | — |
 | **1 Data and safety** | Data model (items, places, tags with parents and kept-together, photos, states, custom fields, history); database; backup and export; change-file sync | Round-trip tests: export → import, two-device sync with conflicts, a corrupted database is kept, not deleted | — |
 | **2 Logging and tags** | Quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove; search including child tags | Owner-approved screens built; S1 passes | S1 |
 | **3 Places and photos** | Place tree; camera (phone only, D-28); item and place photos; settled-area path; place contents view; "in use / away"; move and bulk move | S5 passes; S7's move part passes | S5 |
@@ -222,7 +225,6 @@ Direction only (D-24, D-25); to be workshopped per screen:
 
 | # | Question | Needed by |
 |---|---|---|
-| O-01 | Scoring axes for the purpose map (from the owner's other apps, or new) | Stage 0 |
 | O-02 | Windows equivalent of the home-screen widget (tray, startup window, none) | Stage 7 |
 | O-03 | Consumables and low-stock handling (D-07) | Stage 10 |
 | O-04 | Which tag kinds exist by default | Stage 2 |
@@ -253,4 +255,5 @@ Design references, not open source: Spot It (marked spots on a photo), Nestmer (
 | 2026-10-27 | Name Chatelaine; GPL-3.0; public repo; publish check in hooks and CI |
 | 2026-10-28 | SPEC v0.1 drafted from the owner's answers (D-01..D-27, S1..S7) |
 | 2026-10-28 | Builder check answered: D-28..D-32; restore rule (§5.6) and open-vocabulary recognition (§6) as builder's calls; O-06 opened |
+| 2026-10-28 | D-34 purpose-map axes, D-35 homepage master board, D-36 spikes replaced by a review of the owner's earlier app; O-01 closed |
 | 2026-10-28 | D-33 Wardrobe and Pantry modules (stage 10); field types (§5.5); restore now merges by stamps, following the earlier app; O-07 |
