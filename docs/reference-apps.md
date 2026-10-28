@@ -10,7 +10,7 @@ The seven open-source apps from SPEC §12, inventoried as baselines and controls
 | **Flindex** 1.1.0 (walked) | Each box is a typed or scanned code holding a flat list of names | one level | none | stock dark Material, bare |
 | **Personal Stuff** 2.3.0 (walked) | Flat item list with amount, threshold, price, barcode, expiry, tags, photos; usage, purchase and maintenance logs; checklists | none | flat tags; checklists act as named groups | stock Material, loud tiles, eight equal "Add…" tiles on home |
 | **Who Has My Stuff** 1.1.3 (walked) | Lent items: what, type, date, person; history of returns | none | fixed types | old Holo, dense, quiet |
-| **Prepper** 0.8.3 (source) | Emergency supplies; every location, container and supply needs a scanned barcode; expiry badges | flat locations, containers nested to any depth | one free-text category per supply type | Compose |
+| **Prepper** 0.8.3 (source; opened on the Snapdragon 888 phone) | Emergency supplies; every location, container and supply needs a scanned barcode; expiry badges | flat locations, containers nested to any depth | one free-text category per supply type | Compose |
 | **hot-stuff** 1.1.1 (source) | One-off insurance list: required free-text room and category, one building | room as text | category as text | Views |
 | **StuffList** (source, no licence) | Packing checklist per trip with taken / brought-back ticks; reminder an hour before leaving | none | none | — |
 
@@ -69,5 +69,6 @@ StuffList has no licence: ideas only (photo grid, reminder at the moment of need
 ## Not covered yet
 
 - **boxorg's photo flow** was not walked: it opens the system camera, which would have photographed the room. It's the closest reference to Chatelaine's photo-first path.
-- **Prepper and hot-stuff** were not run; they need Android 13.
+- **Prepper** was opened on the Snapdragon 888 phone with the camera denied: nothing can be stored without a camera. The barcode field rejects typed text, Register stays disabled, the scanner has no manual entry, and supply types can't be deleted anywhere. Tap counts above stay estimated from code.
+- **hot-stuff** was not walked: its first button accepts terms of service (with mandatory arbitration), which only the owner can agree to. Its row stays from code.
 - No export, import, backup or scan flow was run in any app, since each leaves the app for a system screen or the camera.
