@@ -1,6 +1,6 @@
 # Chatelaine — specification
 
-Revision: SPEC v0.1 (draft), 2026-10-28. No code yet.
+Revision: SPEC v0.2 (draft), 2026-10-29. No code yet.
 Package: `com.hazia.chatelaine`. Licence: GPL-3.0. Repository: github.com/haziaferi/Chatelaine.
 
 Companion document: [docs/purpose-map.md](docs/purpose-map.md), which decides which purpose each screen serves before any screen is built.
@@ -33,7 +33,7 @@ The name: a chatelaine ran a household and carried its keys and small tools on a
 | D-12 | One organising concept: **tags**. Items and places can carry several tags. A tag can sit inside a parent tag ("red skirt" inside "sewing"). A tag can be marked **kept together**, meaning its things share a home place. The homepage's tag card shows top-level tags only. |
 | D-13 | Item, place and tag information that a model suggests is always fully editable, one at a time or in bulk. |
 | D-14 | Image recognition is core: a small model ships with the app, a larger, more accurate one is an optional download. Recognition runs on both devices. |
-| D-15 | An optional on-device language model for tag suggestions. Target phone: an older Snapdragon 845 phone if it runs acceptably, otherwise the Snapdragon 888 phone (to be measured, §9 stage 0). |
+| D-15 | An optional on-device language model for tag suggestions. Target phones as in D-29 (to be measured, §9 stage 0). |
 | D-16 | Fully offline. The network is used only for opt-in model downloads. F-Droid-compatible build is optional. |
 | D-17 | Phone and PC share one inventory through **two-way sync over a folder** kept in step by a file-sync tool such as Syncthing. Each device writes its changes as separate files and merges the other device's. |
 | D-18 | Backup: automatic backup to a folder the user picks, plus manual export (JSON and photos). |
@@ -47,14 +47,14 @@ The name: a chatelaine ran a household and carried its keys and small tools on a
 | D-26 | No screens at stage 0; screens start at stage 2 or later, each discussed with the owner before it is built. |
 | D-27 | The purpose map aims to minimise the number of screens and maximise their quality. Other apps serve as baselines to improve upon or as controls that must lose when scored. Scoring axes are agreed with the owner before scoring. |
 | D-28 | The Windows PC is a **desk companion**: everything except taking photos and dictation. It runs recognition on photos taken with the phone and handles bulk editing, the place map, label printing and backup. The owner's PC: a 6-core desktop processor, 16 GB of memory, a 4 GB graphics card. |
-| D-29 | Recognition pass bar, measured on a fixed set of about 20 photos taken for the purpose (kept out of the repository). On the Snapdragon 845 phone: at most about 10 s per photo; no crash or overheating across the set; single objects (S2): the right name among the first three suggestions in at least 4 of 5 photos; crowded boxes (S4): at least a third of the items found, and correction quick enough for the rest. If the Snapdragon 845 phone misses the bar, the target moves to the Snapdragon 888 phone. |
+| D-29 | Recognition pass bar, measured on a fixed set of about 20 photos taken for the purpose (kept out of the repository). On both target phones, a Snapdragon 888 flagship and a Snapdragon 695 budget phone (the slower one sets the bar): at most about 10 s per photo; no crash or overheating across the set; single objects (S2): the right name among the first three suggestions in at least 4 of 5 photos; crowded boxes (S4): at least a third of the items found, and correction quick enough for the rest. *(Amended 2026-10-29: the Snapdragon 845 phone, the first target, is too old for this project.)* |
 | D-30 | Search matches across languages: "cucito" finds "sewing". *(builder's call, from the owner's answer: tags are stored once, as written; model suggestions are offered in the interface language; built-in names such as place and tag kinds switch with the language.)* |
-| D-31 | The phone app stays under about 150 MB; the speech model is downloaded on first use of dictation. The small recogniser and the text-similarity model ship with the app. Limits to be refined in later stages. |
+| D-31 | The phone app's download stays under about 150 MB *(owner, 2026-10-29: download size, compressed, not installed size)*; the speech model is downloaded on first use of dictation. The small recogniser and the text-similarity model ship with the app. Limits to be refined in later stages. |
 | D-32 | No existing inventory data to import; no importer in stage 1. |
 | D-33 | One app on one shared core. **Wardrobe** and **Pantry** are optional modules, off by default. A module = a preset set of custom fields on its tags + a few views of its own + its own purpose-map entries. Users can build their own packs with the same tools. |
 | D-34 | Purpose-map scoring axes (O-01), equal weights, ties shown as ties. **Choosing the purpose set:** A1 coverage (every reference-app function and every S1–S7 step lands in a purpose), A2 exclusivity, A3 balance, A4 fit to Chatelaine's intent, A5 potential improvement over the reference apps. **Choosing screens and homes:** B1 screen count (fewer is better), B2 one home per thing (repeats count against), B3 steps per scenario (taps from the homepage through S1–S7), B4 recall load (steps that ask the user to remember what the screen doesn't show). Reference apps are controls: a control that scores well means the axes are wrong. Layout axes are set per screen from stage 2. |
 | D-35 | The homepage is a master board: shortcuts on it (the two cards, object of the day) are not counted as repeats under B2. |
-| D-36 | Stage 0's change-file-sync spike is replaced by a review of the sync of the owner's earlier app (done 2026-10-28, §5.6). The KMP spike **stays**: the review found the earlier app has no Compose and no runnable Windows app, so a Compose Multiplatform window running on Android and Windows must be proven. The model spike on the Snapdragon 845 phone also stays. |
+| D-36 | Stage 0's change-file-sync spike is replaced by a review of the sync of the owner's earlier app (done 2026-10-28, §5.6). The KMP spike **stays**: the review found the earlier app has no Compose and no runnable Windows app, so a Compose Multiplatform window running on Android and Windows must be proven. The model spike also stays (on the D-29 phones). |
 
 ## 2. Goals, non-goals, anti-goals
 
@@ -172,6 +172,23 @@ Recognition is a hint, never the record. Crowded or overlapping photos are expec
 
 Model files: licence checked per model before adoption. The weights' licence must allow redistribution from a GPL app's download screen.
 
+### 6.1 Stage 0 recognition spike (2026-10-28/29)
+
+Measured on the owner's 20 photos (10 single objects, 10 crowded drawers or boxes; photos and per-photo results kept outside the repository). Scores use an answer sheet the owner is still to check.
+
+| Recogniser | Where | Singles (bar 8/10) | Crowded (bar ⅓) | Verdict |
+|---|---|---|---|---|
+| SmolVLM2-500M, Gemma 4 E2B (small multimodal models) | phone | 7/10 | 22–29% | fail: too slow (15–38 s) and inaccurate |
+| YOLO-World v2-S alone (open-vocabulary detector) | phone | 1/10 | 18% | fail on names; boxes good |
+| **YOLO-World v2-S boxes + SigLIP 2 base naming each box** | phone | **8/10** | **39%** | **passes** |
+| Gemini 3.5 Flash, Qwen3-VL-8B (large, online) | cloud | 10/10 | 88% (Gemini) | ceiling for comparison; not offline |
+
+The passing pair, as it would ship *(stage 0 candidate, not yet adopted)*:
+- YOLO-World v2-S (GPL-3.0), weights stored in fp16: 28 MB. SigLIP 2 base image side (Apache-2.0), 8-bit weights with int8 maths: 109 MB. Name vectors for a fixed 1,356-name vocabulary: 4 MB. A reduced ONNX Runtime 1.30 with only the operators used: 14 MB. Total 155 MB raw, **138 MB compressed** (D-31).
+- Time per photo: Snapdragon 888 phone 1.8–6.3 s, Snapdragon 695 phone 3.1–8.9 s; none of the 20 over 10 s. Accuracy identical to full precision.
+- Weak spots: counts (overlapping boxes counted twice) and crowded drawers (39% found, so correction carries S4). SigLIP 2's text side (about 1.1 GB) is not shipped: user tags and search by meaning need the Similarity model instead, or a later decision.
+- Rejected on the way: dynamic int8 (broke SigLIP), 4-bit weights (lost accuracy), MobileCLIP (Apple research-only licence), Qualcomm's ready-made 8-bit file (no smaller outside their NPU).
+
 ## 7. Clear-box surfaces (D-20, D-22)
 
 | Surface | Rank | Notes |
@@ -199,11 +216,11 @@ Each stage ends with a **done-when** check and, from stage 2 on, a walk on a rea
 
 | Stage | Holds | Done when | Unlocks |
 |---|---|---|---|
-| **0 Foundations** | SPEC; purpose map scored on the D-34 axes; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed on the Snapdragon 845 phone against D-29, then the Snapdragon 888 phone if needed; Compose Multiplatform window running on Android and Windows (D-36) | Owner approves SPEC and purpose map; spike timings recorded in the SPEC | — |
+| **0 Foundations** | SPEC; purpose map scored on the D-34 axes; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed against D-29 on the target phones; Compose Multiplatform window running on Android and Windows (D-36) | Owner approves SPEC and purpose map; spike timings recorded in the SPEC | — |
 | **1 Data and safety** | Data model (items, places, tags with parents and kept-together, photos, states, custom fields, history); database; backup and export; change-file sync | Round-trip tests: export → import, two-device sync with conflicts, a corrupted database is kept, not deleted | — |
 | **2 Logging and tags** | Quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove; search including child tags | Owner-approved screens built; S1 passes | S1 |
 | **3 Places and photos** | Place tree; camera (phone only, D-28); item and place photos; settled-area path; place contents view; "in use / away"; move and bulk move | S5 passes; S7's move part passes | S5 |
-| **4 Recognition** | Small open-vocabulary recognition model on phone and PC (PC works on synced phone photos); suggestions from photos; count; split a photo into items; bulk clear of suggestions | The D-29 pass bar is met on the Snapdragon 845 phone (or the Snapdragon 888 phone); S2, S3, S4 pass | S2, S3, S4 |
+| **4 Recognition** | Small open-vocabulary recognition model on phone and PC (PC works on synced phone photos); suggestions from photos; count; split a photo into items; bulk clear of suggestions | The D-29 pass bar is met on both target phones; S2, S3, S4 pass | S2, S3, S4 |
 | **5 Suggestions and grouping** | Embedding model; personal nearest-neighbour layer; tag suggestions for new items; kept-together tags with home and away views | Suggestions accepted or corrected in one tap; S7 passes fully | S7 |
 | **6 Visual map** | Automatic stylised place map with rearrangeable blocks; filter search by house or floor; fallback results from other places | S6 passes | S6 |
 | **7 Clear-box surfaces** | Photo browsing; home-screen widget; label PDF with QR; object of the day | Owner uses the widget and labels for a week | — |
@@ -233,6 +250,7 @@ Direction only (D-24, D-25); to be workshopped per screen:
 | O-05 | Database library (SQLDelight or Room KMP) | Stage 1 |
 | O-06 | Final list of custom field types and presets, from use cases (D-08, D-33) | Stage 1 |
 | O-07 | Which app owns reminders and shopping lists if the earlier app overlaps (the earlier app has reminders) | Stage 10 |
+| O-08 | An optional AI-service key the user supplies (Gemini, Claude, self-hosted, any provider), off by default, sending photos only when turned on. The owner is open to it for personal use; it would amend D-16. | Stage 4 |
 
 ## 12. Sources to borrow from (D-05)
 
@@ -260,3 +278,4 @@ Design references, not open source: Spot It (marked spots on a photo), Nestmer (
 | 2026-10-28 | Review of the owner's earlier app: D-36 amended (KMP spike restored), §5.6 sync reuse and differences, §12 relicensing note |
 | 2026-10-28 | D-34 purpose-map axes, D-35 homepage master board, D-36 spikes replaced by a review of the owner's earlier app; O-01 closed |
 | 2026-10-28 | D-33 Wardrobe and Pantry modules (stage 10); field types (§5.5); restore now merges by stamps, following the earlier app; O-07 |
+| 2026-10-29 | SPEC v0.2: D-29 target phones Snapdragon 888 and Snapdragon 695 phones (Snapdragon 845 phone dropped), D-15 and D-36 follow; D-31 read as download size; §6.1 stage 0 recognition results; O-08 optional AI-service key |
