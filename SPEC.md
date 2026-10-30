@@ -188,8 +188,11 @@ Measured on the owner's 20 photos (10 single objects, 10 crowded drawers or boxe
 | Gemini 3.5 Flash, tightened instructions (photos 1–16) | cloud | 10/10, counts 10/10 | 93% of lines right, none wrong | clears D-29 widely; not offline |
 | Gemma 4 E2B, tightened instructions | phone | about 3/10 | worse | fail: copies the instructions' examples; 18–49 s |
 | YOLO-World + SigLIP 2, naming only confident boxes (cut 0.14) | phone | 6 right, 0 wrong, 4 "not sure" | 19% of lines wrong; names 37 of 125 boxes | never wrong on singles, but the user names most drawer items; cut tuned on these photos |
+| Qwen3-VL-8B, tightened instructions, offline (photos 1–20) | PC, 5.75 GB | 9/10 (10/10 counting close), counts 9/10 | 75% of lines right, 5% wrong (tightened Claude on the same lines: 78%, 4%); 2.3 extra lines per drawer; 1 drawer of 10 failed (repeat loop) | near-cloud naming offline; fails D-29 on time (about 48 s per photo on a desktop PC) and D-31 on size |
 
-Rows marked *tightened* use instructions that ask for the most specific label name, counts one by one ("about N" when things overlap), and nothing that can't be seen. For drawers, each answer is scored on as many lines as the shortest answer for that photo, since extra lines are extra reading (owner, 2026-10-29).
+Rows marked *tightened* use instructions that ask for the most specific label name, counts one by one ("about N" when things overlap), and nothing that can't be seen. For drawers, each answer is scored on as many lines as the shortest answer for that photo, since extra lines are extra reading (owner, 2026-10-29). The offline Qwen row compares it with Claude and Gemini on the same lines (N from those answers), so its Claude figure differs from the row above.
+
+An open model running offline can now name things nearly as well as the cloud models on these photos; what it lacks is speed and a size that fits the phone. Open for stage 0: whether a smaller model of the same family (Qwen3-VL 2B or 4B) keeps enough of this on the Snapdragon 888 phone within D-29, and whether the recogniser may be downloaded on first use like the speech model (D-31; owner decision).
 
 The best offline pair, as it would ship *(stage 0 candidate, not adopted: fails D-29 by the owner's marks)*:
 - YOLO-World v2-S (GPL-3.0), weights stored in fp16: 28 MB. SigLIP 2 base image side (Apache-2.0), 8-bit weights with int8 maths: 109 MB. Name vectors for a fixed 1,356-name vocabulary: 4 MB. A reduced ONNX Runtime 1.30 with only the operators used: 14 MB. Total 155 MB raw, **138 MB compressed** (D-31).
@@ -288,3 +291,4 @@ Design references, not open source: Spot It (marked spots on a photo), Nestmer (
 | 2026-10-28 | D-33 Wardrobe and Pantry modules (stage 10); field types (§5.5); restore now merges by stamps, following the earlier app; O-07 |
 | 2026-10-29 | SPEC v0.2: D-29 target phones Snapdragon 888 and Snapdragon 695 phones (Snapdragon 845 phone dropped), D-15 and D-36 follow; D-31 read as download size; §6.1 stage 0 recognition results; O-08 optional AI-service key |
 | 2026-10-30 | §6.1 rescored with the owner's blind marks (offline pair fails D-29); tightened-instruction results; D-07 approximate counts with an "accurate amounts" setting; O-08 notes the instructions matter |
+| 2026-10-30 | §6.1: Qwen3-VL-8B offline on a PC, owner's blind marks: near-cloud naming, fails on time and size; smaller-model and first-use-download questions opened |
