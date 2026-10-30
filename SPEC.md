@@ -1,6 +1,6 @@
 # Chatelaine — specification
 
-Revision: SPEC v0.2 (draft), 2026-10-29. No code yet.
+Revision: SPEC v0.2 (draft), 2026-10-30. No code yet.
 Package: `com.hazia.chatelaine`. Licence: GPL-3.0. Repository: github.com/haziaferi/Chatelaine.
 
 Companion document: [docs/purpose-map.md](docs/purpose-map.md), which decides which purpose each screen serves before any screen is built.
@@ -25,7 +25,7 @@ The name: a chatelaine ran a household and carried its keys and small tools on a
 | D-04 | Interface and dictation in Italian and English from the start; the user can switch language independently of the phone. |
 | D-05 | Start from scratch; borrow code file by file from the GPL-3.0 / MIT / Apache projects listed in §12, with licence headers kept and listed in `THIRD_PARTY.md`. |
 | D-06 | Places nest freely, to any depth: drawer partition › drawer › dresser › room › floor › house. Several houses (sites) are allowed. |
-| D-07 | Optional quantity per item; consumables and low-stock handling to be discussed later. |
+| D-07 | Optional quantity per item; consumables and low-stock handling to be discussed later. Suggested counts are approximate by default ("about 5") and always editable; a setting, "accurate amounts", asks for exact counts instead. Exact counts matter mainly where items link to shopping; an estimate first keeps logging quick. *(owner, 2026-10-29)* |
 | D-08 | User-defined custom fields. Full or near-full customisation is a main focus of the app. |
 | D-09 | An item can be "in use / away": taken out of its place and not yet put back. |
 | D-10 | Lending ("who has it") comes in a later stage. |
@@ -174,19 +174,27 @@ Model files: licence checked per model before adoption. The weights' licence mus
 
 ### 6.1 Stage 0 recognition spike (2026-10-28/29)
 
-Measured on the owner's 20 photos (10 single objects, 10 crowded drawers or boxes; photos and per-photo results kept outside the repository). Scores use an answer sheet the owner is still to check.
+Measured on the owner's 20 photos (10 single objects, 10 crowded drawers or boxes; photos and per-photo results kept outside the repository). Scores are the owner's blind marks (each answer line marked right, close or wrong without knowing which recogniser gave it); 8 of the 20 were made hard on purpose (odd angles, untidied things overlapping by more than half), all well lit and in focus. The offline pair scores the same on clear and hard photos (clear singles 4/8), so its weakness is the model, not the photos. Rows not in the blind review keep the earlier answer-sheet scores, which proved more lenient.
 
 | Recogniser | Where | Singles (bar 8/10) | Crowded (bar ⅓) | Verdict |
 |---|---|---|---|---|
 | SmolVLM2-500M, Gemma 4 E2B (small multimodal models) | phone | 7/10 | 22–29% | fail: too slow (15–38 s) and inaccurate |
 | YOLO-World v2-S alone (open-vocabulary detector) | phone | 1/10 | 18% | fail on names; boxes good |
-| **YOLO-World v2-S boxes + SigLIP 2 base naming each box** | phone | **8/10** | **39%** | **passes** |
-| Gemini 3.5 Flash, Qwen3-VL-8B (large, online) | cloud | 10/10 | 88% (Gemini) | ceiling for comparison; not offline |
+| YOLO-World v2-S boxes + SigLIP 2 base naming each box | phone | 6/10 (8/10 counting close) | 26% (53% counting close); 60% of lines wrong | **fails** by the owner's marks; best offline so far |
+| Gemini 3.5 Flash (large, online) | cloud | 10/10 | 88% | ceiling for comparison; not offline |
+| Qwen3-VL-8B (large, online) | cloud | 10/10 (answer sheet) | not yet run | open-weight ceiling |
+| Claude (large, online) | cloud | 10/10 | 65% (97% counting close) | names often broader than exact; not offline |
+| Claude, tightened instructions (photos 1–16) | cloud | 10/10, counts 10/10 | 91% of lines right, none wrong | clears D-29 widely; not offline |
+| Gemini 3.5 Flash, tightened instructions (photos 1–16) | cloud | 10/10, counts 10/10 | 93% of lines right, none wrong | clears D-29 widely; not offline |
+| Gemma 4 E2B, tightened instructions | phone | about 3/10 | worse | fail: copies the instructions' examples; 18–49 s |
+| YOLO-World + SigLIP 2, naming only confident boxes (cut 0.14) | phone | 6 right, 0 wrong, 4 "not sure" | 19% of lines wrong; names 37 of 125 boxes | never wrong on singles, but the user names most drawer items; cut tuned on these photos |
 
-The passing pair, as it would ship *(stage 0 candidate, not yet adopted)*:
+Rows marked *tightened* use instructions that ask for the most specific label name, counts one by one ("about N" when things overlap), and nothing that can't be seen. For drawers, each answer is scored on as many lines as the shortest answer for that photo, since extra lines are extra reading (owner, 2026-10-29).
+
+The best offline pair, as it would ship *(stage 0 candidate, not adopted: fails D-29 by the owner's marks)*:
 - YOLO-World v2-S (GPL-3.0), weights stored in fp16: 28 MB. SigLIP 2 base image side (Apache-2.0), 8-bit weights with int8 maths: 109 MB. Name vectors for a fixed 1,356-name vocabulary: 4 MB. A reduced ONNX Runtime 1.30 with only the operators used: 14 MB. Total 155 MB raw, **138 MB compressed** (D-31).
 - Time per photo: Snapdragon 888 phone 1.8–6.3 s, Snapdragon 695 phone 3.1–8.9 s; none of the 20 over 10 s. Accuracy identical to full precision.
-- Weak spots: counts (overlapping boxes counted twice) and crowded drawers (39% found, so correction carries S4). SigLIP 2's text side (about 1.1 GB) is not shipped: user tags and search by meaning need the Similarity model instead, or a later decision.
+- Weak spots: counts (3/10 right), crowded drawers (26% found, and most lines wrong, so correction would cost more than it saves). SigLIP 2's text side (about 1.1 GB) is not shipped: user tags and search by meaning need the Similarity model instead, or a later decision.
 - Rejected on the way: dynamic int8 (broke SigLIP), 4-bit weights (lost accuracy), MobileCLIP (Apple research-only licence), Qualcomm's ready-made 8-bit file (no smaller outside their NPU).
 
 ## 7. Clear-box surfaces (D-20, D-22)
@@ -250,7 +258,7 @@ Direction only (D-24, D-25); to be workshopped per screen:
 | O-05 | Database library (SQLDelight or Room KMP) | Stage 1 |
 | O-06 | Final list of custom field types and presets, from use cases (D-08, D-33) | Stage 1 |
 | O-07 | Which app owns reminders and shopping lists if the earlier app overlaps (the earlier app has reminders) | Stage 10 |
-| O-08 | An optional AI-service key the user supplies (Gemini, Claude, self-hosted, any provider), off by default, sending photos only when turned on. The owner is open to it for personal use; it would amend D-16. | Stage 4 |
+| O-08 | An optional AI-service key the user supplies (Gemini, Claude, self-hosted, any provider), off by default, sending photos only when turned on. The owner is open to it for personal use; it would amend D-16. Stage 0 found the instructions sent with each photo matter as much as the service: with tightened instructions both Gemini (free key) and Claude clear D-29 with a wide margin (§6.1), so the app would ship those instructions, not a bare question. | Stage 4 |
 
 ## 12. Sources to borrow from (D-05)
 
@@ -279,3 +287,4 @@ Design references, not open source: Spot It (marked spots on a photo), Nestmer (
 | 2026-10-28 | D-34 purpose-map axes, D-35 homepage master board, D-36 spikes replaced by a review of the owner's earlier app; O-01 closed |
 | 2026-10-28 | D-33 Wardrobe and Pantry modules (stage 10); field types (§5.5); restore now merges by stamps, following the earlier app; O-07 |
 | 2026-10-29 | SPEC v0.2: D-29 target phones Snapdragon 888 and Snapdragon 695 phones (Snapdragon 845 phone dropped), D-15 and D-36 follow; D-31 read as download size; §6.1 stage 0 recognition results; O-08 optional AI-service key |
+| 2026-10-30 | §6.1 rescored with the owner's blind marks (offline pair fails D-29); tightened-instruction results; D-07 approximate counts with an "accurate amounts" setting; O-08 notes the instructions matter |
