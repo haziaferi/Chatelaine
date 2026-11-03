@@ -203,6 +203,12 @@ The best offline pair, as it would ship *(stage 0 candidate, not adopted: fails 
 - Weak spots: counts (3/10 right), crowded drawers (26% found, and most lines wrong, so correction would cost more than it saves). SigLIP 2's text side (about 1.1 GB) is not shipped: user tags and search by meaning need the Similarity model instead, or a later decision.
 - Rejected on the way: dynamic int8 (broke SigLIP), 4-bit weights (lost accuracy), MobileCLIP (Apple research-only licence), Qualcomm's ready-made 8-bit file (no smaller outside their NPU).
 
+**Errors by cause (2026-11-03).** Asked whether cluttered backgrounds are a big problem (the photos are of real drawers and boxes, not things on a plain backdrop), every line the owner marked close or wrong, every line naming the container, and every answer-sheet group missed were sorted by cause after looking at each photo (per-line tags kept outside the repository). The background caused few of them: Claude (tightened) 3 of 24 problem lines and 2 of 4 misses; Gemini (tightened, photos 1–17) 0 of 7 and 1 of 1; Qwen3-VL-8B offline 8 of 53 and 1 of 6; YOLO-World + SigLIP 2 15 of 105. The rest were wrong or broader names, wrong counts, Qwen's repeated lines (20 of its 53) and names read off the picture or words printed on a package (5 lines).
+- Things that blend in (dark among dark, the same colour as what is behind, see-through) were the main background cause and every background miss. Misses cost the most to fix (typing a line).
+- Things outside the drawer: one line from the large models (a package standing beside the box); a few from the detector.
+- The container itself named as a stored thing (bin, shelf, the drawer's knobs): Qwen 3 lines, the detector 5. True, but one line each to untick.
+- So no cut-out (segmentation) stage for now: a crop step would have removed about one line on these photos, and low-contrast things are hard for cut-out models too; light (a torch button on Capture) fits the cause better. Caveats: all 20 photos were well lit, so dim light is untested; misses are judged against an answer sheet written before any model ran and not checked by the owner; the detector's boxes were not saved, so 6 of its tags are likely, not seen.
+
 ## 7. Clear-box surfaces (D-20, D-22)
 
 | Surface | Rank | Notes |
@@ -297,3 +303,4 @@ Design references, not open source: Spot It (marked spots on a photo), Nestmer (
 | 2026-10-30 | §6.1: Qwen3-VL-8B offline on a PC, owner's blind marks: near-cloud naming, fails on time and size; smaller-model and first-use-download questions opened |
 | 2026-10-30 | §6.1: Qwen with tuned instructions (shorter, no loops, vaguer); D-37 logging form built for quick correction of approximate answers (owner) |
 | 2026-10-30 | §6.1: Qwen with round 3 instructions plus anti-repeat rules, worse; instruction tuning stopped (owner). D-37: lump into generic names with approximate counts, refine in a few taps, split by use not colour |
+| 2026-11-03 | §6.1: recognition errors sorted by cause; the background causes few (mostly things that blend in), so no segmentation stage for now |
