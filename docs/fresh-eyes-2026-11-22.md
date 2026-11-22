@@ -42,15 +42,18 @@ Owner's decision: none of these may be committed: the photos, the harvest ids, f
 - No photo is tracked; the photos stay outside the repository, as `docs/evidence/stage0-recognition.md` already says.
 - The scorers no longer cite harvest ids, other projects' file paths or `MID-` ids. Each docstring now names its axis in plain words. The mapping from each function to the id it ports moved to the private folder outside the repository, next to the harvest catalogue. Afterwards the scorers' outputs are unchanged, apart from two report lines that dropped an id.
 
+Owner's decision: the R96 checks move to match R96, which is in the owner's own words.
+- Two classification faults fixed first. `purpose()` put the back arrow (40 dp) and the photo thumbnail (44 dp) in one "header" kind. A word chip, whose word sits in a child element, was sized as if it had no label, so its width was compared.
+- *Same size.* The check used to pass at a score of 0.95 over the flow. It now tests each element: every instance within 1 px of its purpose's median (the tolerance the layout skill uses for pinned controls), on every screen of the flow, the mid-correction screen included. D's plain text box is left out, because its height is the room the keyboard leaves. On the newest renders every variant passes.
+- *Look-alikes.* The check runs on every screen of the flow, the PC screen included, on every purpose, and skips the phone's own selection bar. A, B and C still fail, with two more label pairs off the lines: the "+" for one more against "+ Add", and "+ Add" against the control that adds a word. D still passes.
+- The two fixed faults also move the old diagnostics on axis 8 (consistency) slightly. Place's old-measures total for "picture" goes from 0.427 to 0.490, and the ranking does not change. The new axes' scores are unchanged.
+
 ## Needs a decision
 
 1. **A neutral task set.** The task set in `score_taps.py` is read off the owner's photos, so it counts as the photos (owner). The four scorers are now listed in `.gitignore` and stay local. They could be published only with a neutral task set, which means re-rendering the mockups, because `task_model.py` looks the words up in the renders.
-2. **R96 against its checks.** R96 is in the owner's own words, so the checks move to match it, not the rule. Measured on the current renders:
-   - *Look-alikes.* Run on every screen of the flow and on every purpose, the check finds the line pairs it finds today (A, B and C already fail; D passes). It also finds two pairs off the lines: the "+" for one more against "+ Add", and the tools row's "Select all" against the one in the phone's own text-selection bar. The check would have to skip that bar, as the contrast check does.
-   - *Same size.* The 0.95 score threshold would become a test on each element: every instance within 1 px of its purpose's median, the tolerance the layout skill uses for pinned controls. Two scorer faults have to be fixed first, or they fail every variant: `purpose()` puts the back arrow (40 dp) and the photo thumbnail (44 dp) in one "header" kind, and a word chip whose text sits in a child element is sized as if it had no label, so B's chips fail on width. With both fixed, nothing else is more than 1 px off.
-3. **R91's acceptance** reads a control scoring well as proof that the axes are wrong, so no outcome can fail the purpose map (found by the fresh-eyes run on R91's text, not the code).
-4. **`phone_pc_parity`** returns 0 wrapped lines when phone and PC have different line counts, which reads as "no difference". This changes the score, so it is not fixed.
-5. **`read_look`** drops malformed rating lines without a word, so a typo shows the look as "pending". The options are a warning on stderr, or leaving it as it is.
+2. **R91's acceptance** reads a control scoring well as proof that the axes are wrong, so no outcome can fail the purpose map (found by the fresh-eyes run on R91's text, not the code).
+3. **`phone_pc_parity`** returns 0 wrapped lines when phone and PC have different line counts, which reads as "no difference". This changes the score, so it is not fixed.
+4. **`read_look`** drops malformed rating lines without a word, so a typo shows the look as "pending". The options are a warning on stderr, or leaving it as it is.
 
 ## publish_check.py (shared copy: reported, not changed)
 
