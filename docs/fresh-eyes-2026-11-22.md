@@ -4,7 +4,7 @@ Scope: `tools/*.py` (the leak check and the four mockup scorers) and `.github/wo
 
 Method: the necessity checker (slopcheck) and a by-hand read for duplication, dead code and untrue comments; an independent necessity review; a code review; a fresh-eyes run (sonnet reviewer, opus verifier, 11 chunks, each with the SPEC rules its tool serves: 28 findings, 3 narrowed, 1 refuted).
 
-Nothing here is committed. The four scorers are still untracked.
+The four scorers stay local (listed in `.gitignore`): their task set is read off the owner's photos.
 
 ## Fixed
 
@@ -38,18 +38,19 @@ score_screens.py
 Repository
 - `.gitignore` now ignores `__pycache__/`; `git add tools/` would have published `.pyc` files.
 
+Owner's decision: none of these may be committed: the photos, the harvest ids, file paths in other projects, and the `MID-` ids.
+- No photo is tracked; the photos stay outside the repository, as `docs/evidence/stage0-recognition.md` already says.
+- The scorers no longer cite harvest ids, other projects' file paths or `MID-` ids. Each docstring now names its axis in plain words. The mapping from each function to the id it ports moved to the private folder outside the repository, next to the harvest catalogue. Afterwards the scorers' outputs are unchanged, apart from two report lines that dropped an id.
+
 ## Needs a decision
 
-1. **Publishing the scorers (R22).** These files are untracked; committing them makes them public. Before that:
-   - `score_taps.py` task 1 uses an intimate clothing item, of the kind R80's example replaced. Rewording it means re-rendering the mockups, because `task_model.py` looks the word up in the renders.
-   - The docstrings cite harvest ids (short prefixes naming the source projects), and `borrowed_axes.py` cites file paths in another project. The rule is to decide before committing. Options: keep them, replace them with neutral axis names, or move the mapping into the private catalogue.
-   - `task_model.py` and `score_screens.py` cite `MID-` ids that no document in the repository defines.
-2. **R96's scope.** R96 asks for no look-alike pairs "on every screen's render". The check runs on each variant's own screens (at rest and mid-correction), and only on a line's parts (keep, count, name, line). Either widen the check or narrow R96's acceptance.
-3. **R96's "same size".** The consistency check passes at 0.95 of 1, but R96 sets no tolerance. Record 0.95 in R96, or tighten the check.
-4. **Which rule the scorers' axes serve.** Time, clean drawers, lines in view, look and the five checks match R79's typical drawer and R96. No rule records the axes or the old ten-axis path that `score_screens.py` keeps as diagnostics. R91's axes are the purpose map's. Record them in SPEC, or delete the old path.
-5. **R91's acceptance** reads a control scoring well as proof that the axes are wrong, so no outcome can fail the purpose map (found by the fresh-eyes run on R91's text, not the code).
-6. **`phone_pc_parity`** returns 0 wrapped lines when phone and PC have different line counts, which reads as "no difference". This changes the score, so it is not fixed.
-7. **`read_look`** drops malformed rating lines without a word, so a typo shows the look as "pending". The options are a warning on stderr, or leaving it as it is.
+1. **A neutral task set.** The task set in `score_taps.py` is read off the owner's photos, so it counts as the photos (owner). The four scorers are now listed in `.gitignore` and stay local. They could be published only with a neutral task set, which means re-rendering the mockups, because `task_model.py` looks the words up in the renders.
+2. **R96 against its checks.** R96 is in the owner's own words, so the checks move to match it, not the rule. Measured on the current renders:
+   - *Look-alikes.* Run on every screen of the flow and on every purpose, the check finds the line pairs it finds today (A, B and C already fail; D passes). It also finds two pairs off the lines: the "+" for one more against "+ Add", and the tools row's "Select all" against the one in the phone's own text-selection bar. The check would have to skip that bar, as the contrast check does.
+   - *Same size.* The 0.95 score threshold would become a test on each element: every instance within 1 px of its purpose's median, the tolerance the layout skill uses for pinned controls. Two scorer faults have to be fixed first, or they fail every variant: `purpose()` puts the back arrow (40 dp) and the photo thumbnail (44 dp) in one "header" kind, and a word chip whose text sits in a child element is sized as if it had no label, so B's chips fail on width. With both fixed, nothing else is more than 1 px off.
+3. **R91's acceptance** reads a control scoring well as proof that the axes are wrong, so no outcome can fail the purpose map (found by the fresh-eyes run on R91's text, not the code).
+4. **`phone_pc_parity`** returns 0 wrapped lines when phone and PC have different line counts, which reads as "no difference". This changes the score, so it is not fixed.
+5. **`read_look`** drops malformed rating lines without a word, so a typo shows the look as "pending". The options are a warning on stderr, or leaving it as it is.
 
 ## publish_check.py (shared copy: reported, not changed)
 
@@ -69,6 +70,7 @@ The workflow had no findings: its action is pinned by hash, the token is read-on
 
 - "R22 says the check runs before each commit and in CI, but only a pre-push hook exists". Refuted: `.git/hooks/pre-commit` and the workflow both run it. The reviewer's chunk had neither file.
 - "R80's 'adjusting a line is quicker than deleting wrong ones' contradicts a one-tap untick". R80 compares editing one lumped line with deleting the wrong lines of a split list; an untick drops one wrong line. Those are not the same comparison.
+- "No rule records the scorers' axes or the old ten-axis diagnostics". The screen-axis harvest skill records them in its catalogue and recommendations, which are kept privately with the workshop notes. A SPEC rule is not needed (owner).
 - One empty finding ("not a finding; skip"), refuted by the verifier.
 
 ## Not reviewed

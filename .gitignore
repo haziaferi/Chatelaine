@@ -8,6 +8,12 @@ captures/
 *.hprof
 __pycache__/
 
+# Mockup scorers: their task set is read off the owner's photos, so they stay local
+tools/borrowed_axes.py
+tools/score_screens.py
+tools/score_taps.py
+tools/task_model.py
+
 # IDE state (can hold local paths)
 .idea/
 *.iml
