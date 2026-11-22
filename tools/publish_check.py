@@ -43,7 +43,8 @@ HOME = os.path.expanduser("~")
 DENYLIST = os.path.join(HOME, ".claude", "tools", "publish_denylist.txt")
 ALLOW = ".publish-allow"
 
-SECRET = [
+# (label, pattern). A finding reports the label only, never the matched text.
+TOKEN_PATTERNS = [
     ("private key", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY")),
     ("github token", re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,}|\bgithub_pat_[A-Za-z0-9_]{40,}")),
     ("anthropic key", re.compile(r"\bsk-ant-[A-Za-z0-9_-]{20,}")),
@@ -220,9 +221,9 @@ def exif_findings(data):
 
 def scan_text(rel, text, deny, hits):
     for n, line in enumerate(text.splitlines(), 1):
-        for name, rx in SECRET:
+        for label, rx in TOKEN_PATTERNS:
             if rx.search(line):
-                hits.append(("secret", rel, n, name))
+                hits.append(("secret", rel, n, label))
         for m in EMAIL.finditer(line):
             if not EMAIL_OK.search(m.group(0)):
                 hits.append(("email", rel, n, m.group(0)))
