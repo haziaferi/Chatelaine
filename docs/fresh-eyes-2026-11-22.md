@@ -69,6 +69,12 @@ These wait for the design pass, where design decisions are made (owner). The moc
 - `scan_file` has an unused `repo` parameter; `--install-hook` installs only the pre-push hook (this repo's pre-commit hook was added by hand).
 - The hooks run the shared copy, while R22 and CI name `tools/publish_check.py`. The two are identical today but can drift apart.
 
+**Resolved (2026-11-22).** The items above, except the last, were fixed in the shared source, each with a test that fails on the earlier version. `tools/publish_check.py` here is the fixed copy. The independent review of that fix found more, and these were fixed too:
+- skip-worktree and assume-unchanged files, symlinks and UTF-16 text went unscanned;
+- `--install-hook` could overwrite a short hook of the owner's.
+
+Still open: commit and tag messages are not scanned, and the copy here can still drift from the shared one (the last item above).
+
 The workflow had no findings: its action is pinned by hash, the token is read-only and credentials are not kept.
 
 ## Withdrawn
