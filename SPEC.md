@@ -10,7 +10,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 
 | ID | Name | Section |
 |---|---|---|
-| D-R01 | Users and devices | 1. Purpose and jobs |
+| O-R01 | Users and devices | 1. Purpose and jobs |
 | D-R02 | Goals | 1. Purpose and jobs |
 | D-R03 | Anti-goals | 1. Purpose and jobs |
 | Q-R04 | Jobs and how often | 1. Purpose and jobs |
@@ -22,15 +22,16 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R10 | Visual place map and filtered search | 2. Acceptance scenarios |
 | D-R11 | Seasonal swap | 2. Acceptance scenarios |
 | D-R12 | Name, package, licence and repository | 3. Platforms and build |
-| D-R13 | Framework and targets | 3. Platforms and build |
+| O-R13 | Framework and targets | 3. Platforms and build |
 | D-R14 | Shared code | 3. Platforms and build |
-| D-R15 | Offline | 3. Platforms and build |
+| D-R15 | Offline first | 3. Platforms and build |
+| Q-R108 | Household network | 3. Platforms and build |
 | D-R16 | No Google Play services | 3. Platforms and build |
 | D-R17 | F-Droid build | 3. Platforms and build |
 | D-R18 | Languages | 3. Platforms and build |
 | D-R19 | Phone download size | 3. Platforms and build |
 | I-R20 | Owner's PC | 3. Platforms and build |
-| D-R21 | Desk companion | 3. Platforms and build |
+| O-R21 | Desk companion | 3. Platforms and build |
 | D-R22 | Publishing rules | 3. Platforms and build |
 | D-R23 | Borrowing code | 3. Platforms and build |
 | D-R24 | Sources to borrow from | 3. Platforms and build |
@@ -49,7 +50,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R37 | Tag kinds | 4. Items, places and tags |
 | Q-R38 | Default tag kinds | 4. Items, places and tags |
 | D-R39 | Suggested tags | 4. Items, places and tags |
-| D-R40 | Editing suggestions | 4. Items, places and tags |
+| O-R40 | Editing suggestions | 4. Items, places and tags |
 | D-R41 | Photos | 4. Items, places and tags |
 | D-R42 | Proposals from a photo | 4. Items, places and tags |
 | D-R43 | Custom fields | 4. Items, places and tags |
@@ -60,7 +61,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R48 | Local database | 5. Storage, sync and backup |
 | Q-R49 | Database library | 5. Storage, sync and backup |
 | D-R50 | A database that fails to open | 5. Storage, sync and backup |
-| D-R51 | Folder sync | 5. Storage, sync and backup |
+| O-R51 | Folder sync | 5. Storage, sync and backup |
 | D-R52 | Record ids and history | 5. Storage, sync and backup |
 | D-R53 | No shared database file | 5. Storage, sync and backup |
 | D-R54 | Conflicting edits | 5. Storage, sync and backup |
@@ -71,11 +72,9 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R59 | Sync lessons from the earlier app | 5. Storage, sync and backup |
 | D-R60 | Backup and export | 5. Storage, sync and backup |
 | D-R61 | Restoring a backup | 5. Storage, sync and backup |
-| D-R62 | Image recognition | 6. Models and recognition |
+| O-R62 | Image recognition | 6. Models and recognition |
 | D-R63 | Model roles | 6. Models and recognition |
 | D-R64 | Models on device | 6. Models and recognition |
-| D-R65 | Recognition pass bar | 6. Models and recognition |
-| O-R66 | Scoring crowded answers | 6. Models and recognition |
 | D-R67 | Optional language model | 6. Models and recognition |
 | D-R68 | Open-vocabulary recogniser | 6. Models and recognition |
 | D-R69 | Recognition as a hint | 6. Models and recognition |
@@ -87,7 +86,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R75 | Segmentation stage | 6. Models and recognition |
 | Q-R76 | Smaller recogniser model | 6. Models and recognition |
 | Q-R77 | Recogniser as a first-use download | 6. Models and recognition |
-| Q-R78 | AI-service key | 6. Models and recognition |
+| D-R78 | AI-service key | 6. Models and recognition |
 | O-R79 | Correction-first logging form | 7. Logging and search |
 | O-R80 | Lump, then refine | 7. Logging and search |
 | D-R81 | Search through child tags | 7. Logging and search |
@@ -95,28 +94,32 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R83 | Visual place map | 8. Place map, homepage and clear-box surfaces |
 | Q-R84 | Homepage layout | 8. Place map, homepage and clear-box surfaces |
 | D-R85 | Tag card | 8. Place map, homepage and clear-box surfaces |
-| D-R86 | No push by default | 8. Place map, homepage and clear-box surfaces |
+| O-R86 | No push by default | 8. Place map, homepage and clear-box surfaces |
 | D-R87 | Clear-box surfaces | 8. Place map, homepage and clear-box surfaces |
 | D-R88 | Labels | 8. Place map, homepage and clear-box surfaces |
 | Q-R89 | Windows widget | 8. Place map, homepage and clear-box surfaces |
-| D-R90 | Purpose map | 9. Purpose map and look |
+| O-R90 | Purpose map | 9. Purpose map and look |
 | D-R91 | Scoring axes | 9. Purpose map and look |
 | D-R92 | Homepage shortcuts in scoring | 9. Purpose map and look |
-| D-R93 | Screens before building | 9. Purpose map and look |
-| D-R94 | Look and feel | 9. Purpose map and look |
+| O-R93 | Screens before building | 9. Purpose map and look |
+| O-R94 | Look and feel | 9. Purpose map and look |
 | D-R95 | Reach and density | 9. Purpose map and look |
 | D-R96 | Consistent elements | 9. Purpose map and look |
-| D-R97 | Modules | 10. Modules and the shopping list |
+| O-R97 | Modules | 10. Modules and the shopping list |
+| D-R109 | Expiry dates | 10. Modules and the shopping list |
+| D-R110 | Usage rate | 10. Modules and the shopping list |
 | O-R98 | Savings app and the shopping list | 10. Modules and the shopping list |
-| Q-R99 | Reminders | 10. Modules and the shopping list |
+| D-R99 | Reminders | 10. Modules and the shopping list |
 | D-R100 | Stage plan | 11. Stages |
 | D-R101 | Order of stages 4 to 6 | 11. Stages |
 | O-R102 | Stage 0 spikes | 11. Stages |
-| D-R103 | Insurance records | Out of scope |
-| D-R104 | App lock | Out of scope |
-| D-R105 | Lending | Out of scope |
-| D-R106 | Inventory import | Out of scope |
-| D-R107 | Stock and expiry outside Pantry | Out of scope |
+| O-R65 | Recognition pass bar | 12. Test plan |
+| O-R66 | Scoring crowded answers | 12. Test plan |
+| O-R103 | Insurance records | Out of scope |
+| O-R104 | App lock | Out of scope |
+| O-R105 | Lending | Out of scope |
+| O-R106 | Inventory import | Out of scope |
+| D-R107 | Stock and shopping outside Pantry | Out of scope |
 
 ## Glossary
 
@@ -133,6 +136,8 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Field | A value that differs from item to item, such as size M or expires March 2027. A custom field is one the user defines. |
 | Module | A preset set of custom fields on its tags, plus a few views of its own and its own purpose-map entries. |
 | Pack | A module a user builds with the same tools as the built-in modules. |
+| Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
+| Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
 | Settled area | An area whose things are where they belong, photographed as a whole. |
 | Place photo | A photo that belongs to a place. |
 | Suggestion | Information a model proposes, such as a name, a count or a tag. |
@@ -154,13 +159,17 @@ Chatelaine is a home inventory that does what the clear box does. It records wha
 
 The name: a chatelaine ran a household and carried its keys and small tools on a chain at her belt, always in view.
 
-### D-R01 · Users and devices
+### O-R01 · Users and devices
 
 **Rule:** Chatelaine has one user, with two devices: an Android phone and a Windows PC. Several users or shared households are not in v1.
 
+**Why:** v1 needs no identities or permissions. The folder sync (R51) could later carry a household's devices, since each device writes its own changes and the merge works field by field (R55).
+
 **Acceptance:** none: a scope boundary.
 
-**Since:** 2026-10-28 · owner · migrated
+**Not:** One user for good: the sync does not rule out a household later.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ### D-R02 · Goals
 
@@ -194,9 +203,9 @@ The name: a chatelaine ran a household and carried its keys and small tools on a
 | Any model guess that cannot be corrected, or that overrides a user correction |
 | Data loss from sync, backup or a corrupted database |
 
-**Acceptance:** none:
+**Acceptance:** Reading every screen's text and every notification finds no streak, guilt or nagging wording. A fresh install sends no reminder the user did not turn on. A later model run never overwrites a correction. Stage 1's round-trip tests pass.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### Q-R04 · Jobs and how often
 
@@ -287,37 +296,61 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-10-28 · unrecorded · migrated
 
-### D-R13 · Framework and targets
+### O-R13 · Framework and targets
 
-**Rule:** The app is built with Kotlin Multiplatform and Compose Multiplatform. It targets Android, with minSdk 30 (Android 11), and Windows desktop on the JVM.
+**Rule:** The app is built with Kotlin Multiplatform and Compose Multiplatform. It targets Android, with minSdk 33 (Android 13), and Windows desktop on the JVM.
+
+**Why:** The app cannot run successfully on minSdk 30 (Android 11).
 
 **Acceptance:** A Compose Multiplatform window runs on Android and on Windows, as stage 0 holds (R100, R102).
 
-**Since:** 2026-10-28 · owner · migrated
+**Not:** minSdk 30 (Android 11), the first choice: the app cannot run successfully on it.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ### D-R14 · Shared code
 
 **Rule:** Code is shared by default. Platform code is written only for the camera, file access, widgets, speech, model runtimes and printing.
 
-**Acceptance:** none:
+**Acceptance:** Platform source sets (for example `androidMain`, `jvmMain`) hold code only for the camera, file access, widgets, speech, model runtimes and printing. Everything else is in common code.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
-### D-R15 · Offline
+### D-R15 · Offline first
 
-**Rule:** The app is fully offline: the network serves only opt-in model downloads. There are no cloud accounts and no server.
+**Rule:** The app works offline first: every job works with no network. The network serves only the optional uses below. There are no cloud accounts and no server.
 
-**Acceptance:** none:
+**Values:**
 
-**Since:** 2026-10-28 · owner · migrated
+| Network use | Status |
+|---|---|
+| Model downloads | opt-in |
+| AI-service key | optional, off by default (R78) |
+| Household network | optional, being worked out (R108) |
+
+**Acceptance:** With the optional network uses off, a network capture over a full run of R05 to R11 shows no request at all.
+
+**Not:** Fully offline, with model downloads as the only network use: the owner widened it to the optional uses above.
+
+**Since:** 2026-11-22 · owner · agreed rewording
+
+### Q-R108 · Household network
+
+**Rule:** What does the optional household network do (R15), and how does it fit one user in v1 (R01)?
+
+**Default:** Later than v1, an optional household-structured sync, building on R51's change files. The owner is working out the rest.
+
+**Why:** R15 lists it among the optional network uses; R01 keeps one user in v1 but leaves a household's devices open for later.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ### D-R16 · No Google Play services
 
 **Rule:** The core uses no Google Play services.
 
-**Acceptance:** none:
+**Acceptance:** On every build, the core module's resolved dependencies hold no `com.google.android.gms` or `com.google.firebase` artifact.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R17 · F-Droid build
 
@@ -337,13 +370,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R19 · Phone download size
 
-**Rule:** The phone app's download stays under about 150 MB, measured compressed, not as installed. The small recogniser and the text-similarity model ship with the app; the speech model is downloaded on first use of dictation. These limits are refined in later stages.
+**Rule:** The phone app's download has no size limit. The small recogniser and the text-similarity model ship with the app; the speech model is downloaded on first use of dictation.
 
 **Evidence:** Stage 0's best offline recogniser pair came to 138 MB compressed on its own (`docs/evidence/stage0-recognition.md`).
 
-**Acceptance:** The compressed phone download measures under about 150 MB.
+**Acceptance:** none: there is no limit to check.
 
-**Since:** 2026-10-29 · owner · migrated
+**Not:** A limit of about 150 MB, measured compressed: dropped by the owner.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ### I-R20 · Owner's PC
 
@@ -359,13 +394,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-10-28 · owner · migrated
 
-### D-R21 · Desk companion
+### O-R21 · Desk companion
 
 **Rule:** The Windows PC is a desk companion: it does everything except taking photos and dictation. It runs recognition on photos taken with the phone, and handles bulk editing, the place map, label printing and backup.
 
-**Acceptance:** none:
+**Why:** The PC has no camera at hand and no reason to dictate; bulk editing, the map and printing are easier with a keyboard and a big screen.
 
-**Since:** 2026-10-28 · owner · migrated
+**Acceptance:** The Windows build has no camera capture and no dictation entry. Recognition on photos synced from the phone, bulk editing, the place map, label printing and backup all work there.
+
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R22 · Publishing rules
 
@@ -377,33 +414,35 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R23 · Borrowing code
 
-**Rule:** The app starts from scratch. Code is borrowed file by file from the GPL-3.0, MIT and Apache projects in R24, with their licence headers kept and each file listed in `THIRD_PARTY.md`.
+**Rule:** Chatelaine is a new codebase, not a copy of an existing app. Single source files from the projects that R24 marks for copying may be copied in where useful; each keeps its licence notice and is listed in `THIRD_PARTY.md`.
 
-**Acceptance:** none:
+**Acceptance:** A script, run like the publish check, finds every copied file's licence notice and its line in `THIRD_PARTY.md`.
 
-**Since:** 2026-10-28 · owner · migrated
+**Not:** Forking one reference app as the base: its structure and look would fight the purpose map (R90) and the look (R94).
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ### D-R24 · Sources to borrow from
 
-**Rule:** The projects below are read and borrowed from for the use each row gives. Spot It (marked spots on a photo), Nestmer (visual map of rooms) and Store & Forget (photo-first entry) are design references, not open source.
+**Rule:** The projects below are read and borrowed from for the use each row gives; code is copied only from a row whose Copy column says yes. Spot It (marked spots on a photo), Nestmer (visual map of rooms) and Store & Forget (photo-first entry) are design references, not open source.
 
 **Values:**
 
-| Project | Licence | Language | Use |
-|---|---|---|---|
-| `rh-id/a-personal-stuff` | GPL-3.0 | Java | feature ideas (reminders) |
-| `stovocor/whohasmystuff` | GPL-3.0 | Kotlin | lending (R105) |
-| `escapedcanadian/prepper` | GPL-3.0 | Kotlin | to be read |
-| `PamCatten/hot-stuff` | Apache-2.0 | Kotlin | to be read; archived |
-| `asmw/flindex` | MIT | Dart | NFC and QR container flows (port, not copy) |
-| `anderslum/boxorg` | MIT | TypeScript | photo-first box interface (reference) |
-| `sysadminsmedia/homebox` | AGPL-3.0 | Go | data model, QR labels (reference only) |
-| `lcukerd/StuffList` | none | Java | look only, never copy |
-| The owner's earlier app (unpublished) | the owner's own, no licence file; code taken into Chatelaine is relicensed GPL-3.0 by the owner and recorded in `THIRD_PARTY.md` | Kotlin (KMP) | sync engine and folder layer, version catalog, `:core`/`:data` split, typed units, app lock |
+| Project | Licence | Language | Copy | Use |
+|---|---|---|---|---|
+| `rh-id/a-personal-stuff` | GPL-3.0 | Java | yes | feature ideas (reminders) |
+| `stovocor/whohasmystuff` | GPL-3.0 | Kotlin | yes | lending (R105) |
+| `escapedcanadian/prepper` | GPL-3.0 | Kotlin | yes | moving a box with its contents, breadcrumb path, type-ahead picker, expiry badge, zip backup and restore, photo resize and rotation (`docs/reference-apps.md`) |
+| `PamCatten/hot-stuff` | Apache-2.0 | Kotlin | yes | starter room names and categories as place kinds and tags; archived |
+| `asmw/flindex` | MIT | Dart | no | NFC and QR container flows, ported, not copied |
+| `anderslum/boxorg` | MIT | TypeScript | no | photo-first box interface, as a reference |
+| `sysadminsmedia/homebox` | AGPL-3.0 | Go | no | data model and QR labels, as a reference |
+| `lcukerd/StuffList` | none | Java | no | look only |
+| The owner's earlier app (unpublished) | the owner's own, no licence file; code taken into Chatelaine is relicensed GPL-3.0 by the owner and recorded in `THIRD_PARTY.md` | Kotlin (KMP) | yes | sync engine and folder layer, version catalog, `:core`/`:data` split, typed units, app lock |
 
 **Acceptance:** none: a list of sources; R23 says how their code is taken in.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ## 4. Items, places and tags
 
@@ -424,19 +463,26 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | place | optional (R32) |
 | state | R30 |
 
-**Acceptance:** none:
+**Acceptance:** An item saved with only a name is stored and found by search. Each field in its Values can be set and survives export and import.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### O-R26 · Quantity and counts
 
-**Rule:** An item can carry an optional quantity. Suggested counts are approximate by default ("about 5") and always editable; a setting, "accurate amounts", asks for exact counts instead.
+**Rule:** An item can carry an optional quantity. Suggested counts are approximate by default ("about 5") and always editable. Under "Estimated quantities", an "Accuracy" setting has the switches below, which ask for exact counts instead; the labels are the owner's drafts, settled with the Settings screen.
 
 **Why:** Exact counts matter mainly where items link to shopping; an estimate first keeps logging quick.
 
-**Acceptance:** none:
+**Values:**
 
-**Since:** 2026-10-29 · owner · migrated
+| Switch | Exact counts for | Default |
+|---|---|---|
+| "Personal inventory (all modules)" | every item | off |
+| "Pantry module" | Pantry items (R97) | off |
+
+**Acceptance:** A suggested count shows as "about N" and can be edited. With a switch on, suggestions in its scope ask for an exact count; with both off, every suggestion is approximate.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ### Q-R27 · Consumables and low stock
 
@@ -468,9 +514,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Photo first | photographed first, then named |
 | Settled area | placed in a settled area that was photographed as a whole (R41) |
 
-**Acceptance:** none:
+**Acceptance:** Each of the three paths (name only; photo first, then name; placed in a settled area) ends in a saved item.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R30 · Item states
 
@@ -485,17 +531,17 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | in use / away | taken out of its place and not yet put back |
 | lent | lent to someone; comes with lending (R105) |
 
-**Acceptance:** none:
+**Acceptance:** An item can go unplaced, then placed, then in use / away, then placed again, and its state shows on its screen.
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R31 · Photo outdated flag
 
 **Rule:** A "photo outdated" flag, separate from an item's state, is raised when an item, or a place's contents, changed after the last photo.
 
-**Acceptance:** none:
+**Acceptance:** Editing an item, or moving an item into or out of a place, after the last photo raises the flag. A new photo clears it.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R32 · Place tree
 
@@ -509,9 +555,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** A place can carry tags, notes, a photo and a position in the visual map (R83). Each level has a kind (house, floor, room, furniture, container, partition, other) that sets how it is drawn; kinds are user-editable (R47).
 
-**Acceptance:** none:
+**Acceptance:** A place takes tags, notes, a photo and a map position, and its kind changes how it is drawn on the map.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R34 · Tags
 
@@ -525,9 +571,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** A tag has at most one parent tag, so tags form a tree; otherwise tags are flat.
 
-**Acceptance:** none:
+**Acceptance:** A second parent cannot be given to a tag, and no tag can sit inside its own child.
 
-**Since:** 2026-10-28 · builder · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R36 · Kept together
 
@@ -541,9 +587,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** A tag can carry a kind for display: function, project, season, place-like or other. Tag kinds are user-editable (R47).
 
-**Acceptance:** none:
+**Acceptance:** Each of the five kinds can be set on a tag and shows on it as an icon or a group heading. The user can rename, add and remove kinds.
 
-**Since:** 2026-10-28 · builder · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### Q-R38 · Default tag kinds
 
@@ -563,21 +609,23 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-10-28 · unrecorded · migrated
 
-### D-R40 · Editing suggestions
+### O-R40 · Editing suggestions
 
 **Rule:** Item, place and tag information that a model suggests is always fully editable, one at a time or in bulk.
 
+**Why:** The user's corrections come first: R03 rules out a later model run overwriting a correction.
+
 **Acceptance:** R07 and R08 pass: suggested tags are cleared in one action, and wrong items are corrected one at a time.
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R41 · Photos
 
 **Rule:** A photo belongs to an item or to a place. A place photo of a settled area can have regions that point to the items they show, like the marked spots of Spot It.
 
-**Acceptance:** none:
+**Acceptance:** A photo saves on an item or on a place. A region marked on a place photo opens the item it points to.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R42 · Proposals from a photo
 
@@ -610,9 +658,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | checkbox |
 | link to another item or place |
 
-**Acceptance:** none:
+**Acceptance:** A field of each type can be created on an item and on a place, filled in, and survives export and import.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### Q-R45 · Final field types and presets
 
@@ -628,17 +676,17 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** A field can be attached to a tag, so every item carrying that tag gets the field ("clothes" → size), or added to a single item.
 
-**Acceptance:** none:
+**Acceptance:** A field attached to a tag appears on every item that carries the tag, including items tagged later. A field added to one item appears only on that item.
 
-**Since:** 2026-10-28 · builder · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R47 · User-editable lists
 
 **Rule:** Place kinds, tag kinds, homepage cards and the widget's content are user-editable.
 
-**Acceptance:** none:
+**Acceptance:** The user can add, rename and remove place kinds, tag kinds, homepage cards and widget content, and the change shows at once.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ## 5. Storage, sync and backup
 
@@ -646,9 +694,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Each device keeps a local database.
 
-**Acceptance:** none:
+**Acceptance:** Each device opens its own database with the network off.
 
-**Since:** 2026-10-28 · builder · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### Q-R49 · Database library
 
@@ -668,21 +716,23 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-10-28 · unrecorded · migrated
 
-### D-R51 · Folder sync
+### O-R51 · Folder sync
 
 **Rule:** The phone and the PC share one inventory through two-way sync over a folder, kept in step by a file-sync tool such as Syncthing. Each device appends its changes as small files in the folder, and reads and merges the other device's.
 
+**Why:** There is no server (R15), the earlier app's proven sync engine is reused (R58), and a file-sync tool works on the home network without an account.
+
 **Acceptance:** Two-device sync with conflicts passes stage 1's round-trip tests (R100).
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R52 · Record ids and history
 
 **Rule:** Every record has a globally unique id and a modification history.
 
-**Acceptance:** none:
+**Acceptance:** Every record has a unique id, and every change to it adds an entry to its history.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R53 · No shared database file
 
@@ -690,9 +740,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** File sync corrupts live databases.
 
-**Acceptance:** none:
+**Acceptance:** After any stage 1 sync test, the sync folder holds no database file.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R54 · Conflicting edits
 
@@ -706,44 +756,48 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Each user-visible field is its own sync group, and every user-visible group keeps the losing value, so that the history of R54 holds.
 
-**Acceptance:** none:
+**Evidence:** Not checked: the change-log size with one group per field; it is measured in stage 1's sync test.
+
+**Acceptance:** When the two devices edit different fields of one item at the same time, both edits survive. The losing value of a same-field conflict is in history.
 
 **Not:** One group per row, and discarding the losing value except in a few groups, as the earlier app does by default: the history of R54 would not hold.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R56 · Photos in the sync folder
 
 **Rule:** Photos travel as files in the same folder, named by id.
 
-**Acceptance:** none:
+**Acceptance:** After a sync, each photo is in the folder as a file named by its id, and the other device shows it.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R57 · Any folder-sync tool
 
-**Rule:** Sync works with any folder-sync tool. The app does not talk to Syncthing itself.
+**Rule:** Sync works with any folder-sync tool. The app does not talk to Syncthing itself; its only tool-specific code is the list of conflict-copy file-name patterns (R58).
 
-**Acceptance:** none:
+**Evidence:** Not checked: the official Syncthing Android app was discontinued in late 2024, and Syncthing-Fork is the maintained one.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Acceptance:** Stage 1's sync test passes with Syncthing (Syncthing-Fork on the phone), and the app has no code specific to one sync tool beyond the conflict-copy patterns. Before release, the test passes once with a second folder-sync tool.
+
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R58 · Sync code from the earlier app
 
-**Rule:** The folder sync of the earlier app, the owner's own code, is the starting point. Its parts are taken over as the rows below say.
+**Rule:** The folder sync of the earlier app, the owner's own code, is the starting point. Its parts are taken over as the rows below say. The code is copied once for v1; whether it becomes a library shared with the earlier app is decided after stage 1.
 
 **Values:**
 
 | Part | Holds | Taken over |
 |---|---|---|
 | `:core` engine | ULID ids, hybrid logical clock stamps, field groups, merge with a permanent purge registry | almost unchanged |
-| Folder layer | 16 KiB per-device log segments, snapshots every 64, atomic writes, Syncthing conflict copies merged, waiting rows for missing parents, outbox, photos stored by SHA-256 under `blobs/` | adapted: database and group sets passed in, sync tables moved into Chatelaine's schema, new row adapters for items, places, tags and photos |
+| Folder layer | 16 KiB per-device log segments, snapshots every 64, atomic writes, conflict copies merged, found by known file-name patterns (Syncthing's first), waiting rows for missing parents, outbox, photos stored by SHA-256 under `blobs/` | adapted: database and group sets passed in, sync tables moved into Chatelaine's schema, new row adapters for items, places, tags and photos |
 
 **Evidence:** Review of the earlier app, 2026-10-28.
 
 **Acceptance:** none: a choice of starting code; R51, R54 and R55 say what the result must do.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R59 · Sync lessons from the earlier app
 
@@ -756,14 +810,14 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Replayed versions | ignore a replayed version no newer than the base |
 | Device-id file | keep it out of Android Auto Backup |
 | Export | through an outbox, not a stamp cursor |
-| Purge registry | permanent: 90-day tombstones resurrected rows in another of the owner's apps |
+| Purge registry | permanent: purged rows are recorded for good, since time-limited tombstones let deleted rows come back |
 | Recovered database | re-reads its own folder files |
 
 **Evidence:** Review of the earlier app, 2026-10-28.
 
-**Acceptance:** none:
+**Acceptance:** One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database re-reads its folder files.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R60 · Backup and export
 
@@ -788,19 +842,21 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Evidence:** The earlier app built only a settings backup, so full-backup merge and the rollback action are new (review of the earlier app, 2026-10-28).
 
-**Acceptance:** none:
+**Acceptance:** Restoring a backup on one device keeps every edit made after the backup, on both devices. Rolling back is a separate action that adds a history entry, and the replaced state can be restored.
 
-**Since:** 2026-10-28 · builder · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ## 6. Models and recognition
 
-### D-R62 · Image recognition
+### O-R62 · Image recognition
 
 **Rule:** Image recognition is core: a small model ships with the app, and a larger, more accurate one is an optional download. Recognition runs on both devices.
 
+**Why:** The PC can run larger recognisers than the phone: in stage 0, Qwen3-VL-8B ran on a desktop PC at about 48 s a photo (`docs/evidence/stage0-recognition.md`).
+
 **Acceptance:** As stage 4's gate requires (R100), R65's bar is met on both target phones, and R06, R07 and R08 pass.
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R63 · Model roles
 
@@ -825,42 +881,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Every model runs on the device. Models larger than the base set are downloaded on request, never bundled.
 
-**Acceptance:** none:
+**Acceptance:** With the network off, every installed model runs. No model above the base set is in the app's download.
 
-**Since:** 2026-10-28 · unrecorded · migrated
-
-### D-R65 · Recognition pass bar
-
-**Rule:** Recognition passes when every row below holds on both target phones, a Snapdragon 888 flagship and a Snapdragon 695 budget phone; the slower one sets the bar. It is measured on a fixed set of about 20 photos taken for the purpose and kept out of the repository.
-
-**Values:**
-
-| Measure | Bar |
-|---|---|
-| Time | at most about 10 s per photo |
-| Stability | no crash or overheating across the set |
-| Single objects (R06) | the right name among the first three suggestions in at least 4 of 5 photos |
-| Crowded boxes (R08) | at least a third of the items found, and correction quick enough for the rest |
-
-**Evidence:** Stage 0 spike, 2026-10-28 to 2026-10-30 (`docs/evidence/stage0-recognition.md`): by the owner's blind marks no offline recogniser met the bar, and the cloud models with the tightened instructions cleared it widely.
-
-**Acceptance:** The bar is met on both target phones, as stage 4's gate requires (R100).
-
-**Not:** The Snapdragon 845 phone, the first target: too old for this project.
-
-**Since:** 2026-10-29 · owner · migrated
-
-### O-R66 · Scoring crowded answers
-
-**Rule:** For a crowded photo, each recogniser's answer is scored on as many lines as the shortest answer for that photo.
-
-**Why:** Extra lines are extra reading.
-
-**Evidence:** Used for the crowded scores in `docs/evidence/stage0-recognition.md`.
-
-**Acceptance:** none: a scoring practice; R65 carries the check.
-
-**Since:** 2026-10-29 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R67 · Optional language model
 
@@ -924,9 +947,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Each model's licence is checked before it is adopted. The weights' licence must allow redistribution from a GPL app's download screen.
 
-**Acceptance:** none:
+**Acceptance:** Every adopted model has its licence recorded, and each licence allows redistribution from a GPL app's download screen.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### O-R73 · Recognition instructions
 
@@ -950,9 +973,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Evidence:** Qwen3-VL-8B looped on 1 drawer of 10 with the tightened instructions (`docs/evidence/stage0-recognition.md`).
 
-**Acceptance:** none:
+**Acceptance:** An answer that repeats a line shows it once. An answer longer than the instructions' own limit of 15 lines (R73) shows 15.
 
-**Since:** 2026-10-30 · builder · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R75 · Segmentation stage
 
@@ -972,9 +995,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Default:** none proposed: it waits on a measurement the source has not made.
 
-**Why:** Offline on a PC, Qwen3-VL-8B names nearly as well as the cloud models, but fails R65 on time (about 48 s per photo on a desktop PC) and R19 on size (5.75 GB). A smaller model may fit the phone; whether it keeps the naming is unmeasured.
+**Why:** Offline on a PC, Qwen3-VL-8B names nearly as well as the cloud models, but fails R65 on time (about 48 s per photo on a desktop PC) and is a 5.75 GB download. A smaller model may fit the phone; whether it keeps the naming is unmeasured.
 
-**Since:** 2026-10-30 · unrecorded · migrated
+**Since:** 2026-11-22 · unrecorded · migrated
 
 ### Q-R77 · Recogniser as a first-use download
 
@@ -982,19 +1005,21 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Default:** none proposed: the source leaves it to the owner, with no leaning.
 
-**Why:** R19 ships the small recogniser inside the phone download, under about 150 MB, and only the speech model waits for first use; the best offline namer in stage 0 is far larger (R76).
+**Why:** R19 ships the small recogniser inside the phone download, and only the speech model waits for first use; the best offline namer in stage 0 is far larger (R76).
 
-**Since:** 2026-10-30 · unrecorded · migrated
+**Since:** 2026-11-22 · unrecorded · migrated
 
-### Q-R78 · AI-service key
+### D-R78 · AI-service key
 
-**Rule:** Should the user be able to supply an optional AI-service key (Gemini, Claude, self-hosted, any provider), off by default and sending photos only when turned on? It is needed by stage 4.
+**Rule:** The user can supply an optional AI-service key (Gemini, Claude, self-hosted, any provider). It is off by default; only when it is on are photos sent, each with the tightened instructions (R73), not a bare question.
 
-**Default:** none proposed: the owner is open to it for personal use but has not decided. If adopted, it changes R15, and the app would send the tightened instructions with each photo, not a bare question.
+**Why:** Stage 0 found that with the tightened instructions both Gemini (free key) and Claude clear R65 with a wide margin, which no offline recogniser did (`docs/evidence/stage0-recognition.md`). R15 lists the key among its optional network uses.
 
-**Why:** R15 keeps the app offline. On the other side, stage 0 found that with the tightened instructions both Gemini (free key) and Claude clear R65 with a wide margin, which no offline recogniser did (`docs/evidence/stage0-recognition.md`).
+**Acceptance:** With the key off, no photo leaves the device. With it on, each photo is sent with the tightened instructions, and the answer comes back as proposals.
 
-**Since:** 2026-10-30 · unrecorded · migrated
+**Not:** Offline recognition only: no offline recogniser met R65 in stage 0.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ## 7. Logging and search
 
@@ -1004,9 +1029,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** When recognition is approximate, the logging form carries the load. The stage 0 scores show most misses are close names rather than wrong ones (`docs/evidence/stage0-recognition.md`).
 
-**Acceptance:** none:
+**Acceptance:** On the built form, a typical drawer (10 lines: 8 right, 1.5 close, 0.5 wrong) is corrected within the time and the taps that the typical-drawer task model predicts for the chosen layout, and the owner's tap check on the phone confirms it. The limits are set when the form's layout is chosen.
 
-**Since:** 2026-10-30 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### O-R80 · Lump, then refine
 
@@ -1021,27 +1046,27 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Refining a line | "about 3 x wool scarf" → +1, +1, drop "about", drop "wool" → "5 x scarf", save | the owner's example |
 | A split by use | "about 9 x small notebook", "about 10 x notebook" | size matters for note-taking |
 
-**Acceptance:** none:
+**Acceptance:** On an open line, the owner's example takes four edits and a save, each one action. R79 counts the taps.
 
 **Not:** A split list by colour, such as "2 x umbrella" plus "1 x purple umbrella" in place of "3 x umbrella": adjusting a line is quicker than deleting wrong ones.
 
-**Since:** 2026-10-30 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R81 · Search through child tags
 
 **Rule:** Searching a parent tag also finds the items that carry any of its child tags.
 
-**Acceptance:** none:
+**Acceptance:** With "red skirt" inside "sewing", a search for "sewing" finds the items tagged only "red skirt".
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R82 · Search across languages
 
 **Rule:** Search matches across languages: "cucito" finds "sewing". Tags are stored once, as written; model suggestions are offered in the interface language, and built-in names such as place and tag kinds switch with the language.
 
-**Acceptance:** none:
+**Acceptance:** With the interface in English, "cucito" finds items tagged "sewing", and the reverse works in Italian. Switching the language changes the built-in kind names but not the user's tags.
 
-**Since:** 2026-10-28 · builder · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ## 8. Place map, homepage and clear-box surfaces
 
@@ -1078,17 +1103,19 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Evidence:** Not checked: the homepage layout is open (R84); this rule assumes the sketch's tag card.
 
-**Acceptance:** none:
+**Acceptance:** With "red skirt" inside "sewing", the tag card shows "sewing" and not "red skirt".
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
-### D-R86 · No push by default
+### O-R86 · No push by default
 
 **Rule:** The app never pushes by default. Proactive prompts, such as notifications, are opt-in; the clear-box effect comes from passive surfaces (R87).
 
-**Acceptance:** none:
+**Why:** Notifications nag, and R03 rules out nagging, streaks and guilt.
 
-**Since:** 2026-10-28 · owner · migrated
+**Acceptance:** A fresh install with default settings sends no notification during a week of use.
+
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R87 · Clear-box surfaces
 
@@ -1131,13 +1158,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ## 9. Purpose map and look
 
-### D-R90 · Purpose map
+### O-R90 · Purpose map
 
 **Rule:** The purpose map decides which purpose each screen serves before any screen is built. It aims to minimise the number of screens and maximise their quality, with other apps scored beside it as reference apps.
 
+**Why:** Layout and navigation are decided once instead of corrected later.
+
 **Acceptance:** The owner approves the spec and the purpose map, as stage 0's gate requires (R100).
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R91 · Scoring axes
 
@@ -1171,17 +1200,21 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-10-28 · owner · migrated
 
-### D-R93 · Screens before building
+### O-R93 · Screens before building
 
 **Rule:** No screens are built at stage 0. Screens start at stage 2 or later, each discussed with the owner before it is built.
 
+**Why:** Layout and navigation are decided once instead of corrected later (R90).
+
 **Acceptance:** Every screen built is owner-approved, as stage 2's gate requires (R100).
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
-### D-R94 · Look and feel
+### O-R94 · Look and feel
 
-**Rule:** The look is specific to the app's purpose, not framework defaults, and follows the direction below. It is workshopped per screen. The owner's other apps are conceptual references, not templates.
+**Rule:** The look is specific to the app's purpose, not framework defaults, and follows the direction below. It is workshopped per screen.
+
+**Why:** Framework defaults look generic and busy; the app is opened often and should be calm.
 
 **Values:**
 
@@ -1195,62 +1228,107 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Acceptance:** none: a direction, workshopped per screen.
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ### D-R95 · Reach and density
 
-**Rule:** Reach and density follow the model of the owner's earlier app, not that of another of the owner's apps: not everything is visible at once.
+**Rule:** Only the controls for the task at hand are on screen; the rest are one tap away.
 
 **Acceptance:** none: a direction, workshopped per screen.
 
-**Since:** 2026-10-28 · owner · migrated
+**Not:** Everything visible at once.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ### D-R96 · Consistent elements
 
 **Rule:** The same element reads and acts the same on every screen, and controls at the same level keep the same size and place.
 
-**Acceptance:** none:
+**Acceptance:** Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · migrated
 
 ## 10. Modules and the shopping list
 
-### D-R97 · Modules
+### O-R97 · Modules
 
-**Rule:** Chatelaine is one app on one shared core. Wardrobe and Pantry are optional modules, off by default, each designed with the owner first; users can build their own packs with the same tools.
+**Rule:** Chatelaine is one app built on the Inventory module, which is always on and cannot be turned off. Wardrobe and Pantry are optional modules on top of it, off by default, each designed with the owner first; users can build their own packs with the same tools. Expiry belongs to the Inventory module, since it covers medication and cosmetics as well as food.
+
+**Why:** The core stays calm and small; modules add fields and screens only for those who want them.
 
 **Values:**
 
 | Module | Fields | Views |
 |---|---|---|
-| Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year |
-| Pantry | quantity and unit, expiry, opened on, minimum stock | expiring soon, shopping list, "already have it" check |
+| Inventory | expiry date, opened on, months after opening | expiring soon |
+| Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year, usage rate |
+| Pantry | quantity and unit, minimum stock | shopping list, "already have it" check, usage rate |
 
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
-### O-R98 · Savings app and the shopping list
+### D-R109 · Expiry dates
 
-**Rule:** Personal savings is a separate app, not a Chatelaine module, and the two meet only through the shopping list, which belongs to Chatelaine's Pantry module (R97). When something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), and pantry stock (R97) is used first. Each bought item goes one way to the savings app as item, price and date, by export or a shared file; budgets and goals stay in the savings app.
+**Rule:** Expiry dates are read from labels in photos, in the formats below, and fill the item's expiry date or months-after-opening field (R97); the user can also log or edit them by hand. Dates show in the interface language's format.
 
-**Why:** Money is a different job (amounts, accounts, budgets) with its own rhythm and tone, and would raise the security bar for app lock, backups and folder sync. Chatelaine owns the shopping list because it knows the stock.
+**Values:**
 
-**Acceptance:** none:
+| Label | Language | Format | Fills |
+|---|---|---|---|
+| "Best before:" | English | dd/mm/yyyy or mm/yyyy | expiry date |
+| "BBD:" | English | dd/mm/yyyy or mm/yyyy | expiry date |
+| "SCAD." | Italian | dd/mm/yyyy or mm/yyyy | expiry date |
+| "12M" (a number of months) | any | N months | months after opening, counted from "opened on" |
 
-**Not:** Savings as a module inside Chatelaine: ruled out for the reasons in Why.
+**Evidence:** Not checked: which model reads the label text; R63 has no text-reading role yet.
+
+**Acceptance:** A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 
 **Since:** 2026-11-22 · owner · agreed rewording
 
-### Q-R99 · Reminders
+### D-R110 · Usage rate
 
-**Rule:** Which app owns reminders, given that the owner's earlier app has reminders and may overlap? It is needed by stage 10.
+**Rule:** Usage rate is worked out from what is already recorded, with nothing extra to log: in Pantry from quantity changes over time, in Wardrobe from "last worn" and laundry (R97).
 
-**Default:** none proposed: the source leaves it open.
+**Acceptance:** An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 
-**Why:** R98 settles that Chatelaine owns the shopping list and leaves reminders open; the earlier app already has them.
+**Since:** 2026-11-22 · owner · agreed rewording
 
-**Since:** 2026-11-19 · owner · migrated
+### O-R98 · Savings app and the shopping list
+
+**Rule:** Personal savings is a separate app, not a Chatelaine module. The two meet only through the Pantry module's shopping list (R97), so the bridge exists only when Pantry is on: when something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), pantry stock is used first, and each bought item goes one way to the savings app as item, price and date, by export or a shared file. Budgets and goals stay in the savings app.
+
+**Why:** Money is a different job (amounts, accounts, budgets) with its own rhythm and tone, and would raise the security bar for app lock, backups and folder sync. Chatelaine owns the shopping list because it knows the stock.
+
+**Acceptance:** With Pantry on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Pantry off, no shopping list or export appears. Chatelaine holds no budget or goal.
+
+**Not:** Savings as a module inside Chatelaine: money is a different job, as Why says. The shopping list as a core feature: odd for someone who only wants to find where things are, such as important documents or rarely used small appliances.
+
+**Since:** 2026-11-22 · owner · agreed rewording
+
+### D-R99 · Reminders
+
+**Rule:** Chatelaine owns every reminder about its things. Each notification belongs to a module and can be turned on only while that module is on; the Inventory module's are always available (R97). Every notification is opt-in (R86): all are off until the user turns them on, also when their module is switched on.
+
+**Values:**
+
+| Notification | Module |
+|---|---|
+| expiry: best-before dates (medication, food), months after opening (cosmetics) | Inventory |
+| low stock | Pantry |
+| add to the shopping list | Pantry |
+| usage rate rising or falling | Pantry |
+| time to do the laundry | Wardrobe |
+| running out of clean items of a kind, the rest being in the laundry | Wardrobe |
+| usage rate: none, low, medium or high; rising or falling | Wardrobe |
+| seasonal swap | Wardrobe |
+
+**Acceptance:** With a module off, none of its notifications can be turned on or arrive. The Inventory module's notifications can be turned on at any time.
+
+**Not:** Leaving reminders to the owner's earlier app: every reminder about Chatelaine's things belongs to Chatelaine. Reminders that are not about a thing, such as paying a bill: not Chatelaine's.
+
+**Since:** 2026-11-22 · owner · agreed rewording
 
 ## 11. Stages
 
@@ -1291,7 +1369,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R102 · Stage 0 spikes
 
-**Rule:** Stage 0 reviews the sync of the earlier app in place of a change-file-sync spike; the review was done on 2026-10-28 (R58). The KMP spike stays and proves a Compose Multiplatform window running on Android and Windows. The model spike also stays, on the target phones of R65.
+**Rule:** Stage 0 reviews the sync of the earlier app in place of a change-file-sync spike; the review was done on 2026-10-28 (R58). The KMP spike stays and proves a Compose Multiplatform window running on Android, at minSdk 33 (R13), and on Windows. The model spike also stays, on the target phones of R65.
 
 **Why:** The review found the earlier app has no Compose and no runnable Windows app.
 
@@ -1299,10 +1377,48 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Not:** Replacing the KMP spike with the review as well, as first planned: the earlier app has no Compose and no runnable Windows app.
 
+**Since:** 2026-11-22 · owner · migrated
+
+## 12. Test plan
+
+### O-R65 · Recognition pass bar
+
+**Rule:** Recognition passes when every row below holds on both target phones, a Snapdragon 888 flagship and a Snapdragon 695 budget phone; the slower one sets the bar. It is measured on a fixed set of about 20 photos taken for the purpose and kept out of the repository.
+
+**Why:** About 10 s is the longest wait the owner accepts standing at a drawer, and a third of the items found is where correcting starts to beat typing. The owner may revise the numbers.
+
+**Values:**
+
+| Measure | Bar |
+|---|---|
+| Time | at most about 10 s per photo |
+| Stability | no crash or overheating across the set |
+| Single objects (R06) | the right name among the first three suggestions in at least 4 of 5 photos |
+| Crowded boxes (R08) | at least a third of the items found, and correction quick enough for the rest |
+
+**Evidence:** Stage 0 spike, 2026-10-28 to 2026-10-30 (`docs/evidence/stage0-recognition.md`): by the owner's blind marks no offline recogniser met the bar, and the cloud models with the tightened instructions cleared it widely.
+
+**Acceptance:** The bar is met on both target phones, as stage 4's gate requires (R100).
+
+**Not:** The Snapdragon 845 phone, the first target: too old for this project.
+
+**Since:** 2026-11-22 · owner · migrated
+
+### O-R66 · Scoring crowded answers
+
+**Rule:** For a crowded photo, each recogniser's answer is scored on as many lines as the shortest answer for that photo.
+
+**Why:** Extra lines are extra reading.
+
+**Evidence:** Used for the crowded scores in `docs/evidence/stage0-recognition.md`.
+
+**Acceptance:** none: a scoring practice; R65 carries the check.
+
 **Since:** 2026-10-29 · owner · migrated
 
 ## Acceptance list
 
+- R03 · Anti-goals: Reading every screen's text and every notification finds no streak, guilt or nagging wording. A fresh install sends no reminder the user did not turn on. A later model run never overwrites a correction. Stage 1's round-trip tests pass.
 - R05 · Project from a tag: The steps succeed end to end, as stage 2's gate requires (R100).
 - R06 · Photo with suggestions: The steps succeed end to end, as stage 4's gate requires (R100).
 - R07 · Bulk clear: The steps succeed end to end, as stage 4's gate requires (R100).
@@ -1311,76 +1427,123 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R10 · Visual place map and filtered search: The steps succeed end to end, as stage 6's gate requires (R100).
 - R11 · Seasonal swap: The move part succeeds at stage 3 and the whole scenario at stage 5, as those stages' gates require (R100).
 - R13 · Framework and targets: A Compose Multiplatform window runs on Android and on Windows, as stage 0 holds (R100, R102).
+- R14 · Shared code: Platform source sets (for example `androidMain`, `jvmMain`) hold code only for the camera, file access, widgets, speech, model runtimes and printing. Everything else is in common code.
+- R15 · Offline first: With the optional network uses off, a network capture over a full run of R05 to R11 shows no request at all.
+- R16 · No Google Play services: On every build, the core module's resolved dependencies hold no `com.google.android.gms` or `com.google.firebase` artifact.
 - R18 · Languages: A dictated list of ten things becomes ten items, in Italian and in English, as stage 8's gate requires (R100).
-- R19 · Phone download size: The compressed phone download measures under about 150 MB.
+- R21 · Desk companion: The Windows build has no camera capture and no dictation entry. Recognition on photos synced from the phone, bulk editing, the place map, label printing and backup all work there.
 - R22 · Publishing rules: The publish check reports no finding before each commit and push, and in CI.
+- R23 · Borrowing code: A script, run like the publish check, finds every copied file's licence notice and its line in `THIRD_PARTY.md`.
+- R25 · Item: An item saved with only a name is stored and found by search. Each field in its Values can be set and survives export and import.
+- R26 · Quantity and counts: A suggested count shows as "about N" and can be edited. With a switch on, suggestions in its scope ask for an exact count; with both off, every suggestion is approximate.
 - R28 · Identical things: R06 passes with the three headphones saved as one item with a count of three.
+- R29 · Order of an item's facts: Each of the three paths (name only; photo first, then name; placed in a settled area) ends in a saved item.
+- R30 · Item states: An item can go unplaced, then placed, then in use / away, then placed again, and its state shows on its screen.
+- R31 · Photo outdated flag: Editing an item, or moving an item into or out of a place, after the last photo raises the flag. A new photo clears it.
 - R32 · Place tree: R10 passes, with its map running from drawer partitions up to several houses.
+- R33 · Place details: A place takes tags, notes, a photo and a map position, and its kind changes how it is drawn on the map.
 - R34 · Tags: R05 passes.
+- R35 · Tag tree: A second parent cannot be given to a tag, and no tag can sit inside its own child.
 - R36 · Kept together: R11 passes fully, with the home and away views that stage 5 holds, as stage 5's gate requires (R100).
+- R37 · Tag kinds: Each of the five kinds can be set on a tag and shows on it as an icon or a group heading. The user can rename, add and remove kinds.
 - R39 · Suggested tags: R06 passes: the suggested tags the user keeps are saved with the item, and the deleted one is not.
 - R40 · Editing suggestions: R07 and R08 pass: suggested tags are cleared in one action, and wrong items are corrected one at a time.
+- R41 · Photos: A photo saves on an item or on a place. A region marked on a place photo opens the item it points to.
 - R42 · Proposals from a photo: R06, R07 and R08 pass, as stage 4's gate requires (R100).
+- R44 · Field types: A field of each type can be created on an item and on a place, filled in, and survives export and import.
+- R46 · Where a field attaches: A field attached to a tag appears on every item that carries the tag, including items tagged later. A field added to one item appears only on that item.
+- R47 · User-editable lists: The user can add, rename and remove place kinds, tag kinds, homepage cards and widget content, and the change shows at once.
+- R48 · Local database: Each device opens its own database with the network off.
 - R50 · A database that fails to open: In stage 1's round-trip tests, a corrupted database is kept, not deleted (R100).
 - R51 · Folder sync: Two-device sync with conflicts passes stage 1's round-trip tests (R100).
+- R52 · Record ids and history: Every record has a unique id, and every change to it adds an entry to its history.
+- R53 · No shared database file: After any stage 1 sync test, the sync folder holds no database file.
 - R54 · Conflicting edits: In stage 1's two-device sync test with conflicts (R100), the later edit wins and the overwritten value can be restored from history.
+- R55 · Sync groups: When the two devices edit different fields of one item at the same time, both edits survive. The losing value of a same-field conflict is in history.
+- R56 · Photos in the sync folder: After a sync, each photo is in the folder as a file named by its id, and the other device shows it.
+- R57 · Any folder-sync tool: Stage 1's sync test passes with Syncthing (Syncthing-Fork on the phone), and the app has no code specific to one sync tool beyond the conflict-copy patterns. Before release, the test passes once with a second folder-sync tool.
+- R59 · Sync lessons from the earlier app: One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database re-reads its folder files.
 - R60 · Backup and export: Export → import passes stage 1's round-trip tests (R100).
+- R61 · Restoring a backup: Restoring a backup on one device keeps every edit made after the backup, on both devices. Rolling back is a separate action that adds a history entry, and the replaced state can be restored.
 - R62 · Image recognition: As stage 4's gate requires (R100), R65's bar is met on both target phones, and R06, R07 and R08 pass.
 - R63 · Model roles: Each optional model measurably improves a scenario, as stage 9's gate requires (R100).
-- R65 · Recognition pass bar: The bar is met on both target phones, as stage 4's gate requires (R100).
+- R64 · Models on device: With the network off, every installed model runs. No model above the base set is in the app's download.
 - R67 · Optional language model: The model measurably improves a scenario, as stage 9's gate requires (R100).
 - R68 · Open-vocabulary recogniser: R06 passes: the recogniser names the headphones.
 - R69 · Recognition as a hint: R08 passes.
 - R70 · Model cooperation: Suggestions are accepted or corrected in one tap, as stage 5's gate requires (R100).
 - R71 · Personal learning: As stage 5's gate requires (R100), suggestions are accepted or corrected in one tap, and R11 passes fully.
+- R72 · Model licences: Every adopted model has its licence recorded, and each licence allows redistribution from a GPL app's download screen.
+- R74 · Repeated lines: An answer that repeats a line shows it once. An answer longer than the instructions' own limit of 15 lines (R73) shows 15.
+- R78 · AI-service key: With the key off, no photo leaves the device. With it on, each photo is sent with the tightened instructions, and the answer comes back as proposals.
+- R79 · Correction-first logging form: On the built form, a typical drawer (10 lines: 8 right, 1.5 close, 0.5 wrong) is corrected within the time and the taps that the typical-drawer task model predicts for the chosen layout, and the owner's tap check on the phone confirms it. The limits are set when the form's layout is chosen.
+- R80 · Lump, then refine: On an open line, the owner's example takes four edits and a save, each one action. R79 counts the taps.
+- R81 · Search through child tags: With "red skirt" inside "sewing", a search for "sewing" finds the items tagged only "red skirt".
+- R82 · Search across languages: With the interface in English, "cucito" finds items tagged "sewing", and the reverse works in Italian. Switching the language changes the built-in kind names but not the user's tags.
 - R83 · Visual place map: R10 passes, as stage 6's gate requires (R100).
+- R85 · Tag card: With "red skirt" inside "sewing", the tag card shows "sewing" and not "red skirt".
+- R86 · No push by default: A fresh install with default settings sends no notification during a week of use.
 - R87 · Clear-box surfaces: The owner uses the widget and the labels for a week, as stage 7's gate requires (R100).
 - R88 · Labels: The owner uses the labels for a week, as stage 7's gate requires (R100).
 - R90 · Purpose map: The owner approves the spec and the purpose map, as stage 0's gate requires (R100).
 - R91 · Scoring axes: Every reference app, scored as a control, loses: a control that scores well means the axes are wrong.
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
+- R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
+- R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
+- R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
+- R98 · Savings app and the shopping list: With Pantry on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Pantry off, no shopping list or export appears. Chatelaine holds no budget or goal.
+- R99 · Reminders: With a module off, none of its notifications can be turned on or arrive. The Inventory module's notifications can be turned on at any time.
 - R100 · Stage plan: Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
 - R102 · Stage 0 spikes: A Compose Multiplatform window runs on Android and on Windows, and the spike timings are recorded, as stage 0 requires (R100).
+- R65 · Recognition pass bar: The bar is met on both target phones, as stage 4's gate requires (R100).
 
 ## Out of scope
 
-### D-R103 · Insurance records
+### O-R103 · Insurance records
 
 **Rule:** Value, receipts and serial numbers for insurance use are out of scope for v1. The one price kept is on bought shopping-list items, for the savings-app bridge (R98).
 
+**Why:** Value tracking is a different job.
+
 **Acceptance:** none: a scope boundary.
 
-**Since:** 2026-11-19 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
-### D-R104 · App lock
+### O-R104 · App lock
 
 **Rule:** An app lock (biometric, PIN or password) is not in v1. The stage plan lists it for stage 11 (R100).
 
+**Why:** One user, offline first, on a personal phone: the phone's own lock protects it.
+
 **Acceptance:** none: a scope boundary; stage 11 gives it its own decision first.
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
-### D-R105 · Lending
+### O-R105 · Lending
 
 **Rule:** Lending, recording who has a thing, comes in a later stage. The stage plan lists it for stage 11 (R100).
 
+**Why:** Lending is not a daily job.
+
 **Acceptance:** none: a scope boundary; stage 11 gives it its own decision first.
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-22 · owner · migrated
 
-### D-R106 · Inventory import
+### O-R106 · Inventory import
 
-**Rule:** There is no existing inventory data to import, so stage 1 has no importer for it.
+**Rule:** Stage 1 has no importer for existing inventory data.
 
-**Acceptance:** none: a scope boundary.
-
-**Since:** 2026-10-28 · owner · migrated
-
-### D-R107 · Stock and expiry outside Pantry
-
-**Rule:** Low-stock alerts, shopping lists and expiry tracking outside the Pantry module (R97) are not in v1.
+**Why:** There is no existing inventory data to import.
 
 **Acceptance:** none: a scope boundary.
 
-**Since:** 2026-10-28 · unrecorded · migrated
+**Since:** 2026-11-22 · owner · agreed rewording
+
+### D-R107 · Stock and shopping outside Pantry
+
+**Rule:** Low-stock alerts and shopping lists outside the Pantry module (R97) are not in v1.
+
+**Acceptance:** none: a scope boundary.
+
+**Since:** 2026-11-22 · owner · migrated

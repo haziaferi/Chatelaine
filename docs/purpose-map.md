@@ -90,7 +90,7 @@ How to read it:
 | **Outfits**: links between clothing items | Wardrobe | module view | Tag results |
 | **Seasonal swap** | Wardrobe | module view | Bulk move (R11) |
 | **Not worn in a year** | Wardrobe | module view | Object of the day |
-| **Expiring soon** | Pantry | module view | Rediscover prompt |
+| **Expiring soon** | Inventory | module view | Rediscover prompt |
 | **Shopping list**: items below minimum stock | Pantry | module view | — |
 | **Already have it?**: quick check while shopping | Pantry | module view | Search bar (R09) |
 

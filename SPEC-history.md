@@ -125,3 +125,83 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-22 · spec · migrated · to the project-spec-writer format, from the old format held in commit 2f54ae8 · builder
 - 2026-11-22 · R18 · changed · dictation arrives in stage 8, the interface languages from the start · owner
 - 2026-11-22 · R98 · changed · the shopping list belongs to the Pantry module (R97) · owner
+- 2026-11-22 · R26 · changed · two accuracy switches, whole inventory and Pantry, both off by default · owner
+- 2026-11-22 · R79 · changed · check: typical-drawer time and taps from the task model, plus the tap check · owner
+- 2026-11-22 · R80 · changed · check counts edits on an open line; R79 counts the taps · owner
+- 2026-11-22 · R98 · changed · the bridge exists only when Pantry is on; no core shopping list · owner
+- 2026-11-22 · spec · changed · Test plan section holds R65 and R66; glossary defines the Pantry module · owner
+- 2026-11-22 · R01 · kind · D → O, with its reason: v1 needs no identities or permissions · owner
+- 2026-11-22 · R21 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R40 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R51 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R62 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R65 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R86 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R90 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R93 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R94 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R95 · changed · restated: Only the controls for the task at hand are on screen; the rest are one tap away · owner
+- 2026-11-22 · R97 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R103 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R104 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R105 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R106 · changed · restated: Stage 1 has no importer for existing inventory data · owner
+- 2026-11-22 · R106 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R13 · changed · minSdk 30 → 33 · owner
+- 2026-11-22 · R13 · kind · D → O, reason recorded · owner
+- 2026-11-22 · R15 · changed · offline first; optional AI-service key and household network · owner
+- 2026-11-22 · R19 · changed · no download size limit · owner
+- 2026-11-22 · R76 · changed · Why no longer cites a size limit · owner
+- 2026-11-22 · R77 · changed · Why no longer cites a size limit · owner
+- 2026-11-22 · R78 · changed · Why follows R15's optional key · owner
+- 2026-11-22 · R108 · added · question: the household network · builder
+- 2026-11-22 · R03 · changed · Acceptance added · owner
+- 2026-11-22 · R14 · changed · Acceptance added · owner
+- 2026-11-22 · R15 · changed · Acceptance added · owner
+- 2026-11-22 · R16 · changed · Acceptance added · owner
+- 2026-11-22 · R21 · changed · Acceptance added · owner
+- 2026-11-22 · R25 · changed · Acceptance added · owner
+- 2026-11-22 · R29 · changed · Acceptance added · owner
+- 2026-11-22 · R30 · changed · Acceptance added · owner
+- 2026-11-22 · R31 · changed · Acceptance added · owner
+- 2026-11-22 · R33 · changed · Acceptance added · owner
+- 2026-11-22 · R35 · changed · Acceptance added · owner
+- 2026-11-22 · R37 · changed · Acceptance added · owner
+- 2026-11-22 · R41 · changed · Acceptance added · owner
+- 2026-11-22 · R44 · changed · Acceptance added · owner
+- 2026-11-22 · R46 · changed · Acceptance added · owner
+- 2026-11-22 · R47 · changed · Acceptance added · owner
+- 2026-11-22 · R48 · changed · Acceptance added · owner
+- 2026-11-22 · R52 · changed · Acceptance added · owner
+- 2026-11-22 · R53 · changed · Acceptance added · owner
+- 2026-11-22 · R55 · changed · Acceptance added · owner
+- 2026-11-22 · R56 · changed · Acceptance added · owner
+- 2026-11-22 · R57 · changed · Acceptance added · owner
+- 2026-11-22 · R59 · changed · Acceptance added · owner
+- 2026-11-22 · R61 · changed · Acceptance added · owner
+- 2026-11-22 · R64 · changed · Acceptance added · owner
+- 2026-11-22 · R72 · changed · Acceptance added · owner
+- 2026-11-22 · R74 · changed · Acceptance added · owner
+- 2026-11-22 · R81 · changed · Acceptance added · owner
+- 2026-11-22 · R82 · changed · Acceptance added · owner
+- 2026-11-22 · R85 · changed · Acceptance added · owner
+- 2026-11-22 · R86 · changed · Acceptance added · owner
+- 2026-11-22 · R96 · changed · Acceptance added · owner
+- 2026-11-22 · R23 · changed · restated: a new codebase; single files may be copied in, with their licence notice · owner
+- 2026-11-22 · R78 · kind · Q → D: the optional key exists, off by default · owner
+- 2026-11-22 · R24 · changed · Copy column; Prepper and hot-stuff uses from the inventory; earlier-app row trimmed · owner
+- 2026-11-22 · R23 · changed · copies only from projects R24 marks for copying · owner
+- 2026-11-22 · R55 · changed · Evidence: log size measured in stage 1 · owner
+- 2026-11-22 · R57 · changed · conflict-copy patterns allowed; Syncthing-Fork on the phone · owner
+- 2026-11-22 · R58 · changed · conflict copies by file-name patterns; copied once for v1, library decided after stage 1 · owner
+- 2026-11-22 · R59 · changed · purge lesson stated directly · owner
+- 2026-11-22 · R94 · changed · pointer to the owner's other apps dropped · owner
+- 2026-11-22 · R97 · changed · built on the always-on Inventory module; expiry moves there from Pantry · owner
+- 2026-11-22 · R99 · kind · Q → D: Chatelaine owns every reminder; notifications by module · owner
+- 2026-11-22 · R102 · changed · window spike at minSdk 33 · owner
+- 2026-11-22 · R107 · changed · expiry no longer Pantry-only; renamed "Stock and shopping outside Pantry" · owner
+- 2026-11-22 · R108 · changed · proposed answer: an optional household-structured sync, later than v1 · owner
+- 2026-11-22 · spec · changed · glossary defines the Inventory module · owner
+- 2026-11-22 · R99 · changed · notifications off until turned on, also when a module is switched on; Wardrobe running-out row; no reminders not about a thing · owner
+- 2026-11-22 · R109 · added · expiry dates read from labels or logged by hand · owner
+- 2026-11-22 · R110 · added · usage rate from what is already recorded · owner

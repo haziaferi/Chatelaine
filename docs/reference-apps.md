@@ -44,7 +44,7 @@ Walked counts are measured; source counts are estimated from the navigation code
 | Function | Seen in | Where it belongs for Chatelaine |
 |---|---|---|
 | Lending and return history | Who Has My Stuff | stage 11 (R105); a purpose then, or part of "in use / away" |
-| Expiry and low-stock alerts, on by default | Personal Stuff, Prepper | Pantry module (R97), and opt-in only (R86) |
+| Expiry and low-stock alerts, on by default | Personal Stuff, Prepper | expiry in the Inventory module, low stock in Pantry (R97, R99), and opt-in only (R86) |
 | Usage, purchase and maintenance logs; stock movements | Personal Stuff | Pantry module or out of scope |
 | Scanning a code to open or register a box | Flindex, Prepper | P1 (open a place by its label's QR) — to place when scoring |
 | Product barcode lookup | Personal Stuff | not planned |
@@ -58,7 +58,7 @@ From Prepper (GPL-3.0), under `app/src/main/java/io/github/escapedcanadian/prepp
 - `data/repository/ContainerRepository.kt`: move a box with everything inside; needs a guard against moving a box into itself.
 - `ui/components/ContainerBreadcrumb.kt`: tappable "location › … › box" path.
 - `ui/components/SearchableDropdown.kt`: type-ahead picker that can create a missing entry.
-- `ui/components/ExpirationBadge.kt`, `util/DateUtils.kt`: expiry status (Pantry); swap `java.time` for `kotlinx-datetime`.
+- `ui/components/ExpirationBadge.kt`, `util/DateUtils.kt`: expiry status (Inventory module); swap `java.time` for `kotlinx-datetime`.
 - `export/CsvExportManager.kt`, `export/CsvImportManager.kt`: zip backup and restore (Android/JVM).
 - `util/PhotoHelper.kt`: photo resize and rotation fix (Android).
 
