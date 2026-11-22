@@ -68,17 +68,29 @@ class GitError(Exception):
     """A git command failed, or answered in a shape this script does not understand."""
 
 
-def git(repo, *args, ok=(0,), input=None):
-    """stdout of `git -C repo args`; GitError unless the exit status is in ok."""
+def git(repo, *args, ok=(0,), input=None, raw=False):
+    """stdout of `git -C repo args` (bytes if raw); GitError unless the exit status is in ok."""
+    text = {} if raw else dict(text=True, encoding="utf-8", errors="replace")
     try:
-        p = subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, encoding="utf-8",
-                           errors="replace", input=input)
+        p = subprocess.run(["git", "-C", repo, *args], capture_output=True, input=input, **text)
     except OSError as e:
         raise GitError("cannot run git: %s" % e)
     if p.returncode not in ok:
+        err = p.stderr.decode("utf-8", "replace") if raw else p.stderr
         raise GitError("git %s failed (exit %d): %s" % (" ".join(args), p.returncode,
-                                                        p.stderr.strip()[:500] or "no message"))
+                                                        err.strip()[:500] or "no message"))
     return p.stdout
+
+
+def git_z(repo, *args):
+    """The NUL-separated entries of a -z listing, decoded the way the file system names them
+    (os.fsdecode), so a name that is not UTF-8 still opens and still matches across listings."""
+    return [os.fsdecode(e) for e in git(repo, *args, raw=True).split(b"\0") if e]
+
+
+def shown(s):
+    """s printable on any console: names that are not UTF-8 come out with replacement characters."""
+    return s.encode("utf-8", "surrogateescape").decode("utf-8", "replace")
 
 
 def read_blobs(repo, oids):
@@ -255,8 +267,19 @@ def scan_file(rel, data, deny, hits):
     if text is None and is_binary(data):
         scan_deny_bytes(rel, data, deny, hits, "binary")
         return
+    if text is not None:
+        # a binary file can start like UTF-16 text; its raw bytes keep the deny-list check binaries get
+        # (genuine UTF-16 text never matches here, its letters are interleaved with NULs)
+        scan_deny_bytes(rel, data, deny, hits, "raw bytes")
     if len(data) > TEXT_LIMIT:
-        scan_deny_bytes(rel, data, deny, hits, "large file")
+        if text is None:
+            scan_deny_bytes(rel, data, deny, hits, "large file")
+        else:
+            low = text.lower()
+            for term in deny:
+                if term.lower() in low:
+                    hits.append(("private", rel, 0, "deny-list term #%d (large UTF-16 file)"
+                                 % (deny.index(term) + 1)))
         hits.append(("large", rel, 0, "text file over %d MiB: only the deny-list was checked"
                      % (TEXT_LIMIT // (1024 * 1024))))
         return
@@ -274,17 +297,16 @@ def blobs_to_scan(repo, history, read):
     stage. Paths listed as changed only because their stat data moved are dropped by hashing the
     working-tree copy the way git would (filters included). With history, every other blob of every
     commit follows."""
-    changed = {f for f in git(repo, "diff-files", "--name-only", "-z").split("\0") if f}
-    for entry in git(repo, "ls-files", "-v", "-z").split("\0"):
+    changed = set(git_z(repo, "diff-files", "--name-only", "-z"))
+    for entry in git_z(repo, "ls-files", "-v", "-z"):
         if len(entry) > 2 and (entry[0].islower() or entry[0] == "S"):   # assume-unchanged, skip-worktree
             changed.add(entry[2:])
     present = sorted(f for f in changed if f in read and not os.path.islink(os.path.join(repo, f)))
-    disk = dict(zip(present, git(repo, "hash-object", "--stdin-paths", input="\n".join(present) + "\n")
-                    .split())) if present else {}
+    disk = dict(zip(present, git(repo, "hash-object", "--stdin-paths", raw=True,
+                                 input=b"".join(os.fsencode(f) + b"\n" for f in present)).decode().split())
+                ) if present else {}
     covered, wanted = set(), {}
-    for entry in git(repo, "ls-files", "-s", "-z").split("\0"):
-        if not entry:
-            continue
+    for entry in git_z(repo, "ls-files", "-s", "-z"):
         meta, path = entry.split("\t", 1)
         mode, oid, stage = meta.split()[:3]
         if mode == "160000":            # a submodule's commit, not a blob of this repo
@@ -307,7 +329,7 @@ def scan(repo, history):
     allow = [re.compile(p) for p in load_lines(os.path.join(repo, ALLOW))]
     hits = []
 
-    files = [f for f in git(repo, "ls-files", "-co", "--exclude-standard", "-z").split("\0") if f]
+    files = git_z(repo, "ls-files", "-co", "--exclude-standard", "-z")
     read = set()
     for rel in files:
         p = os.path.join(repo, rel)
@@ -347,7 +369,7 @@ def scan(repo, history):
         if h not in kept and not any(a.search("%s|%s|%s" % (h[0], h[1], h[3])) for a in allow):
             kept.append(h)
     for rule, rel, n, what in kept:
-        print("%-8s %s%s  %s" % (rule, rel, ":%d" % n if n else "", what))
+        print(shown("%-8s %s%s  %s" % (rule, rel, ":%d" % n if n else "", what)))
     print("publish_check: %d files%s, %d finding(s)%s" % (
         scanned, " + %d staged or earlier blobs" % len(blobs) if blobs else "", len(kept),
         "" if not deny else ", deny-list %d terms" % len(deny)))
