@@ -6,6 +6,7 @@ captures/
 *.apk
 *.aab
 *.hprof
+__pycache__/
 
 # IDE state (can hold local paths)
 .idea/
