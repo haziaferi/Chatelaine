@@ -1,0 +1,127 @@
+# Chatelaine spec history
+
+Not a source of current rules: `SPEC.md` is. One line per change, newest at the bottom. Retired wording is in git.
+
+- 2026-10-27 · R12 · added · name Chatelaine, GPL-3.0, public repository · unrecorded · 9e7838e
+- 2026-10-27 · R22 · added · no personal data in the repository; publish check in hooks and CI · unrecorded · 9e7838e
+- 2026-10-28 · R01 · added · one user with a phone and a PC; several users not in v1 · owner · 9e7838e
+- 2026-10-28 · R02 · added · goals · unrecorded · 9e7838e
+- 2026-10-28 · R03 · added · anti-goals · unrecorded · 9e7838e
+- 2026-10-28 · R05 · added · scenario: project from a tag · owner · 9e7838e
+- 2026-10-28 · R06 · added · scenario: photo with suggestions · owner · 9e7838e
+- 2026-10-28 · R07 · added · scenario: bulk clear · owner · 9e7838e
+- 2026-10-28 · R08 · added · scenario: box split into items · owner · 9e7838e
+- 2026-10-28 · R09 · added · scenario: before buying · owner · 9e7838e
+- 2026-10-28 · R10 · added · scenario: visual place map and filtered search · owner · 9e7838e
+- 2026-10-28 · R11 · added · scenario: seasonal swap · owner · 9e7838e
+- 2026-10-28 · R12 · changed · package `com.hazia.chatelaine` first recorded · unrecorded · 9e7838e
+- 2026-10-28 · R13 · added · Kotlin and Compose Multiplatform; Android minSdk 30 and Windows on the JVM · owner · 9e7838e
+- 2026-10-28 · R14 · added · code shared by default; platform code for named areas only · unrecorded · 9e7838e
+- 2026-10-28 · R15 · added · fully offline; network only for opt-in model downloads · owner · 9e7838e
+- 2026-10-28 · R16 · added · no Google Play services in the core · unrecorded · 9e7838e
+- 2026-10-28 · R17 · added · F-Droid build optional · owner · 9e7838e
+- 2026-10-28 · R18 · added · Italian and English interface and dictation · owner · 9e7838e
+- 2026-10-28 · R19 · added · phone app under about 150 MB; speech model on first use · owner · 9e7838e
+- 2026-10-28 · R20 · added · the owner's PC · owner · 9e7838e
+- 2026-10-28 · R21 · added · Windows PC as desk companion · owner · 9e7838e
+- 2026-10-28 · R23 · added · start from scratch; borrow file by file with licence headers · owner · 9e7838e
+- 2026-10-28 · R24 · added · sources to borrow from · unrecorded · 9e7838e
+- 2026-10-28 · R24 · changed · earlier app relicensed GPL-3.0 by the owner · owner · a13f446
+- 2026-10-28 · R25 · added · item fields; an item exists once named · unrecorded · 9e7838e
+- 2026-10-28 · R26 · added · optional quantity; consumables later · owner · 9e7838e
+- 2026-10-28 · R27 · added · question: consumables and low stock · unrecorded · 9e7838e
+- 2026-10-28 · R28 · added · identical things as one item with a quantity · builder · 9e7838e
+- 2026-10-28 · R29 · added · tags, place and photo in any order · unrecorded · 9e7838e
+- 2026-10-28 · R30 · added · item states, in use or away · owner · 9e7838e
+- 2026-10-28 · R31 · added · photo outdated flag · unrecorded · 9e7838e
+- 2026-10-28 · R32 · added · places nest to any depth; several sites · owner · 9e7838e
+- 2026-10-28 · R33 · added · place tags, notes, photo, map position and kind · unrecorded · 9e7838e
+- 2026-10-28 · R34 · added · tags as the one organising concept · owner · 9e7838e
+- 2026-10-28 · R35 · added · one parent per tag · builder · 9e7838e
+- 2026-10-28 · R36 · added · kept-together tags with a home place · owner · 9e7838e
+- 2026-10-28 · R37 · added · tag kinds for display · builder · 9e7838e
+- 2026-10-28 · R38 · added · question: default tag kinds · unrecorded · 9e7838e
+- 2026-10-28 · R39 · added · suggested tags stored until accepted · unrecorded · 9e7838e
+- 2026-10-28 · R40 · added · model suggestions always editable · owner · 9e7838e
+- 2026-10-28 · R41 · added · photos of items and places; marked regions · unrecorded · 9e7838e
+- 2026-10-28 · R42 · added · proposals from a photo · unrecorded · 9e7838e
+- 2026-10-28 · R43 · added · user-defined custom fields · owner · 9e7838e
+- 2026-10-28 · R44 · added · field types · unrecorded · 9e7838e
+- 2026-10-28 · R45 · added · question: final field types and presets · unrecorded · 9e7838e
+- 2026-10-28 · R46 · added · fields on a tag or on a single item · builder · 9e7838e
+- 2026-10-28 · R47 · added · user-editable kinds, homepage cards and widget · unrecorded · 9e7838e
+- 2026-10-28 · R48 · added · local database per device · builder · 9e7838e
+- 2026-10-28 · R49 · added · question: database library · builder · 9e7838e
+- 2026-10-28 · R50 · added · a database that fails to open is kept · unrecorded · 9e7838e
+- 2026-10-28 · R51 · added · two-way sync over a folder · owner · 9e7838e
+- 2026-10-28 · R52 · added · unique ids and modification history · unrecorded · 9e7838e
+- 2026-10-28 · R53 · added · no database file shared directly · unrecorded · 9e7838e
+- 2026-10-28 · R54 · added · later edit wins; overwritten value kept in history · builder · 9e7838e
+- 2026-10-28 · R55 · added · one sync group per user-visible field; losing values kept · unrecorded · a13f446
+- 2026-10-28 · R56 · added · photos as files named by id · unrecorded · 9e7838e
+- 2026-10-28 · R57 · added · any folder-sync tool · unrecorded · 9e7838e
+- 2026-10-28 · R58 · added · the earlier app's folder sync as the starting point · unrecorded · 9e7838e
+- 2026-10-28 · R58 · changed · `:core` reused almost unchanged, folder layer adapted · unrecorded · a13f446
+- 2026-10-28 · R59 · added · sync lessons from the earlier app · unrecorded · a13f446
+- 2026-10-28 · R60 · added · automatic backup and manual export · owner · 9e7838e
+- 2026-10-28 · R61 · added · restore merges by stamps; rollback is a separate action · builder · 9e7838e
+- 2026-10-28 · R62 · added · recognition is core; larger model optional · owner · 9e7838e
+- 2026-10-28 · R63 · added · model roles · unrecorded · 9e7838e
+- 2026-10-28 · R64 · added · models on device; larger ones downloaded on request · unrecorded · 9e7838e
+- 2026-10-28 · R65 · added · recognition pass bar on the Snapdragon 845 phone · owner · 9e7838e
+- 2026-10-28 · R67 · added · optional language model for tag suggestions · owner · 9e7838e
+- 2026-10-28 · R68 · added · open-vocabulary recogniser · builder · 9e7838e
+- 2026-10-28 · R69 · added · recognition is a hint · unrecorded · 9e7838e
+- 2026-10-28 · R70 · added · model cooperation · unrecorded · 9e7838e
+- 2026-10-28 · R71 · added · personal learning from the user's examples · unrecorded · 9e7838e
+- 2026-10-28 · R72 · added · model licences checked before adoption · unrecorded · 9e7838e
+- 2026-10-28 · R81 · added · parent-tag search finds child tags · unrecorded · 9e7838e
+- 2026-10-28 · R82 · added · search across languages · builder · 9e7838e
+- 2026-10-28 · R83 · added · automatic visual place map · owner · 9e7838e
+- 2026-10-28 · R84 · added · question: homepage, the owner's sketch · owner · 9e7838e
+- 2026-10-28 · R85 · added · tag card shows top-level tags only · owner · 9e7838e
+- 2026-10-28 · R86 · added · no push by default · owner · 9e7838e
+- 2026-10-28 · R87 · added · clear-box surfaces ranked by the owner · owner · 9e7838e
+- 2026-10-28 · R88 · added · A4 photo labels with a QR code; NFC later · owner · 9e7838e
+- 2026-10-28 · R89 · added · question: Windows widget · unrecorded · 9e7838e
+- 2026-10-28 · R90 · added · purpose map before any screen · owner · 9e7838e
+- 2026-10-28 · R91 · added · purpose-map scoring axes · owner · 4b51567
+- 2026-10-28 · R92 · added · homepage shortcuts not counted as repeats · owner · 4b51567
+- 2026-10-28 · R93 · added · no screens at stage 0; each discussed first · owner · 9e7838e
+- 2026-10-28 · R94 · added · look and feel direction · owner · 9e7838e
+- 2026-10-28 · R95 · added · reach and density from the earlier app · owner · 9e7838e
+- 2026-10-28 · R96 · added · same element, same behaviour · unrecorded · 9e7838e
+- 2026-10-28 · R97 · added · Wardrobe and Pantry modules, off by default · owner · 9e7838e
+- 2026-10-28 · R99 · added · question: reminders and shopping lists · unrecorded · 9e7838e
+- 2026-10-28 · R100 · added · stage plan · unrecorded · 9e7838e
+- 2026-10-28 · R101 · added · visual map after recognition and suggestions · builder · 9e7838e
+- 2026-10-28 · R102 · added · stage 0 spikes replaced by a review of the earlier app · owner · 4b51567
+- 2026-10-28 · R102 · changed · KMP spike kept · owner · a13f446
+- 2026-10-28 · R103 · added · insurance records out of scope · owner · 9e7838e
+- 2026-10-28 · R104 · added · app lock not in v1 · owner · 9e7838e
+- 2026-10-28 · R105 · added · lending in a later stage · owner · 9e7838e
+- 2026-10-28 · R106 · added · no importer in stage 1 · owner · 9e7838e
+- 2026-10-28 · R107 · added · stock and expiry only in the Pantry module · unrecorded · 9e7838e
+- 2026-10-29 · R19 · changed · limit read as download size, compressed · owner · 45ff4af
+- 2026-10-29 · R26 · changed · approximate counts by default; "accurate amounts" setting · owner · f6a7eff
+- 2026-10-29 · R65 · changed · target phones Snapdragon 888 and 695; Snapdragon 845 dropped · owner · 45ff4af
+- 2026-10-29 · R66 · added · crowded answers scored on the shortest answer's lines · owner · f6a7eff
+- 2026-10-29 · R67 · changed · target phones follow R65 · owner · 45ff4af
+- 2026-10-29 · R78 · added · question: optional AI-service key · unrecorded · 45ff4af
+- 2026-10-29 · R100 · changed · stages 0 and 4 on both target phones · unrecorded · 45ff4af
+- 2026-10-29 · R102 · changed · model spike on the target phones · owner · 45ff4af
+- 2026-10-30 · R73 · added · recognition instructions not tuned further · owner · dfca89e
+- 2026-10-30 · R74 · added · repeated lines cut; answer capped at 15 lines · builder · dfca89e
+- 2026-10-30 · R76 · added · question: smaller recogniser model · unrecorded · d91b2ac
+- 2026-10-30 · R77 · added · question: recogniser as a first-use download · unrecorded · d91b2ac
+- 2026-10-30 · R78 · changed · tightened instructions would go with the key · unrecorded · f6a7eff
+- 2026-10-30 · R79 · added · logging form built for quick correction · owner · 84da86f
+- 2026-10-30 · R80 · added · lump, then refine · owner · dfca89e
+- 2026-11-03 · R75 · added · no segmentation stage · unrecorded · bb9fc05
+- 2026-11-19 · R98 · added · savings is a separate app, bridged one way by the shopping list · owner · 9e2acc3
+- 2026-11-19 · R99 · changed · shopping list settled by R98; reminders stay open · owner · 9e2acc3
+- 2026-11-19 · R103 · changed · price kept on bought shopping-list items only · owner · 9e2acc3
+- 2026-11-22 · R04 · added · question: jobs and how often · builder
+- 2026-11-22 · spec · migrated · to the project-spec-writer format, from the old format held in commit 2f54ae8 · builder
+- 2026-11-22 · R18 · changed · dictation arrives in stage 8, the interface languages from the start · owner
+- 2026-11-22 · R98 · changed · the shopping list belongs to the Pantry module (R97) · owner

@@ -1,6 +1,6 @@
 # Reference apps (stage 0, 2026-10-28)
 
-The seven open-source apps from SPEC §12, inventoried as baselines and controls for the purpose map (SPEC D-27, D-34). Four were walked on an older Snapdragon 845 phone. Prepper and hot-stuff need Android 13 and StuffList was never published, so those three were read from source. Per-app inventories and 54 screenshots are kept in a private folder outside the repository.
+The seven open-source apps from SPEC R24, inventoried as baselines and controls for the purpose map (SPEC R90, R91). Four were walked on an older Snapdragon 845 phone. Prepper and hot-stuff need Android 13 and StuffList was never published, so those three were read from source. Per-app inventories and 54 screenshots are kept in a private folder outside the repository.
 
 ## The apps in brief
 
@@ -26,7 +26,7 @@ Walked counts are measured; source counts are estimated from the navigation code
 | (d) tag several items at once | not measured | not supported | not supported | not supported | not supported | not supported | not supported |
 | (e) move an item | in code, not measured | not supported | not supported | 3 (change person) | ~7 + scan | ~6 + retyping | not supported |
 
-**No reference app supports tagging or moving several items at once** (S1, S3, S7). Only Prepper nests places deeper than one level, and none draws them (S6), falls back to other places when a search finds nothing (S6), or searches by meaning across languages (D-30).
+**No reference app supports tagging or moving several items at once** (R05, R07, R11). Only Prepper nests places deeper than one level, and none draws them (R10), falls back to other places when a search finds nothing (R10), or searches by meaning across languages (R82).
 
 ## Functions by candidate purpose
 
@@ -43,16 +43,16 @@ Walked counts are measured; source counts are estimated from the navigation code
 
 | Function | Seen in | Where it belongs for Chatelaine |
 |---|---|---|
-| Lending and return history | Who Has My Stuff | stage 11 (D-10); a purpose then, or part of "in use / away" |
-| Expiry and low-stock alerts, on by default | Personal Stuff, Prepper | Pantry module (D-33), and opt-in only (D-20) |
+| Lending and return history | Who Has My Stuff | stage 11 (R105); a purpose then, or part of "in use / away" |
+| Expiry and low-stock alerts, on by default | Personal Stuff, Prepper | Pantry module (R97), and opt-in only (R86) |
 | Usage, purchase and maintenance logs; stock movements | Personal Stuff | Pantry module or out of scope |
 | Scanning a code to open or register a box | Flindex, Prepper | P1 (open a place by its label's QR) — to place when scoring |
 | Product barcode lookup | Personal Stuff | not planned |
-| Price and total value | Personal Stuff, hot-stuff | out of scope (D-11) |
+| Price and total value | Personal Stuff, hot-stuff | out of scope (R103) |
 | Trip packing (taken / brought back) | StuffList | close to "in use / away" and lending |
-| Calendar entries, in-app help, unit conversion | Who Has My Stuff, hot-stuff, Prepper | not planned; unit handling comes with typed units (§5.5) |
+| Calendar entries, in-app help, unit conversion | Who Has My Stuff, hot-stuff, Prepper | not planned; unit handling comes with typed units (R44) |
 
-## Code worth borrowing (SPEC D-05)
+## Code worth borrowing (SPEC R23)
 
 From Prepper (GPL-3.0), under `app/src/main/java/io/github/escapedcanadian/prepper/`:
 - `data/repository/ContainerRepository.kt`: move a box with everything inside; needs a guard against moving a box into itself.
