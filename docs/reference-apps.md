@@ -62,7 +62,7 @@ From Prepper (GPL-3.0), under `app/src/main/java/io/github/escapedcanadian/prepp
 - `export/CsvExportManager.kt`, `export/CsvImportManager.kt`: zip backup and restore (Android/JVM).
 - `util/PhotoHelper.kt`: photo resize and rotation fix (Android).
 
-From hot-stuff (Apache-2.0): `app/src/main/res/values/arrays.xml`, 58 room names and 63 categories, as starter place kinds and tags.
+From hot-stuff (Apache-2.0): `app/src/main/res/values/arrays.xml`, 58 room names and 63 categories, as starter place names and tags.
 
 StuffList has no licence: ideas only (photo grid, reminder at the moment of need, "Add more" in the add form), written from scratch if used.
 

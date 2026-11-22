@@ -25,11 +25,11 @@ How to read it:
 
 | Entry | Where | Scenarios | Overlaps |
 |---|---|---|---|
-| **Search bar**: by name, tag (child tags included) and meaning | homepage, top | R05, R10 | Tag grid, Place filter |
+| **Search bar**: by name, tag (sub-tags included) and meaning | homepage, top | R05, R10 | Tag grid, Place filter |
 | **Place filter**: limit search to a house, floor or place | search results | R10 | Place map |
 | **Fallback results**: the same search in other places when the chosen one has none | search results | R10 | — |
 | **Place contents**: what is in a place, with its photo | place screen | R09 | Photo browsing |
-| **Tag results**: items carrying a tag or its children, with multi-select | tag screen | R05 | Search bar |
+| **Tag results**: items carrying a tag or its sub-tags, with multi-select | tag screen | R05 | Search bar |
 
 ## P2 Record
 
@@ -47,7 +47,7 @@ How to read it:
 
 | Entry | Where | Scenarios | Overlaps |
 |---|---|---|---|
-| **Tag grid**: top-level tags, opening into children | homepage card | R05, R11 | Search bar |
+| **Tag grid**: top-level tags, opening into sub-tags | homepage card | R05, R11 | Search bar |
 | **Tag editor**: name, parent, kind, kept together, home place | tag screen | R05 | — |
 | **Bulk tag edit**: add or remove tags on a selection | any multi-select list | R05, R07 | Proposal review |
 | **Tag suggestions**: proposed tags and parent tags for new items | item editor, proposal review | R06 | Proposal review |
@@ -60,7 +60,7 @@ How to read it:
 |---|---|---|---|
 | **Places entry**: house map, or floor cards, or house grid, depending on how many exist | homepage card | R10 | Place map |
 | **Place map**: stylised blocks drawn from the place tree, rearrangeable | Places | R10 | Place filter, Places entry |
-| **Place editor**: name, kind, parent, tags, photo, position | place screen | R10 | — |
+| **Place editor**: name, size, parent, tags, photo, position | place screen | R10 | — |
 
 ## P5 Keep in view
 
@@ -80,7 +80,7 @@ How to read it:
 | **Sync folder** | settings | — | Backup |
 | **Language** (interface, dictation) | settings | — | — |
 | **Models**: download, remove, which device | settings | — | — |
-| **Customisation**: fields, place kinds, tag kinds, homepage cards, widget | settings | — | Tag editor, Place editor |
+| **Customisation**: fields, tag kinds, homepage cards, widget | settings | — | Tag editor, Place editor |
 | **App lock** (stage 11) | settings | — | — |
 
 ## Modules (SPEC R97, stage 10; mapped when designed)

@@ -205,3 +205,101 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-22 · R99 · changed · notifications off until turned on, also when a module is switched on; Wardrobe running-out row; no reminders not about a thing · owner
 - 2026-11-22 · R109 · added · expiry dates read from labels or logged by hand · owner
 - 2026-11-22 · R110 · added · usage rate from what is already recorded · owner
+- 2026-11-22 · spec · changed · purpose text in the owner's words · owner
+- 2026-11-22 · R02 · changed · first goal reworded by the owner · owner
+- 2026-11-22 · R03 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R04 · kind · Q → D: the owner's first estimate of how often · owner
+- 2026-11-22 · R05 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R06 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R07 · changed · own tags "junk" and "to be sorted"; the drawer is the "junk drawer" · owner
+- 2026-11-22 · R08 · changed · each kind of thing saved as an item with its count, inside the box as a place · owner
+- 2026-11-22 · R09 · changed · an Inventory scenario: relies on what was logged, never a new photo · owner
+- 2026-11-22 · R10 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R11 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R111 · added · items and places are different things · owner
+- 2026-11-22 · spec · changed · glossary: Item and Place · owner
+- 2026-11-22 · R04 · changed · photo logging daily during the first big tidy, otherwise about monthly · owner
+- 2026-11-22 · R101 · changed · reason: photo logging is daily during the first big tidy · owner
+- 2026-11-22 · spec · changed · glossary: the landscape effect · owner
+- 2026-11-22 · R12 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R14 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R16 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R17 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R21 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R25 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R28 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R29 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R30 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R31 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R34 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R35 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R36 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R37 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R39 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R41 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R42 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R43 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R46 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R20 · changed · the PC described by class, not by its parts · owner
+- 2026-11-22 · R22 · kind · D → O: what never goes public, listed; the repository is public · owner
+- 2026-11-22 · R27 · kind · Q → D: consumables live in the Pantry module · owner
+- 2026-11-22 · R32 · changed · example names places as what they are · owner
+- 2026-11-22 · R33 · changed · places are called what they are and differ only in size · owner
+- 2026-11-22 · R38 · kind · Q → D: the five tag kinds are the defaults · owner
+- 2026-11-22 · R44 · changed · sized for every module · owner
+- 2026-11-22 · R47 · changed · place kinds removed · owner
+- 2026-11-22 · R24 · changed · hot-stuff room names become place names · owner
+- 2026-11-22 · R48 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R50 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R51 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R52 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R53 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R54 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R55 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R57 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R58 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R59 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R60 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R61 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R62 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R64 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R67 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R68 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R69 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R70 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R71 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R72 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R73 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R74 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R75 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R56 · changed · photos named by content hash, as R58 · owner
+- 2026-11-22 · R49 · changed · proposed answer: the library the earlier app's sync code uses · owner
+- 2026-11-22 · R63 · changed · larger recogniser Qwen3-VL class; Reader role for label text; speech fallback without Google services · owner
+- 2026-11-22 · R109 · changed · Evidence follows R63's Reader role · owner
+- 2026-11-22 · R40 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R65 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R66 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R79 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R80 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R86 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R90 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R93 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R94 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R97 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R102 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R103 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R104 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R105 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R107 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R83 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R85 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R87 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R88 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R91 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R92 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · R96 · changed · wording reviewed by the owner · owner
+- 2026-11-22 · spec · renamed · "child tag" → "sub-tag" · owner
+- 2026-11-22 · R81 · changed · named Search through sub-tags · owner
+- 2026-11-22 · R35 · changed · sub-tag wording · owner
+- 2026-11-22 · R82 · changed · built-in names: tag kinds and starter place names · owner
+- 2026-11-22 · R100 · changed · consumables out of stage 11; label reading in stage 4; notifications in stage 10 · owner
