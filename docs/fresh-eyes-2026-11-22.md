@@ -50,6 +50,8 @@ Owner's decision: the R96 checks move to match R96, which is in the owner's own 
 
 ## Needs a decision
 
+These wait for the design pass, where design decisions are made (owner). The mockups' failing R96 look-alike pairs (A, B and C) are design work for the same pass.
+
 1. **A neutral task set.** The task set in `score_taps.py` is read off the owner's photos, so it counts as the photos (owner). The four scorers are now listed in `.gitignore` and stay local. They could be published only with a neutral task set, which means re-rendering the mockups, because `task_model.py` looks the words up in the renders.
 2. **R91's acceptance** reads a control scoring well as proof that the axes are wrong, so no outcome can fail the purpose map (found by the fresh-eyes run on R91's text, not the code).
 3. **`phone_pc_parity`** returns 0 wrapped lines when phone and PC have different line counts, which reads as "no difference". This changes the score, so it is not fixed.
