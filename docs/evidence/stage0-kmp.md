@@ -36,12 +36,13 @@ Every version was already in the PC's Gradle cache, so all builds ran with `--of
 
 ## Build and run times
 
-Each build ran from a clean project (no `build/` folders) with `--no-build-cache`, in a single-use Gradle daemon (the PC's Gradle settings turn the daemon off), so the times include starting Gradle.
+Every build ran in a single-use Gradle daemon (the PC's Gradle settings turn the daemon off), so the times include starting Gradle. The first two builds ran one after the other in a fresh project, with `--no-build-cache`, so every task they list ran. The desktop one came before the build files named the Compose libraries directly; the versions resolved were the same. The third rebuilt the committed project with every task rerun, and showed no warnings, deprecations included.
 
 | Step | Time |
 |---|---|
-| `gradlew --offline --no-build-cache :desktopApp:jar` | 67 s (10 tasks) |
-| `gradlew --offline --no-build-cache :androidApp:assembleDebug` | 100 s (46 tasks); debug APK 29 MB |
+| `gradlew --offline --no-build-cache :desktopApp:jar`, fresh project | 67 s (10 tasks) |
+| `gradlew --offline --no-build-cache :androidApp:assembleDebug`, right after | 100 s (46 tasks); debug APK 29 MB |
+| `gradlew --offline --rerun-tasks :desktopApp:jar :androidApp:assembleDebug`, both together | 96 s |
 | `gradlew --offline :desktopApp:run`, command to window on screen | 49 s (recompiling `shared` after a build-file change) |
 | Emulator start, quick boot from its snapshot | 21 s |
 | Android cold start, first launch just after the snapshot restore | 12.4 s, and one ANR while the emulator was still busy |
