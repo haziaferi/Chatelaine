@@ -115,7 +115,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R123 | Receipt file | 10. Modules and the shopping list |
 | D-R124 | What makes a receipt | 10. Modules and the shopping list |
 | D-R125 | Item category | 10. Modules and the shopping list |
-| Q-R126 | Lines with no category | 10. Modules and the shopping list |
+| D-R126 | No category, no shopping list | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
@@ -155,12 +155,14 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Replica | A module a user builds with the same tools as the built-in modules. |
 | Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
-| Shopping module | The module for what to buy, where and at what price: the shopping list, the price book and the price comparison. |
+| Shopping module | The module for what to buy, where and at what price: the shopping list, the wish list, the price book and the price comparison. |
 | Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack. |
 | Price book | Shop prices recorded by pack, store and date, with promotions and their end dates. |
-| Wish | A shopping-list entry for something not in Inventory; it becomes an item only when ticked as bought (R117). |
+| Wish | An entry on the wish list or the shopping list for something not in Inventory; it becomes an item only when ticked as bought (R117). |
+| Wish list | The Shopping module's list of wishes kept for later; a wish moves from it to the shopping list when it is to be bought (R117). |
+| Savings export | The Shopping setting, off by default, that sends each receipt to the savings app and shows the category field (R113, R125). |
 | Receipt | The items bought at one store in one payment; one row in the savings export (R124). |
-| Category | An optional label on an item or wish that the savings app matches to one of its own categories (R125). |
+| Category | A label on an item or wish, shown while the savings export is on, that the savings app matches to one of its own categories (R125). |
 | Settled area | An area whose things are where they belong, photographed as a whole. |
 | Place photo | A photo that belongs to a place. |
 | Suggestion | Information a model proposes, such as a name, a count or a tag. |
@@ -1340,15 +1342,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Inventory | expiry date, opened on, months after opening | expiring soon |
 | Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year, usage rate |
 | Pantry | quantity and unit, minimum stock | usage rate |
-| Shopping | category, off by default (R125); prices live in the price book (R112) | shopping list, "already have it" check, price comparison |
+| Shopping | category, shown while the savings export is on (R125); prices live in the price book (R112) | shopping list, wish list, "already have it" check, price comparison |
 
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R112 · Shopping module
 
-**Rule:** The Shopping module holds the shopping list, the price book and the price comparison, and builds on the Inventory module rather than on Pantry, so anything can go on the list. With Pantry on too, low stock appears on the list as a suggestion the user accepts with one tap, and the list shows Pantry stock. The price comparison comes from a standalone library the owner's other apps can also use (R119).
+**Rule:** The Shopping module holds the shopping list, the wish list (R117), the price book and the price comparison, and builds on the Inventory module rather than on Pantry, so anything can go on the list. With Pantry on too, low stock appears on the list as a suggestion the user accepts with one tap (flagged instead when it has no category, R126), and the list shows Pantry stock. The price comparison comes from a standalone library the owner's other apps can also use (R119).
 
 **Why:** Pantry is about what the user has and how fast it is used; Shopping is about what to buy, where and at what price. Not everything bought is a consumable, and the money bridge (R98) sits where money is spent, so Chatelaine touches money in one module only.
 
@@ -1356,19 +1358,19 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Not:** The shopping list inside the Pantry module: non-consumables could not go on the list, and a list would require stock tracking.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R113 · Export per receipt
 
-**Rule:** Bought items go to the savings app as one row per receipt (R124): store, date and total paid, with the receipt's lines as detail in the receipt file (R123). No line is an expense of its own; the savings app splits a receipt across its categories (R122).
+**Rule:** While the savings export is on (R125), bought items go to the savings app as one row per receipt (R124): store, date and total paid, with the receipt's lines as detail in the receipt file (R123). No line is an expense of its own; the savings app splits a receipt across its categories (R122).
 
 **Why:** The savings app records each expense against a category with a place and a date, and imports bank statements, where one card payment is one row.
 
-**Acceptance:** A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
+**Acceptance:** A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing.
 
 **Not:** One row per item: once the bank statement is imported, the savings app would count the card payment twice. One row per category from Chatelaine: no row would match the bank's single row, so the savings app's duplicate check would miss the payment.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R122 · Savings categories
 
@@ -1426,35 +1428,39 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R125 · Item category
 
-**Rule:** An item or a wish can carry one category, a label kept apart from its tags and chosen from a list the user edits. The category is optional and off by default: a Shopping setting turns it on.
+**Rule:** An item or a wish can carry one category, a label kept apart from its tags and chosen from a list the user edits. The category field appears only while the savings export is on: a Shopping setting, off by default, and with it off nothing is exported (R113).
 
-**Why:** The savings app files each receipt line under a category (R122), and tags cannot say which one: an item carries tags of several kinds (R37).
+**Why:** The savings app files each receipt line under a category (R122), and tags cannot say which one: an item carries tags of several kinds (R37). Someone who uses Shopping without a savings app is never asked for categories.
 
-**Acceptance:** With Shopping on and the setting off, no category field appears. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
+**Acceptance:** With Shopping on and the savings export off, no category field appears, anything can go on the shopping list, and nothing is exported. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
 
-**Not:** Category as a tag kind: an item could then carry several, and tag kinds are for display (R37).
+**Not:** Category as a tag kind: an item could then carry several, and tag kinds are for display (R37). A category that comes with the Shopping module itself: everyone using Shopping would have to categorise, even with no savings app. A category setting of its own: with it off, nothing could go on the shopping list (R126).
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
-### Q-R126 · Lines with no category
+### D-R126 · No category, no shopping list
 
-**Rule:** How does the savings app file a receipt line that carries no category, because the setting is off or the item has none?
+**Rule:** While the savings export is on (R125), an item or a wish with no category cannot be added to the shopping list. A low-stock item with no category (R112) shows in Shopping flagged as having none and cannot be added until it is given one, which the flag lets the user do.
 
-**Default:** The user picks a category for the line in the savings app's import review, and nothing is remembered, since the line carries nothing stable to remember it by. Changes: R122's import review and R123's lines.
+**Why:** Every receipt line then carries a category, so the savings app never meets a line it cannot file (R122).
 
-**Why:** Picking by hand each time is simple but repeats for the same item; remembering per item would need the item's id (R52) on every line of the receipt file.
+**Acceptance:** With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; every exported line carries a category.
 
-**Since:** 2026-11-23 · builder · agreed rewording
+**Not:** Picking a category for an uncategorised line in the savings app's import review: it would repeat for the same item on every receipt.
+
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R117 · Wishes
 
-**Rule:** A list entry for something already in Inventory links to that item. Anything else put on the list is a wish, a record of its own, and becomes an Inventory item only when it is ticked as bought.
+**Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, and becomes an Inventory item only when it is ticked as bought.
 
-**Acceptance:** Putting a kettle that is not in Inventory on the list creates a wish and no item; search and the object of the day do not show it; ticking it as bought creates the item. Putting batteries that are in Inventory on the list links to that item, and ticking them as bought raises its quantity.
+**Evidence:** Not checked: how the wish list works (wishes kept for later, moved to the shopping list when they are to be bought) is the builder's proposal of 2026-11-24; the owner named the wish list as part of Shopping.
+
+**Acceptance:** Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item. Putting batteries that are in Inventory on the shopping list links to that item, and ticking them as bought raises its quantity.
 
 **Not:** A "to buy" item state: things not owned would show in search and as the object of the day.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R118 · Shopping records in sync and backup
 
@@ -1535,11 +1541,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** Money is a different job (amounts, accounts, budgets) with its own rhythm and tone, and would raise the security bar for app lock, backups and folder sync. Shop prices are not personal finances: no account, balance or budget is involved. Chatelaine owns the shopping list because it knows the stock.
 
-**Acceptance:** With Shopping on, putting an item on the shopping list shows how many are owned and where, and each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
+**Acceptance:** With Shopping on, putting an item on the shopping list shows how many are owned and where, and with the savings export on (R125) each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 
 **Not:** Savings as a module inside Chatelaine: money is a different job, as Why says. The shopping list as a core feature: odd for someone who only wants to find where things are, such as important documents or rarely used small appliances.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R99 · Reminders
 
@@ -1731,19 +1737,20 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
-- R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
+- R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing.
 - R122 · Savings categories: Every line with a category carries it in the receipt file, and Chatelaine reads nothing from the savings app.
 - R123 · Receipt file: An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
 - R124 · What makes a receipt: Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file.
-- R125 · Item category: With Shopping on and the setting off, no category field appears. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
-- R117 · Wishes: Putting a kettle that is not in Inventory on the list creates a wish and no item; search and the object of the day do not show it; ticking it as bought creates the item. Putting batteries that are in Inventory on the list links to that item, and ticking them as bought raises its quantity.
+- R125 · Item category: With Shopping on and the savings export off, no category field appears, anything can go on the shopping list, and nothing is exported. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
+- R126 · No category, no shopping list: With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; every exported line carries a category.
+- R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item. Putting batteries that are in Inventory on the shopping list links to that item, and ticking them as bought raises its quantity.
 - R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
 - R121 · Showing the difference: Ticking an item as bought below or above its saved price shows no difference or saving, at the tick step or anywhere else.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
-- R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
+- R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and with the savings export on (R125) each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 - R99 · Reminders: With any of its modules off, a notification can neither be turned on nor arrive. The Inventory module's notifications can be turned on at any time.
 - R100 · Stage plan: Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
 - R102 · Stage 0 spikes: A Compose Multiplatform window runs on Android and on Windows, and the spike timings are recorded, as stage 0 requires (R100).

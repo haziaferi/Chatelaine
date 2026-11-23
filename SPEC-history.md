@@ -352,3 +352,11 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-23 · R115 · changed · "trip's savings export" → "receipt's savings export" · owner
 - 2026-11-23 · R116 · changed · "trip total" → "receipt total" · owner
 - 2026-11-23 · spec · added · glossary: Receipt, Category · owner
+- 2026-11-24 · R125 · changed · category shown only while the savings export is on, a Shopping setting off by default · owner
+- 2026-11-24 · R126 · kind · Q → D: no category, no shopping list; uncategorised low stock flagged · owner
+- 2026-11-24 · R112 · changed · Shopping holds a wish list; low stock with no category is flagged · owner
+- 2026-11-24 · R117 · changed · wishes kept on the wish list or put straight on the shopping list · owner
+- 2026-11-24 · R113 · changed · export only while the savings export is on · owner
+- 2026-11-24 · R97 · changed · Shopping row: category shown with the savings export; wish list view · owner
+- 2026-11-24 · R98 · changed · receipts export only with the savings export on · owner
+- 2026-11-24 · spec · added · glossary: Wish list, Savings export; Wish, Category, Shopping module changed · owner
