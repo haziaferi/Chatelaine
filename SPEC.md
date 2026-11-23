@@ -115,7 +115,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
 | O-R116 | Price paid in the savings export | 10. Modules and the shopping list |
-| Q-R121 | Showing the difference | 10. Modules and the shopping list |
+| D-R121 | Showing the difference | 10. Modules and the shopping list |
 | D-R109 | Expiry dates | 10. Modules and the shopping list |
 | D-R110 | Usage rate | 10. Modules and the shopping list |
 | O-R98 | Savings app and the shopping list | 10. Modules and the shopping list |
@@ -1407,15 +1407,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-11-23 · owner · agreed rewording
 
-### Q-R121 · Showing the difference
+### D-R121 · Showing the difference
 
-**Rule:** When the price paid differs from the saved price (R115), does Chatelaine show the difference?
+**Rule:** Chatelaine does not show the difference between the price paid and the saved price (R115). Ticking an item as bought shows only the price paid.
 
-**Default:** Once, when the item is ticked as bought ("0,30 € less than saved"), and nowhere else. Changes: R115's tick step.
+**Acceptance:** Ticking an item as bought below or above its saved price shows no difference or saving, at the tick step or anywhere else.
 
-**Why:** Showing it acknowledges a good find; not showing it keeps the tick step to one figure.
+**Not:** Showing the difference once at the tick step ("0,30 € less than saved").
 
-**Since:** 2026-11-23 · builder · agreed rewording
+**Since:** 2026-11-23 · owner · agreed rewording
 
 ### D-R109 · Expiry dates
 
@@ -1650,6 +1650,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, exports the amount in its Exported column, and no export carries a difference or a saving as a separate amount.
+- R121 · Showing the difference: Ticking an item as bought below or above its saved price shows no difference or saving, at the tick step or anywhere else.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
