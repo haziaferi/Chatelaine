@@ -146,7 +146,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Kept together | A mark on a tag: its things share a home place. |
 | Field | A value that differs from item to item, such as size M or expires March 2027. A custom field is one the user defines. |
 | Module | A preset set of custom fields on its tags or records of its own (the Shopping module's price book), plus a few views of its own and its own purpose-map entries. |
-| Mold | A module a user builds with the same tools as the built-in modules. |
+| Replica | A module a user builds with the same tools as the built-in modules. |
 | Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
 | Shopping module | The module for what to buy, where and at what price: the shopping list, the price book and the price comparison. |
@@ -1321,7 +1321,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R97 · Modules
 
-**Rule:** Chatelaine is one app built on the Inventory module, which is always on and cannot be turned off. Wardrobe, Pantry and Shopping are optional modules on top of it, off by default, each designed with the owner first; users can build their own molds with the same tools. Expiry belongs to the Inventory module, since it covers medication and cosmetics as well as food.
+**Rule:** Chatelaine is one app built on the Inventory module, which is always on and cannot be turned off. Wardrobe, Pantry and Shopping are optional modules on top of it, off by default, each designed with the owner first; users can build their own replicas with the same tools. Expiry belongs to the Inventory module, since it covers medication and cosmetics as well as food.
 
 **Why:** The core stays calm and small; modules add fields and screens only for those who want them.
 
