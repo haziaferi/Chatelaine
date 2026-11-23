@@ -303,3 +303,5 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-22 · R35 · changed · sub-tag wording · owner
 - 2026-11-22 · R82 · changed · built-in names: tag kinds and starter place names · owner
 - 2026-11-22 · R100 · changed · consumables out of stage 11; label reading in stage 4; notifications in stage 10 · owner
+- 2026-11-23 · R102 · changed · Evidence: KMP spike run · owner
+- 2026-11-23 · R100 · changed · stage 0 done-when points to the KMP spike record · owner

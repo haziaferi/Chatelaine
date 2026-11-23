@@ -1379,7 +1379,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 | Stage | Holds | Done when | Unlocks |
 |---|---|---|---|
-| 0 Foundations | the spec; purpose map scored on the axes of R91; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed against R65 on the target phones; Compose Multiplatform window running on Android and Windows (R102) | owner approves the spec and the purpose map; spike timings recorded (`docs/evidence/stage0-recognition.md`) | — |
+| 0 Foundations | the spec; purpose map scored on the axes of R91; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed against R65 on the target phones; Compose Multiplatform window running on Android and Windows (R102) | owner approves the spec and the purpose map; spike timings recorded (`docs/evidence/stage0-recognition.md`); KMP spike run recorded (`docs/evidence/stage0-kmp.md`) | — |
 | 1 Data and safety | data model (items, places, tags with parents and kept-together, photos, states, custom fields, history); database; backup and export; change-file sync | round-trip tests: export → import, two-device sync with conflicts, a corrupted database is kept, not deleted | — |
 | 2 Logging and tags | quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove; search including sub-tags | owner-approved screens built; R05 passes | R05 |
 | 3 Places and photos | place tree; camera (phone only, R21); item and place photos; settled-area path; place contents view; in use / away; move and bulk move | R09 passes; the move part of R11 passes | R09 |
@@ -1411,6 +1411,8 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 **Rule:** Stage 0 reviews the sync of the earlier app in place of a change-file-sync spike; the review was done on 2026-10-28 (R58). The KMP spike stays and proves a Compose Multiplatform window running on Android, at minSdk 33 (R13), and on Windows. The model spike also stays, on the target phones of R65.
 
 **Why:** The review found the earlier app has no Compose and no runnable Windows app.
+
+**Evidence:** Stage 0 KMP spike, 2026-11-23 (`docs/evidence/stage0-kmp.md`): one shared screen ran on Windows and on Android at API 36 and API 34, from a build with minSdk 33. Not checked: an API 33 device.
 
 **Acceptance:** A Compose Multiplatform window runs on Android and on Windows, and the spike timings are recorded, as stage 0 requires (R100).
 
