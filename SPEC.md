@@ -107,6 +107,8 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R95 | Reach and density | 9. Purpose map and look |
 | D-R96 | Consistent elements | 9. Purpose map and look |
 | O-R97 | Modules | 10. Modules and the shopping list |
+| D-R112 | Shopping module | 10. Modules and the shopping list |
+| Q-R113 | Export granularity | 10. Modules and the shopping list |
 | D-R109 | Expiry dates | 10. Modules and the shopping list |
 | D-R110 | Usage rate | 10. Modules and the shopping list |
 | O-R98 | Savings app and the shopping list | 10. Modules and the shopping list |
@@ -120,7 +122,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | O-R104 | App lock | Out of scope |
 | O-R105 | Lending | Out of scope |
 | O-R106 | Inventory import | Out of scope |
-| D-R107 | Stock and shopping outside Pantry | Out of scope |
+| D-R107 | Low stock outside Pantry | Out of scope |
 
 ## Glossary
 
@@ -140,6 +142,8 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Pack | A module a user builds with the same tools as the built-in modules. |
 | Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
+| Shopping module | The module for what to buy, where and at what price: the shopping list, the price book and the price comparison. |
+| Price book | Shop prices recorded by product, size, store and date, with promotions and their end dates. |
 | Settled area | An area whose things are where they belong, photographed as a whole. |
 | Place photo | A photo that belongs to a place. |
 | Suggestion | Information a model proposes, such as a name, a count or a tag. |
@@ -1291,7 +1295,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R97 · Modules
 
-**Rule:** Chatelaine is one app built on the Inventory module, which is always on and cannot be turned off. Wardrobe and Pantry are optional modules on top of it, off by default, each designed with the owner first; users can build their own packs with the same tools. Expiry belongs to the Inventory module, since it covers medication and cosmetics as well as food.
+**Rule:** Chatelaine is one app built on the Inventory module, which is always on and cannot be turned off. Wardrobe, Pantry and Shopping are optional modules on top of it, off by default, each designed with the owner first; users can build their own packs with the same tools. Expiry belongs to the Inventory module, since it covers medication and cosmetics as well as food.
 
 **Why:** The core stays calm and small; modules add fields and screens only for those who want them.
 
@@ -1301,11 +1305,34 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 |---|---|---|
 | Inventory | expiry date, opened on, months after opening | expiring soon |
 | Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year, usage rate |
-| Pantry | quantity and unit, minimum stock | shopping list, "already have it" check, usage rate |
+| Pantry | quantity and unit, minimum stock | "already have it" check, usage rate |
+| Shopping | none: prices live in the price book (R112) | shopping list, price comparison |
 
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### D-R112 · Shopping module
+
+**Rule:** The Shopping module holds the shopping list, the price book and the price comparison, and builds on the Inventory module rather than on Pantry, so anything can go on the list. With Pantry on too, low stock adds to the list and the list shows Pantry stock. The price comparison comes from a standalone library the owner's other apps can also use.
+
+**Why:** Pantry is about what the user has and how fast it is used; Shopping is about what to buy, where and at what price. Not everything bought is a consumable, and the money bridge (R98) sits where money is spent, so Chatelaine touches money in one module only.
+
+**Acceptance:** With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or export appears.
+
+**Not:** The shopping list inside the Pantry module: non-consumables could not go on the list, and a list would require stock tracking.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### Q-R113 · Export granularity
+
+**Rule:** Do bought items go to the savings app one row per item, or one row per shopping trip?
+
+**Default:** One row per trip (store, date, total), split by savings category only when one receipt crosses categories. The savings app records each expense against a category with a place and a date, and imports bank statements, where per-item rows would count the card payment twice. Changes: R98's wording and the export format.
+
+**Why:** Per item keeps every line visible in the savings app; per trip matches the one bank row and the savings app's category budgets.
+
+**Since:** 2026-11-23 · builder · agreed rewording
 
 ### D-R109 · Expiry dates
 
@@ -1336,19 +1363,19 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R98 · Savings app and the shopping list
 
-**Rule:** Personal savings is a separate app, not a Chatelaine module. The two meet only through the Pantry module's shopping list (R97), so the bridge exists only when Pantry is on: when something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), pantry stock is used first, and each bought item goes one way to the savings app as item, price and date, by export or a shared file. Budgets and goals stay in the savings app.
+**Rule:** Personal savings is a separate app, not a Chatelaine module. The two meet only through the Shopping module's list (R112), so the bridge exists only when Shopping is on: when something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), pantry stock is used first when Pantry is on, and each bought item goes one way to the savings app as item, price and date, by export or a shared file. Shop prices used for comparison stay in Chatelaine's price book (R112), while what was spent, budgets and goals stay in the savings app.
 
-**Why:** Money is a different job (amounts, accounts, budgets) with its own rhythm and tone, and would raise the security bar for app lock, backups and folder sync. Chatelaine owns the shopping list because it knows the stock.
+**Why:** Money is a different job (amounts, accounts, budgets) with its own rhythm and tone, and would raise the security bar for app lock, backups and folder sync. Shop prices are not personal finances: no account, balance or budget is involved. Chatelaine owns the shopping list because it knows the stock.
 
-**Acceptance:** With Pantry on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Pantry off, no shopping list or export appears. Chatelaine holds no budget or goal.
+**Acceptance:** With Shopping on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 
 **Not:** Savings as a module inside Chatelaine: money is a different job, as Why says. The shopping list as a core feature: odd for someone who only wants to find where things are, such as important documents or rarely used small appliances.
 
-**Since:** 2026-11-22 · owner · agreed rewording
+**Since:** 2026-11-23 · owner · agreed rewording
 
 ### D-R99 · Reminders
 
-**Rule:** Chatelaine owns every reminder about its things. Each notification belongs to a module and can be turned on only while that module is on; the Inventory module's are always available (R97). Every notification is opt-in (R86): all are off until the user turns them on, also when their module is switched on.
+**Rule:** Chatelaine owns every reminder about its things. Each notification belongs to one or more modules and can be turned on only while all of them are on; the Inventory module's are always available (R97). Every notification is opt-in (R86): all are off until the user turns them on, also when their module is switched on.
 
 **Values:**
 
@@ -1356,18 +1383,18 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 |---|---|
 | expiry: best-before dates (medication, food), months after opening (cosmetics) | Inventory |
 | low stock | Pantry |
-| add to the shopping list | Pantry |
+| add to the shopping list | Pantry and Shopping |
 | usage rate rising or falling | Pantry |
 | time to do the laundry | Wardrobe |
 | running out of clean items of a kind, the rest being in the laundry | Wardrobe |
 | usage rate: none, low, medium or high; rising or falling | Wardrobe |
 | seasonal swap | Wardrobe |
 
-**Acceptance:** With a module off, none of its notifications can be turned on or arrive. The Inventory module's notifications can be turned on at any time.
+**Acceptance:** With any of its modules off, a notification can neither be turned on nor arrive. The Inventory module's notifications can be turned on at any time.
 
 **Not:** Leaving reminders to the owner's earlier app: every reminder about Chatelaine's things belongs to Chatelaine. Reminders that are not about a thing, such as paying a bill: not Chatelaine's.
 
-**Since:** 2026-11-22 · owner · agreed rewording
+**Since:** 2026-11-23 · owner · agreed rewording
 
 ## 11. Stages
 
@@ -1533,10 +1560,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
+- R112 · Shopping module: With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or export appears.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
-- R98 · Savings app and the shopping list: With Pantry on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Pantry off, no shopping list or export appears. Chatelaine holds no budget or goal.
-- R99 · Reminders: With a module off, none of its notifications can be turned on or arrive. The Inventory module's notifications can be turned on at any time.
+- R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
+- R99 · Reminders: With any of its modules off, a notification can neither be turned on nor arrive. The Inventory module's notifications can be turned on at any time.
 - R100 · Stage plan: Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
 - R102 · Stage 0 spikes: A Compose Multiplatform window runs on Android and on Windows, and the spike timings are recorded, as stage 0 requires (R100).
 - R65 · Recognition pass bar: The bar is met on both target phones, as stage 4's gate requires (R100).
@@ -1545,13 +1573,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R103 · Insurance records
 
-**Rule:** Value, receipts and serial numbers for insurance use are out of scope for v1. The one price kept is on bought shopping-list items, for the savings-app bridge (R98).
+**Rule:** Value, receipts and serial numbers for insurance use are out of scope for v1. The prices kept are shop prices in the price book and the prices of bought items (R112), for comparing and for the savings-app bridge (R98).
 
 **Why:** Value tracking is a different job.
 
 **Acceptance:** none: a scope boundary.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-23 · owner · agreed rewording
 
 ### O-R104 · App lock
 
@@ -1583,10 +1611,10 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-11-22 · owner · agreed rewording
 
-### D-R107 · Stock and shopping outside Pantry
+### D-R107 · Low stock outside Pantry
 
-**Rule:** Low-stock alerts and shopping lists outside the Pantry module (R97) are not in v1.
+**Rule:** Low-stock alerts outside the Pantry module (R97) are not in v1. Shopping lists live in the Shopping module (R112).
 
 **Acceptance:** none: a scope boundary.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-23 · owner · agreed rewording

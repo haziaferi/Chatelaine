@@ -305,3 +305,10 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-22 · R100 · changed · consumables out of stage 11; label reading in stage 4; notifications in stage 10 · owner
 - 2026-11-23 · R102 · changed · Evidence: KMP spike run · owner
 - 2026-11-23 · R100 · changed · stage 0 done-when points to the KMP spike record · owner
+- 2026-11-23 · R112 · added · Shopping module: list, price book, comparison; built on Inventory, not Pantry · owner
+- 2026-11-23 · R97 · changed · Shopping module added; shopping list moves from Pantry to Shopping · owner
+- 2026-11-23 · R98 · changed · savings bridge through the Shopping module; shop prices stay in Chatelaine · owner
+- 2026-11-23 · R99 · changed · a notification can need several modules; add-to-list needs Pantry and Shopping · owner
+- 2026-11-23 · R103 · changed · prices kept: the price book and bought items · owner
+- 2026-11-23 · R107 · changed · low stock only; shopping lists live in the Shopping module · owner
+- 2026-11-23 · R113 · added · open: export one row per item or per trip · builder
