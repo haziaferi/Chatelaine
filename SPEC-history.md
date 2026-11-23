@@ -332,3 +332,8 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-23 · R116 · kind · Q → O: the savings export carries the price paid, discounts applied · owner
 - 2026-11-23 · R121 · added · open: show the difference from the saved price at the tick step · builder
 - 2026-11-23 · R121 · kind · Q → D: the difference from the saved price is not shown · owner
+- 2026-11-23 · R113 · kind · Q → D: one export row per trip, split by category when needed · owner
+- 2026-11-23 · R98 · changed · each shopping trip goes to the savings app as store, date and total paid · owner
+- 2026-11-23 · R116 · changed · the price paid is counted in the trip total · owner
+- 2026-11-23 · R115 · changed · the trip's savings export counts the price paid · owner
+- 2026-11-23 · R122 · added · open: how a trip row gets its savings category · builder
