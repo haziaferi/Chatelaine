@@ -337,3 +337,7 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-23 · R116 · changed · the price paid is counted in the trip total · owner
 - 2026-11-23 · R115 · changed · the trip's savings export counts the price paid · owner
 - 2026-11-23 · R122 · added · open: how a trip row gets its savings category · builder
+- 2026-11-23 · R122 · kind · Q → D: the savings app picks categories from line tags and remembers them · owner
+- 2026-11-23 · R113 · changed · one row per trip with lines as detail; the savings app splits by category · owner
+- 2026-11-23 · R123 · added · trip file fields and format version · builder
+- 2026-11-23 · R124 · added · open: which bought items form one trip · builder

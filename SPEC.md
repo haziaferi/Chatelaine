@@ -111,7 +111,9 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | O-R97 | Modules | 10. Modules and the shopping list |
 | D-R112 | Shopping module | 10. Modules and the shopping list |
 | D-R113 | Export per trip | 10. Modules and the shopping list |
-| Q-R122 | Savings category of a trip row | 10. Modules and the shopping list |
+| D-R122 | Savings categories | 10. Modules and the shopping list |
+| D-R123 | Trip file | 10. Modules and the shopping list |
+| Q-R124 | What makes a trip | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
@@ -1354,23 +1356,55 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R113 · Export per trip
 
-**Rule:** Bought items go to the savings app as one row per shopping trip: store, date and total paid. A trip that crosses savings categories becomes one row per category (R122).
+**Rule:** Bought items go to the savings app as one row per shopping trip (R124): store, date and total paid, with the trip's lines as detail in the trip file (R123). No line is an expense of its own; the savings app splits a trip across its categories (R122).
 
 **Why:** The savings app records each expense against a category with a place and a date, and imports bank statements, where one card payment is one row.
 
-**Acceptance:** A trip of five items at one store exports one row with the store, the date and the total paid. A trip with groceries and cleaning supplies exports one row per category, and their amounts add up to the total paid.
+**Acceptance:** A trip of five items at one store exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
 
-**Not:** One row per item: once the bank statement is imported, the savings app would count the card payment twice.
+**Not:** One row per item: once the bank statement is imported, the savings app would count the card payment twice. One row per category from Chatelaine: no row would match the bank's single row, so the savings app's duplicate check would miss the payment.
 
 **Since:** 2026-11-23 · owner · agreed rewording
 
-### Q-R122 · Savings category of a trip row
+### D-R122 · Savings categories
 
-**Rule:** How does a trip row get its savings category?
+**Rule:** The savings app picks each trip's categories in its import review, from the tags on the trip's lines, and remembers the category chosen for each tag. Chatelaine never holds or reads the savings app's categories.
 
-**Default:** The export groups the trip's items by their top-level tag, and the savings app matches each tag to one of its categories on the first import and remembers the match, so the flow stays one way (R98). Changes: R113's split and the export format.
+**Why:** Chatelaine stays free of money logic (R98) and the flow stays one way; categorising is where the savings app already reviews imported rows.
 
-**Why:** Chatelaine knows tags, not the savings app's categories; holding the savings app's category list in Chatelaine would need a flow back from the savings app.
+**Acceptance:** Every line in a trip file carries its tags, and Chatelaine reads nothing from the savings app.
+
+**Not:** Chatelaine grouping lines by top-level tag: it puts categorising in Chatelaine and needs a rule for items with several tags. Chatelaine reading the savings app's category list: a flow back against R98.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### D-R123 · Trip file
+
+**Rule:** The trip file Chatelaine writes for the savings app carries the fields below. The savings app's spec cites this rule, and a change to a field's meaning raises the format version.
+
+**Values:**
+
+| Field | Holds |
+|---|---|
+| format version | a whole number, starting at 1 |
+| trip id | the trip's unique id (R52), so a second import of the same trip is recognised |
+| store | the store's name |
+| date | the day of the trip |
+| currency | an ISO 4217 code, `EUR` in v1 |
+| total paid | in whole cents: the sum of the lines' prices paid |
+| lines | per line: item or wish name, pack, quantity, price paid with every discount applied (R116), and tags, each with its parent path ("food > cookies") |
+
+**Acceptance:** An exported trip file holds every field above, its total paid equals the sum of its lines, and exporting the same trip twice gives the same trip id.
+
+**Since:** 2026-11-23 · builder · agreed rewording
+
+### Q-R124 · What makes a trip
+
+**Rule:** Which bought items form one trip?
+
+**Default:** The items ticked as bought at one store on one day, with a way to split them into two trips before export, for two payments at the same store on one day. Changes: R113's rows and the trip id of R123.
+
+**Why:** A trip has to match one card payment for the savings app to recognise it in the bank statement.
 
 **Since:** 2026-11-23 · builder · agreed rewording
 
@@ -1659,7 +1693,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
-- R113 · Export per trip: A trip of five items at one store exports one row with the store, the date and the total paid. A trip with groceries and cleaning supplies exports one row per category, and their amounts add up to the total paid.
+- R113 · Export per trip: A trip of five items at one store exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
+- R122 · Savings categories: Every line in a trip file carries its tags, and Chatelaine reads nothing from the savings app.
+- R123 · Trip file: An exported trip file holds every field above, its total paid equals the sum of its lines, and exporting the same trip twice gives the same trip id.
 - R117 · Wishes: Putting a kettle that is not in Inventory on the list creates a wish and no item; search and the object of the day do not show it; ticking it as bought creates the item. Putting batteries that are in Inventory on the list links to that item, and ticking them as bought raises its quantity.
 - R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
