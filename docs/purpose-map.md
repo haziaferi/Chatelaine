@@ -93,6 +93,8 @@ How to read it:
 | **Expiring soon** | Inventory | module view | Rediscover prompt |
 | **Shopping list**: things to buy; with Pantry on, items below minimum stock too | Shopping | module view | — |
 | **Already have it?**: quick check while shopping | Shopping | module view | Search bar (R09) |
+| **Wish list**: things not owned, kept for later (R117) | Shopping | module view | Shopping list |
+| **Price comparison**: packs under a tag, cheapest per unit first (R114) | Shopping | module view | Tag results |
 
 ## Overlap candidates to settle when scoring
 

@@ -360,3 +360,10 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R97 · changed · Shopping row: category shown with the savings export; wish list view · owner
 - 2026-11-24 · R98 · changed · receipts export only with the savings export on · owner
 - 2026-11-24 · spec · added · glossary: Wish list, Savings export; Wish, Category, Shopping module changed · owner
+- 2026-11-24 · R113 · changed · receipts closed while the export is off are never sent · builder
+- 2026-11-24 · R122 · changed · lines carry the category's id and name; a rename keeps the match · builder
+- 2026-11-24 · R123 · changed · category as id and name; pack only when the line has one · builder
+- 2026-11-24 · R124 · changed · a tick takes its price paid, asked for when the price book has none · builder
+- 2026-11-24 · R126 · changed · uncategorised entries also cannot be ticked; flagged when left without one · builder
+- 2026-11-24 · R118 · changed · categories and receipts sync and back up · builder
+- 2026-11-24 · R127 · added · open: how a tick knows its store · builder

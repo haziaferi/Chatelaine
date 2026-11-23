@@ -116,6 +116,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R124 | What makes a receipt | 10. Modules and the shopping list |
 | D-R125 | Item category | 10. Modules and the shopping list |
 | D-R126 | No category, no shopping list | 10. Modules and the shopping list |
+| Q-R127 | Store of a tick | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
@@ -1362,13 +1363,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R113 · Export per receipt
 
-**Rule:** While the savings export is on (R125), bought items go to the savings app as one row per receipt (R124): store, date and total paid, with the receipt's lines as detail in the receipt file (R123). No line is an expense of its own; the savings app splits a receipt across its categories (R122).
+**Rule:** While the savings export is on (R125), bought items go to the savings app as one row per receipt (R124): store, date and total paid, with the receipt's lines as detail in the receipt file (R123). No line is an expense of its own; the savings app splits a receipt across its categories (R122). Receipts closed while the savings export is off are never sent, also after it is turned on.
 
 **Why:** The savings app records each expense against a category with a place and a date, and imports bank statements, where one card payment is one row.
 
-**Acceptance:** A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing.
+**Acceptance:** A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing, and turning it on later sends none of those receipts.
 
-**Not:** One row per item: once the bank statement is imported, the savings app would count the card payment twice. One row per category from Chatelaine: no row would match the bank's single row, so the savings app's duplicate check would miss the payment.
+**Not:** One row per item: once the bank statement is imported, the savings app would count the card payment twice. One row per category from Chatelaine: no row would match the bank's single row, so the savings app's duplicate check would miss the payment. Sending earlier receipts when the export is turned on: they were never categorised, and the savings app may already hold those payments from a statement.
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
@@ -1378,11 +1379,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** Chatelaine stays free of money logic (R98) and the flow stays one way; the user sets up categories in each app and links them once.
 
-**Acceptance:** Every line with a category carries it in the receipt file, and Chatelaine reads nothing from the savings app.
+**Acceptance:** Every line carries its category's id and name in the receipt file (R123, R126); renaming a category in Chatelaine keeps the savings app's match; Chatelaine reads nothing from the savings app.
 
 **Not:** Categories worked out from tags: an item carries tags of several kinds (R37), such as a season or a place, so no tag says which category a line belongs to. Chatelaine reading the savings app's category list: a flow back against R98.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R123 · Receipt file
 
@@ -1398,17 +1399,17 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | date | the day of the payment |
 | currency | an ISO 4217 code, `EUR` in v1 |
 | total paid | in whole cents: the sum of the lines' prices paid |
-| lines | per line: item or wish name, pack, quantity, price paid with every discount applied (R116), and category (R125) when the line has one |
+| lines | per line: item or wish name, pack when it has one, quantity, price paid with every discount applied (R116), and category (R125, R126) as its unique id (R52) and its name, so a renamed category keeps its match in the savings app (R122) |
 
 **Acceptance:** An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
 
 **Not:** Tags on each line: they no longer decide the category (R122), and they would send labels such as projects and places that the savings app has no use for.
 
-**Since:** 2026-11-23 · builder · agreed rewording
+**Since:** 2026-11-24 · builder · agreed rewording
 
 ### D-R124 · What makes a receipt
 
-**Rule:** A receipt is one payment: the items ticked as bought at one store until the user closes the receipt at the till. Without a close, the receipt ends at the end of the day or when an item is ticked as bought at another store; a closed receipt never changes.
+**Rule:** A receipt is one payment: the items ticked as bought at one store (R127) until the user closes the receipt at the till. Without a close, the receipt ends at the end of the day or when an item is ticked as bought at another store; a closed receipt never changes. Ticking an item as bought takes its price paid, pre-filled from the price book for that pack and store (R115) and asked for when there is none.
 
 **Why:** One receipt matches one row of the bank statement. The user knows at the till when they pay twice, while the savings app sees payments only days later, in a statement.
 
@@ -1420,11 +1421,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Items ticked at store A, never closed | one, ending at the end of the day |
 | Items ticked at store A, then at store B | two, one per store |
 
-**Acceptance:** Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file.
+**Acceptance:** Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file; ticking a pack with no price at that store asks for the price paid before it is ticked.
 
 **Not:** Splitting in the savings app: it sees payments only when a statement is imported, when no one remembers which items went with which payment. One receipt per store per day with no close: two payments at one store on one day would not match the bank's rows.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R125 · Item category
 
@@ -1440,15 +1441,25 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R126 · No category, no shopping list
 
-**Rule:** While the savings export is on (R125), an item or a wish with no category cannot be added to the shopping list. A low-stock item with no category (R112) shows in Shopping flagged as having none and cannot be added until it is given one, which the flag lets the user do.
+**Rule:** While the savings export is on (R125), an item or a wish with no category cannot be added to the shopping list or ticked as bought. A low-stock item with no category (R112), or a list entry left without one (the export turned on later, or its category deleted), shows in Shopping flagged as having none until it is given one, which the flag lets the user do.
 
 **Why:** Every receipt line then carries a category, so the savings app never meets a line it cannot file (R122).
 
-**Acceptance:** With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; every exported line carries a category.
+**Acceptance:** With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; turning the export on with uncategorised entries already on the list flags them, and they cannot be ticked as bought until each has a category; every exported line carries a category.
 
 **Not:** Picking a category for an uncategorised line in the savings app's import review: it would repeat for the same item on every receipt.
 
 **Since:** 2026-11-24 · owner · agreed rewording
+
+### Q-R127 · Store of a tick
+
+**Rule:** How does Chatelaine know at which store an item is ticked as bought?
+
+**Default:** The shopping list has a current store, picked when the user starts ticking and pre-filled with the last store used; every tick goes to that store until the user changes it. Changes: where R124's receipts begin and end, and which saved price R115 pre-fills.
+
+**Why:** Receipts (R124) and the price book (R115) both need a store for every tick. Asking at every tick is exact but slow; a current store is quick but can be left on the wrong store.
+
+**Since:** 2026-11-24 · builder · agreed rewording
 
 ### D-R117 · Wishes
 
@@ -1464,13 +1475,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R118 · Shopping records in sync and backup
 
-**Rule:** Wishes, list entries, stores and the price book sync (R51) and back up (R60) like every other record.
+**Rule:** Wishes, list entries, stores, categories, receipts and the price book sync (R51) and back up (R60) like every other record.
 
 **Why:** They hold shop prices and what was bought, not accounts or balances, so the security bar R98 guards against does not rise.
 
 **Acceptance:** A wish and a price added on one device appear on the other after a sync, and both survive export and import.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R119 · Price-comparison library
 
@@ -1737,12 +1748,12 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
-- R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing.
-- R122 · Savings categories: Every line with a category carries it in the receipt file, and Chatelaine reads nothing from the savings app.
+- R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing, and turning it on later sends none of those receipts.
+- R122 · Savings categories: Every line carries its category's id and name in the receipt file (R123, R126); renaming a category in Chatelaine keeps the savings app's match; Chatelaine reads nothing from the savings app.
 - R123 · Receipt file: An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
-- R124 · What makes a receipt: Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file.
+- R124 · What makes a receipt: Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file; ticking a pack with no price at that store asks for the price paid before it is ticked.
 - R125 · Item category: With Shopping on and the savings export off, no category field appears, anything can go on the shopping list, and nothing is exported. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
-- R126 · No category, no shopping list: With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; every exported line carries a category.
+- R126 · No category, no shopping list: With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; turning the export on with uncategorised entries already on the list flags them, and they cannot be ticked as bought until each has a category; every exported line carries a category.
 - R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item. Putting batteries that are in Inventory on the shopping list links to that item, and ticking them as bought raises its quantity.
 - R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
