@@ -110,10 +110,12 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R96 | Consistent elements | 9. Purpose map and look |
 | O-R97 | Modules | 10. Modules and the shopping list |
 | D-R112 | Shopping module | 10. Modules and the shopping list |
-| D-R113 | Export per trip | 10. Modules and the shopping list |
+| D-R113 | Export per receipt | 10. Modules and the shopping list |
 | D-R122 | Savings categories | 10. Modules and the shopping list |
-| D-R123 | Trip file | 10. Modules and the shopping list |
-| Q-R124 | What makes a trip | 10. Modules and the shopping list |
+| D-R123 | Receipt file | 10. Modules and the shopping list |
+| D-R124 | What makes a receipt | 10. Modules and the shopping list |
+| D-R125 | Item category | 10. Modules and the shopping list |
+| Q-R126 | Lines with no category | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
@@ -157,6 +159,8 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack. |
 | Price book | Shop prices recorded by pack, store and date, with promotions and their end dates. |
 | Wish | A shopping-list entry for something not in Inventory; it becomes an item only when ticked as bought (R117). |
+| Receipt | The items bought at one store in one payment; one row in the savings export (R124). |
+| Category | An optional label on an item or wish that the savings app matches to one of its own categories (R125). |
 | Settled area | An area whose things are where they belong, photographed as a whole. |
 | Place photo | A photo that belongs to a place. |
 | Suggestion | Information a model proposes, such as a name, a count or a tag. |
@@ -318,9 +322,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R115 · Cheaper than the saved price
 
-**Rule:** Cookies Q 600 g are on the list with a saved price of 1,59 € at Supermarket A, and on the shelf there they cost 1,29 €. The user ticks them as bought and types 1,29 € over the pre-filled 1,59 €. The price book records 1,29 € at Supermarket A on that date as the current price, and the trip's savings export counts 1,29 €, the price paid.
+**Rule:** Cookies Q 600 g are on the list with a saved price of 1,59 € at Supermarket A, and on the shelf there they cost 1,29 €. The user ticks them as bought and types 1,29 € over the pre-filled 1,59 €. The price book records 1,29 € at Supermarket A on that date as the current price, and the receipt's savings export counts 1,29 €, the price paid.
 
-**Acceptance:** After the purchase the cookies rank by 1,29 € (2,15 €/kg), 1,59 € stays in the price history, and the trip's savings export counts 1,29 €, as stage 10's gate requires (R100).
+**Acceptance:** After the purchase the cookies rank by 1,29 € (2,15 €/kg), 1,59 € stays in the price history, and the receipt's savings export counts 1,29 €, as stage 10's gate requires (R100).
 
 **Since:** 2026-11-23 · owner · agreed rewording
 
@@ -1336,7 +1340,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Inventory | expiry date, opened on, months after opening | expiring soon |
 | Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year, usage rate |
 | Pantry | quantity and unit, minimum stock | usage rate |
-| Shopping | none: prices live in the price book (R112) | shopping list, "already have it" check, price comparison |
+| Shopping | category, off by default (R125); prices live in the price book (R112) | shopping list, "already have it" check, price comparison |
 
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
@@ -1354,13 +1358,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-11-23 · owner · agreed rewording
 
-### D-R113 · Export per trip
+### D-R113 · Export per receipt
 
-**Rule:** Bought items go to the savings app as one row per shopping trip (R124): store, date and total paid, with the trip's lines as detail in the trip file (R123). No line is an expense of its own; the savings app splits a trip across its categories (R122).
+**Rule:** Bought items go to the savings app as one row per receipt (R124): store, date and total paid, with the receipt's lines as detail in the receipt file (R123). No line is an expense of its own; the savings app splits a receipt across its categories (R122).
 
 **Why:** The savings app records each expense against a category with a place and a date, and imports bank statements, where one card payment is one row.
 
-**Acceptance:** A trip of five items at one store exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
+**Acceptance:** A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
 
 **Not:** One row per item: once the bank statement is imported, the savings app would count the card payment twice. One row per category from Chatelaine: no row would match the bank's single row, so the savings app's duplicate check would miss the payment.
 
@@ -1368,43 +1372,77 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R122 · Savings categories
 
-**Rule:** The savings app picks each trip's categories in its import review, from the tags on the trip's lines, and remembers the category chosen for each tag. Chatelaine never holds or reads the savings app's categories.
+**Rule:** The savings app splits each receipt across its own categories by the category each line carries (R125). The user matches each Chatelaine category to one of the savings app's once, the first time it appears, and the savings app remembers the match; Chatelaine never reads the savings app's categories.
 
-**Why:** Chatelaine stays free of money logic (R98) and the flow stays one way; categorising is where the savings app already reviews imported rows.
+**Why:** Chatelaine stays free of money logic (R98) and the flow stays one way; the user sets up categories in each app and links them once.
 
-**Acceptance:** Every line in a trip file carries its tags, and Chatelaine reads nothing from the savings app.
+**Acceptance:** Every line with a category carries it in the receipt file, and Chatelaine reads nothing from the savings app.
 
-**Not:** Chatelaine grouping lines by top-level tag: it puts categorising in Chatelaine and needs a rule for items with several tags. Chatelaine reading the savings app's category list: a flow back against R98.
+**Not:** Categories worked out from tags: an item carries tags of several kinds (R37), such as a season or a place, so no tag says which category a line belongs to. Chatelaine reading the savings app's category list: a flow back against R98.
 
 **Since:** 2026-11-23 · owner · agreed rewording
 
-### D-R123 · Trip file
+### D-R123 · Receipt file
 
-**Rule:** The trip file Chatelaine writes for the savings app carries the fields below. The savings app's spec cites this rule, and a change to a field's meaning raises the format version.
+**Rule:** The receipt file Chatelaine writes for the savings app carries the fields below. The savings app's spec cites this rule, and a change to a field's meaning raises the format version.
 
 **Values:**
 
 | Field | Holds |
 |---|---|
 | format version | a whole number, starting at 1 |
-| trip id | the trip's unique id (R52), so a second import of the same trip is recognised |
+| receipt id | the receipt's unique id (R52), so a second import of the same receipt is recognised |
 | store | the store's name |
-| date | the day of the trip |
+| date | the day of the payment |
 | currency | an ISO 4217 code, `EUR` in v1 |
 | total paid | in whole cents: the sum of the lines' prices paid |
-| lines | per line: item or wish name, pack, quantity, price paid with every discount applied (R116), and tags, each with its parent path ("food > cookies") |
+| lines | per line: item or wish name, pack, quantity, price paid with every discount applied (R116), and category (R125) when the line has one |
 
-**Acceptance:** An exported trip file holds every field above, its total paid equals the sum of its lines, and exporting the same trip twice gives the same trip id.
+**Acceptance:** An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
+
+**Not:** Tags on each line: they no longer decide the category (R122), and they would send labels such as projects and places that the savings app has no use for.
 
 **Since:** 2026-11-23 · builder · agreed rewording
 
-### Q-R124 · What makes a trip
+### D-R124 · What makes a receipt
 
-**Rule:** Which bought items form one trip?
+**Rule:** A receipt is one payment: the items ticked as bought at one store until the user closes the receipt at the till. Without a close, the receipt ends at the end of the day or when an item is ticked as bought at another store; a closed receipt never changes.
 
-**Default:** The items ticked as bought at one store on one day, with a way to split them into two trips before export, for two payments at the same store on one day. Changes: R113's rows and the trip id of R123.
+**Why:** One receipt matches one row of the bank statement. The user knows at the till when they pay twice, while the savings app sees payments only days later, in a statement.
 
-**Why:** A trip has to match one card payment for the savings app to recognise it in the bank statement.
+**Values:**
+
+| Case | Receipts |
+|---|---|
+| Items ticked at store A, receipt closed at the till | one; items ticked at A afterwards start a new receipt |
+| Items ticked at store A, never closed | one, ending at the end of the day |
+| Items ticked at store A, then at store B | two, one per store |
+
+**Acceptance:** Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file.
+
+**Not:** Splitting in the savings app: it sees payments only when a statement is imported, when no one remembers which items went with which payment. One receipt per store per day with no close: two payments at one store on one day would not match the bank's rows.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### D-R125 · Item category
+
+**Rule:** An item or a wish can carry one category, a label kept apart from its tags and chosen from a list the user edits. The category is optional and off by default: a Shopping setting turns it on.
+
+**Why:** The savings app files each receipt line under a category (R122), and tags cannot say which one: an item carries tags of several kinds (R37).
+
+**Acceptance:** With Shopping on and the setting off, no category field appears. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
+
+**Not:** Category as a tag kind: an item could then carry several, and tag kinds are for display (R37).
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### Q-R126 · Lines with no category
+
+**Rule:** How does the savings app file a receipt line that carries no category, because the setting is off or the item has none?
+
+**Default:** The user picks a category for the line in the savings app's import review, and nothing is remembered, since the line carries nothing stable to remember it by. Changes: R122's import review and R123's lines.
+
+**Why:** Picking by hand each time is simple but repeats for the same item; remembering per item would need the item's id (R52) on every line of the receipt file.
 
 **Since:** 2026-11-23 · builder · agreed rewording
 
@@ -1444,13 +1482,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Values:**
 
-| Purchase | Saved price | Counted in the trip total |
+| Purchase | Saved price | Counted in the receipt total |
 |---|---|---|
 | Cookies Q 600 g, bought below the saved price (R115) | 1,59 € | 1,29 € |
 | 3 packs at 1,59 € under "3 x 2" | 1,59 € each | 3,18 € |
 | 1 pack at 2,00 € with 25% off | 2,00 € | 1,50 € |
 
-**Acceptance:** Each row's purchase, ticked as bought, adds the amount in its last column to the trip's exported total, and no export carries a difference or a saving as a separate amount.
+**Acceptance:** Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
 
 **Since:** 2026-11-23 · owner · agreed rewording
 
@@ -1493,11 +1531,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R98 · Savings app and the shopping list
 
-**Rule:** Personal savings is a separate app, not a Chatelaine module. The two meet only through the Shopping module's list (R112), so the bridge exists only when Shopping is on: when something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), pantry stock is used first when Pantry is on, and each shopping trip goes one way to the savings app as store, date and total paid (R113), by export or a shared file. Shop prices used for comparison stay in Chatelaine's price book (R112), while what was spent, budgets and goals stay in the savings app.
+**Rule:** Personal savings is a separate app, not a Chatelaine module. The two meet only through the Shopping module's list (R112), so the bridge exists only when Shopping is on: when something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), pantry stock is used first when Pantry is on, and each receipt goes one way to the savings app as store, date and total paid (R113), by export or a shared file. Shop prices used for comparison stay in Chatelaine's price book (R112), while what was spent, budgets and goals stay in the savings app.
 
 **Why:** Money is a different job (amounts, accounts, budgets) with its own rhythm and tone, and would raise the security bar for app lock, backups and folder sync. Shop prices are not personal finances: no account, balance or budget is involved. Chatelaine owns the shopping list because it knows the stock.
 
-**Acceptance:** With Shopping on, putting an item on the shopping list shows how many are owned and where, and each shopping trip exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
+**Acceptance:** With Shopping on, putting an item on the shopping list shows how many are owned and where, and each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 
 **Not:** Savings as a module inside Chatelaine: money is a different job, as Why says. The shopping list as a core feature: odd for someone who only wants to find where things are, such as important documents or rarely used small appliances.
 
@@ -1625,7 +1663,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R10 · Visual place map and filtered search: The steps succeed end to end, as stage 6's gate requires (R100).
 - R11 · Seasonal swap: The move part succeeds at stage 3 and the whole scenario at stage 5, as those stages' gates require (R100).
 - R114 · Cheapest pack under a tag: The three packs appear in that order with those prices per kg, as stage 10's gate requires (R100).
-- R115 · Cheaper than the saved price: After the purchase the cookies rank by 1,29 € (2,15 €/kg), 1,59 € stays in the price history, and the trip's savings export counts 1,29 €, as stage 10's gate requires (R100).
+- R115 · Cheaper than the saved price: After the purchase the cookies rank by 1,29 € (2,15 €/kg), 1,59 € stays in the price history, and the receipt's savings export counts 1,29 €, as stage 10's gate requires (R100).
 - R13 · Framework and targets: A Compose Multiplatform window runs on Android and on Windows, as stage 0 holds (R100, R102).
 - R14 · Shared code: Platform source sets (for example `androidMain`, `jvmMain`) hold code only for the camera, file access, widgets, speech, model runtimes and printing. Everything else is in common code.
 - R15 · Offline first: With the optional network uses off, a network capture over a full run of R05 to R11 shows no request at all.
@@ -1693,17 +1731,19 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
-- R113 · Export per trip: A trip of five items at one store exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
-- R122 · Savings categories: Every line in a trip file carries its tags, and Chatelaine reads nothing from the savings app.
-- R123 · Trip file: An exported trip file holds every field above, its total paid equals the sum of its lines, and exporting the same trip twice gives the same trip id.
+- R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own.
+- R122 · Savings categories: Every line with a category carries it in the receipt file, and Chatelaine reads nothing from the savings app.
+- R123 · Receipt file: An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
+- R124 · What makes a receipt: Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file.
+- R125 · Item category: With Shopping on and the setting off, no category field appears. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
 - R117 · Wishes: Putting a kettle that is not in Inventory on the list creates a wish and no item; search and the object of the day do not show it; ticking it as bought creates the item. Putting batteries that are in Inventory on the list links to that item, and ticking them as bought raises its quantity.
 - R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
-- R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the trip's exported total, and no export carries a difference or a saving as a separate amount.
+- R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
 - R121 · Showing the difference: Ticking an item as bought below or above its saved price shows no difference or saving, at the tick step or anywhere else.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
-- R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each shopping trip exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
+- R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 - R99 · Reminders: With any of its modules off, a notification can neither be turned on nor arrive. The Inventory module's notifications can be turned on at any time.
 - R100 · Stage plan: Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
 - R102 · Stage 0 spikes: A Compose Multiplatform window runs on Android and on Windows, and the spike timings are recorded, as stage 0 requires (R100).

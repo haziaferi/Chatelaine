@@ -341,3 +341,14 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-23 · R113 · changed · one row per trip with lines as detail; the savings app splits by category · owner
 - 2026-11-23 · R123 · added · trip file fields and format version · builder
 - 2026-11-23 · R124 · added · open: which bought items form one trip · builder
+- 2026-11-23 · R124 · kind · Q → D: a receipt is one payment, closed at the till or at day's end · owner
+- 2026-11-23 · R113 · changed · one row per receipt instead of per trip · owner
+- 2026-11-23 · R125 · added · optional item category, off by default, a Shopping setting · owner
+- 2026-11-23 · R122 · changed · the savings app splits by line category, matched once per category, not by tags · owner
+- 2026-11-23 · R123 · changed · receipt file: receipt id, line category instead of tags · builder
+- 2026-11-23 · R126 · added · open: how lines with no category are filed · builder
+- 2026-11-23 · R97 · changed · Shopping row gains the category field (R125) · owner
+- 2026-11-23 · R98 · changed · each receipt, not each trip, goes to the savings app · owner
+- 2026-11-23 · R115 · changed · "trip's savings export" → "receipt's savings export" · owner
+- 2026-11-23 · R116 · changed · "trip total" → "receipt total" · owner
+- 2026-11-23 · spec · added · glossary: Receipt, Category · owner
