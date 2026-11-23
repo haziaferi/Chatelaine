@@ -138,7 +138,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Parent tag | A tag that other tags sit inside; those are its sub-tags. A top-level tag has no parent. |
 | Kept together | A mark on a tag: its things share a home place. |
 | Field | A value that differs from item to item, such as size M or expires March 2027. A custom field is one the user defines. |
-| Module | A preset set of custom fields on its tags, plus a few views of its own and its own purpose-map entries. |
+| Module | A preset set of custom fields on its tags or records of its own (the Shopping module's price book), plus a few views of its own and its own purpose-map entries. |
 | Pack | A module a user builds with the same tools as the built-in modules. |
 | Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
@@ -1305,8 +1305,8 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 |---|---|---|
 | Inventory | expiry date, opened on, months after opening | expiring soon |
 | Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year, usage rate |
-| Pantry | quantity and unit, minimum stock | "already have it" check, usage rate |
-| Shopping | none: prices live in the price book (R112) | shopping list, price comparison |
+| Pantry | quantity and unit, minimum stock | usage rate |
+| Shopping | none: prices live in the price book (R112) | shopping list, "already have it" check, price comparison |
 
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
@@ -1318,7 +1318,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** Pantry is about what the user has and how fast it is used; Shopping is about what to buy, where and at what price. Not everything bought is a consumable, and the money bridge (R98) sits where money is spent, so Chatelaine touches money in one module only.
 
-**Acceptance:** With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or export appears.
+**Acceptance:** With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or savings export appears.
 
 **Not:** The shopping list inside the Pantry module: non-consumables could not go on the list, and a list would require stock tracking.
 
@@ -1375,7 +1375,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R99 · Reminders
 
-**Rule:** Chatelaine owns every reminder about its things. Each notification belongs to one or more modules and can be turned on only while all of them are on; the Inventory module's are always available (R97). Every notification is opt-in (R86): all are off until the user turns them on, also when their module is switched on.
+**Rule:** Chatelaine owns every reminder about its things. Each notification belongs to one or more modules and can be turned on only while all of them are on; the Inventory module's are always available (R97). Every notification is opt-in (R86): all are off until the user turns them on, also when their modules are switched on.
 
 **Values:**
 
@@ -1421,7 +1421,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Acceptance:** Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
 
-**Since:** 2026-11-22 · owner · agreed rewording
+**Since:** 2026-11-23 · owner · agreed rewording
 
 ### D-R101 · Order of stages 4 to 6
 
@@ -1445,7 +1445,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Not:** Replacing the KMP spike with the review as well, as first planned: the earlier app has no Compose and no runnable Windows app.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-23 · owner · own words
 
 ## 12. Test plan
 
@@ -1560,7 +1560,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
-- R112 · Shopping module: With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or export appears.
+- R112 · Shopping module: With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or savings export appears.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.

@@ -312,3 +312,7 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-23 · R103 · changed · prices kept: the price book and bought items · owner
 - 2026-11-23 · R107 · changed · low stock only; shopping lists live in the Shopping module · owner
 - 2026-11-23 · R113 · added · open: export one row per item or per trip · builder
+- 2026-11-23 · R97 · changed · "already have it" check moves from Pantry to Shopping · owner
+- 2026-11-23 · R112 · changed · acceptance names the savings export, not R60's backup export · owner
+- 2026-11-23 · R99 · changed · plural wording for notifications that need several modules · owner
+- 2026-11-23 · spec · changed · glossary: a module can hold records of its own · owner
