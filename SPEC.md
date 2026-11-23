@@ -21,6 +21,8 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R09 | Before buying | 2. Acceptance scenarios |
 | D-R10 | Visual place map and filtered search | 2. Acceptance scenarios |
 | D-R11 | Seasonal swap | 2. Acceptance scenarios |
+| D-R114 | Cheapest pack under a tag | 2. Acceptance scenarios |
+| D-R115 | Cheaper than the saved price | 2. Acceptance scenarios |
 | D-R12 | Name, package, licence and repository | 3. Platforms and build |
 | O-R13 | Framework and targets | 3. Platforms and build |
 | D-R14 | Shared code | 3. Platforms and build |
@@ -109,6 +111,10 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | O-R97 | Modules | 10. Modules and the shopping list |
 | D-R112 | Shopping module | 10. Modules and the shopping list |
 | Q-R113 | Export granularity | 10. Modules and the shopping list |
+| D-R117 | Wishes | 10. Modules and the shopping list |
+| D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
+| D-R119 | Price-comparison library | 10. Modules and the shopping list |
+| Q-R116 | Difference from the saved price | 10. Modules and the shopping list |
 | D-R109 | Expiry dates | 10. Modules and the shopping list |
 | D-R110 | Usage rate | 10. Modules and the shopping list |
 | O-R98 | Savings app and the shopping list | 10. Modules and the shopping list |
@@ -123,6 +129,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | O-R105 | Lending | Out of scope |
 | O-R106 | Inventory import | Out of scope |
 | D-R107 | Low stock outside Pantry | Out of scope |
+| O-R120 | Shopping notifications | Out of scope |
 
 ## Glossary
 
@@ -139,11 +146,13 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Kept together | A mark on a tag: its things share a home place. |
 | Field | A value that differs from item to item, such as size M or expires March 2027. A custom field is one the user defines. |
 | Module | A preset set of custom fields on its tags or records of its own (the Shopping module's price book), plus a few views of its own and its own purpose-map entries. |
-| Pack | A module a user builds with the same tools as the built-in modules. |
+| Mold | A module a user builds with the same tools as the built-in modules. |
 | Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
 | Shopping module | The module for what to buy, where and at what price: the shopping list, the price book and the price comparison. |
-| Price book | Shop prices recorded by product, size, store and date, with promotions and their end dates. |
+| Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack. |
+| Price book | Shop prices recorded by pack, store and date, with promotions and their end dates. |
+| Wish | A shopping-list entry for something not in Inventory; it becomes an item only when ticked as bought (R117). |
 | Settled area | An area whose things are where they belong, photographed as a whole. |
 | Place photo | A photo that belongs to a place. |
 | Suggestion | Information a model proposes, such as a name, a count or a tag. |
@@ -226,11 +235,12 @@ The name: a chatelaine was the mistress of a château, in charge of the househol
 | Check before buying | R09 | weekly |
 | Gather things for a project | R05 | monthly |
 | Seasonal swap | R11 | twice a year |
+| Shop from the list, comparing prices | R114, R115 | every shopping trip |
 | The first big tidy | — | once, over some weeks |
 
 **Acceptance:** none: the frequencies guide the stage order (R101); there is nothing in the app to check.
 
-**Since:** 2026-11-22 · owner · agreed rewording
+**Since:** 2026-11-23 · owner · agreed rewording
 
 ## 2. Acceptance scenarios
 
@@ -293,6 +303,22 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 **Acceptance:** The move part succeeds at stage 3 and the whole scenario at stage 5, as those stages' gates require (R100).
 
 **Since:** 2026-11-22 · owner · own words
+
+### D-R114 · Cheapest pack under a tag
+
+**Rule:** Select the tag "cookies", which three packs carry: brand S 1 kg at 2,99 €, brand S 500 g at 1,99 € and brand Q 600 g at 1,59 €. The list compares them per 1 kg and ranks them cheapest first: Q 600 g at 2,65 €/kg, S 1 kg at 2,99 €/kg, S 500 g at 3,98 €/kg.
+
+**Acceptance:** The three packs appear in that order with those prices per kg, as stage 10's gate requires (R100).
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### D-R115 · Cheaper than the saved price
+
+**Rule:** Cookies Q 600 g are on the list with a saved price of 1,59 € at Supermarket A, and on the shelf there they cost 1,29 €. The user ticks them as bought and types 1,29 € over the pre-filled 1,59 €. The price book records 1,29 € at Supermarket A on that date as the current price, and the savings export carries 1,29 €, the price paid.
+
+**Acceptance:** After the purchase the cookies rank by 1,29 € (2,15 €/kg), 1,59 € stays in the price history, and the savings export carries 1,29 €, as stage 10's gate requires (R100).
+
+**Since:** 2026-11-23 · owner · agreed rewording
 
 ## 3. Platforms and build
 
@@ -1219,19 +1245,19 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 | Axis | Measures | Chooses |
 |---|---|---|
-| Coverage | every reference-app function and every step of R05 to R11 lands in a purpose | the purpose set |
+| Coverage | every reference-app function and every step of R05 to R11, R114 and R115 lands in a purpose | the purpose set |
 | Exclusivity | — | the purpose set |
 | Balance | — | the purpose set |
 | Fit | fit to Chatelaine's intent | the purpose set |
 | Potential | potential improvement over the reference apps | the purpose set |
 | Screen count | fewer is better | screens and homes |
 | One home per thing | repeats count against | screens and homes |
-| Steps per scenario | taps from the homepage through R05 to R11 | screens and homes |
+| Steps per scenario | taps from the homepage through R05 to R11, R114 and R115 | screens and homes |
 | Recall load | steps that ask the user to remember what the screen does not show | screens and homes |
 
 **Acceptance:** Every reference app, scored as a control, loses: a control that scores well means the axes are wrong.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-23 · owner · own words
 
 ### D-R92 · Homepage shortcuts in scoring
 
@@ -1295,7 +1321,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R97 · Modules
 
-**Rule:** Chatelaine is one app built on the Inventory module, which is always on and cannot be turned off. Wardrobe, Pantry and Shopping are optional modules on top of it, off by default, each designed with the owner first; users can build their own packs with the same tools. Expiry belongs to the Inventory module, since it covers medication and cosmetics as well as food.
+**Rule:** Chatelaine is one app built on the Inventory module, which is always on and cannot be turned off. Wardrobe, Pantry and Shopping are optional modules on top of it, off by default, each designed with the owner first; users can build their own molds with the same tools. Expiry belongs to the Inventory module, since it covers medication and cosmetics as well as food.
 
 **Why:** The core stays calm and small; modules add fields and screens only for those who want them.
 
@@ -1314,11 +1340,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R112 · Shopping module
 
-**Rule:** The Shopping module holds the shopping list, the price book and the price comparison, and builds on the Inventory module rather than on Pantry, so anything can go on the list. With Pantry on too, low stock adds to the list and the list shows Pantry stock. The price comparison comes from a standalone library the owner's other apps can also use.
+**Rule:** The Shopping module holds the shopping list, the price book and the price comparison, and builds on the Inventory module rather than on Pantry, so anything can go on the list. With Pantry on too, low stock appears on the list as a suggestion the user accepts with one tap, and the list shows Pantry stock. The price comparison comes from a standalone library the owner's other apps can also use (R119).
 
 **Why:** Pantry is about what the user has and how fast it is used; Shopping is about what to buy, where and at what price. Not everything bought is a consumable, and the money bridge (R98) sits where money is spent, so Chatelaine touches money in one module only.
 
-**Acceptance:** With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or savings export appears.
+**Acceptance:** With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
 
 **Not:** The shopping list inside the Pantry module: non-consumables could not go on the list, and a list would require stock tracking.
 
@@ -1331,6 +1357,44 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 **Default:** One row per trip (store, date, total), split by savings category only when one receipt crosses categories. The savings app records each expense against a category with a place and a date, and imports bank statements, where per-item rows would count the card payment twice. Changes: R98's wording and the export format.
 
 **Why:** Per item keeps every line visible in the savings app; per trip matches the one bank row and the savings app's category budgets.
+
+**Since:** 2026-11-23 · builder · agreed rewording
+
+### D-R117 · Wishes
+
+**Rule:** A list entry for something already in Inventory links to that item. Anything else put on the list is a wish, a record of its own, and becomes an Inventory item only when it is ticked as bought.
+
+**Acceptance:** Putting a kettle that is not in Inventory on the list creates a wish and no item; search and the object of the day do not show it; ticking it as bought creates the item. Putting batteries that are in Inventory on the list links to that item, and ticking them as bought raises its quantity.
+
+**Not:** A "to buy" item state: things not owned would show in search and as the object of the day.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### D-R118 · Shopping records in sync and backup
+
+**Rule:** Wishes, list entries, stores and the price book sync (R51) and back up (R60) like every other record.
+
+**Why:** They hold shop prices and what was bought, not accounts or balances, so the security bar R98 guards against does not rise.
+
+**Acceptance:** A wish and a price added on one device appear on the other after a sync, and both survive export and import.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### D-R119 · Price-comparison library
+
+**Rule:** In v1 the price comparison (R112) comes from a GPL-3.0 library of the owner's own, used as a dependency rather than copied in file by file (R23). It never fetches prices online, so the network uses of R15 are unchanged.
+
+**Acceptance:** The library's licence is GPL-3.0, and with the network off every price comparison works.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### Q-R116 · Difference from the saved price
+
+**Rule:** When the price paid differs from the saved price (R115), does Chatelaine show the difference, and does the savings app get it?
+
+**Default:** Chatelaine shows it once, when the item is ticked as bought ("0,30 € less than saved"), and never exports it: the savings app records money that moved, and a saving against an expected price never moved. Changes: R115's tick step and the savings export.
+
+**Why:** Showing it acknowledges a good find; exporting it would put an amount nobody spent into the savings app's figures.
 
 **Since:** 2026-11-23 · builder · agreed rewording
 
@@ -1416,7 +1480,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | 7 Clear-box surfaces | photo browsing; home-screen widget; label PDF with QR; object of the day | owner uses the widget and labels for a week | — |
 | 8 Voice | dictated logging in Italian and English on the phone (R21); speech model downloaded on first use (R19); splitting a list into items | a dictated list of ten things becomes ten items | — |
 | 9 Optional models | large recogniser; labeller LLM; download screen; licence checks | each optional model measurably improves a scenario | — |
-| 10 Modules | the modules of R97, each designed with the owner first; notifications by module, expiry included (R99) | each module passes its own scenarios, to be written with the owner | — |
+| 10 Modules | the modules of R97, each designed with the owner first; notifications by module, expiry included (R99); the price-comparison library (R119) and the savings export (R98) | each module passes its own scenarios, to be written with the owner; R114 and R115 pass | R114, R115 |
 | 11 Later | lending; app lock; NFC; lock-screen surface; rediscover prompt; free-drawing map editor; F-Droid build | each gets its own decision first | — |
 
 **Acceptance:** Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
@@ -1494,6 +1558,8 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R09 · Before buying: The steps succeed end to end, as stage 3's gate requires (R100).
 - R10 · Visual place map and filtered search: The steps succeed end to end, as stage 6's gate requires (R100).
 - R11 · Seasonal swap: The move part succeeds at stage 3 and the whole scenario at stage 5, as those stages' gates require (R100).
+- R114 · Cheapest pack under a tag: The three packs appear in that order with those prices per kg, as stage 10's gate requires (R100).
+- R115 · Cheaper than the saved price: After the purchase the cookies rank by 1,29 € (2,15 €/kg), 1,59 € stays in the price history, and the savings export carries 1,29 €, as stage 10's gate requires (R100).
 - R13 · Framework and targets: A Compose Multiplatform window runs on Android and on Windows, as stage 0 holds (R100, R102).
 - R14 · Shared code: Platform source sets (for example `androidMain`, `jvmMain`) hold code only for the camera, file access, widgets, speech, model runtimes and printing. Everything else is in common code.
 - R15 · Offline first: With the optional network uses off, a network capture over a full run of R05 to R11 shows no request at all.
@@ -1560,7 +1626,10 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
-- R112 · Shopping module: With Shopping on and Pantry off, a non-consumable item can be put on the list and ticked as bought. With Shopping off, no list, price book, comparison or savings export appears.
+- R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
+- R117 · Wishes: Putting a kettle that is not in Inventory on the list creates a wish and no item; search and the object of the day do not show it; ticking it as bought creates the item. Putting batteries that are in Inventory on the list links to that item, and ticking them as bought raises its quantity.
+- R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
+- R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
@@ -1614,6 +1683,16 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 ### D-R107 · Low stock outside Pantry
 
 **Rule:** Low-stock alerts outside the Pantry module (R97) are not in v1. Shopping lists live in the Shopping module (R112).
+
+**Acceptance:** none: a scope boundary.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### O-R120 · Shopping notifications
+
+**Rule:** The Shopping module has no notifications of its own in v1, such as a promotion ending or a shop's price dropping.
+
+**Why:** Following shop prices would need crawling or scraping shop sites, and the anti-goals (R03) keep notifications few.
 
 **Acceptance:** none: a scope boundary.
 

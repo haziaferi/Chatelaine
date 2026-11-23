@@ -316,3 +316,16 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-23 · R112 · changed · acceptance names the savings export, not R60's backup export · owner
 - 2026-11-23 · R99 · changed · plural wording for notifications that need several modules · owner
 - 2026-11-23 · spec · changed · glossary: a module can hold records of its own · owner
+- 2026-11-23 · spec · changed · glossary: a user-built module is a Mold; Pack now means one unit of a product with a given size; Wish added · owner
+- 2026-11-23 · R97 · changed · users build their own molds · owner
+- 2026-11-23 · R117 · added · a list entry not in Inventory is a wish; an item only once bought · owner
+- 2026-11-23 · R118 · added · Shopping records sync and back up like every other record · owner
+- 2026-11-23 · R119 · added · price comparison from a GPL-3.0 library dependency; no online prices · owner
+- 2026-11-23 · R116 · added · open: show or export the difference from the saved price · builder
+- 2026-11-23 · R112 · changed · low stock is a one-tap suggestion; non-consumables go on the list as wishes · owner
+- 2026-11-23 · R120 · added · no Shopping notifications of its own in v1 · owner
+- 2026-11-23 · R114 · added · scenario: cheapest pack under a tag (cookies) · owner
+- 2026-11-23 · R115 · added · scenario: bought below the saved price · owner
+- 2026-11-23 · R04 · changed · job: shop from the list, comparing prices, every trip · owner
+- 2026-11-23 · R91 · changed · coverage and steps count R114 and R115 · owner
+- 2026-11-23 · R100 · changed · stage 10 holds the library and savings export; unlocks R114, R115 · owner
