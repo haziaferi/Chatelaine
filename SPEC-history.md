@@ -329,3 +329,5 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-23 · R04 · changed · job: shop from the list, comparing prices, every trip · owner
 - 2026-11-23 · R91 · changed · coverage and steps count R114 and R115 · owner
 - 2026-11-23 · R100 · changed · stage 10 holds the library and savings export; unlocks R114, R115 · owner
+- 2026-11-23 · R116 · kind · Q → O: the savings export carries the price paid, discounts applied · owner
+- 2026-11-23 · R121 · added · open: show the difference from the saved price at the tick step · builder

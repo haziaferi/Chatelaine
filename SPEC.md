@@ -114,7 +114,8 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
-| Q-R116 | Difference from the saved price | 10. Modules and the shopping list |
+| O-R116 | Price paid in the savings export | 10. Modules and the shopping list |
+| Q-R121 | Showing the difference | 10. Modules and the shopping list |
 | D-R109 | Expiry dates | 10. Modules and the shopping list |
 | D-R110 | Usage rate | 10. Modules and the shopping list |
 | O-R98 | Savings app and the shopping list | 10. Modules and the shopping list |
@@ -1388,13 +1389,31 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-11-23 · owner · agreed rewording
 
-### Q-R116 · Difference from the saved price
+### O-R116 · Price paid in the savings export
 
-**Rule:** When the price paid differs from the saved price (R115), does Chatelaine show the difference, and does the savings app get it?
+**Rule:** The savings export (R98) carries the price actually paid, with every discount applied, never the saved price. A difference from the saved price is not sent as an amount of its own.
 
-**Default:** Chatelaine shows it once, when the item is ticked as bought ("0,30 € less than saved"), and never exports it: the savings app records money that moved, and a saving against an expected price never moved. Changes: R115's tick step and the savings export.
+**Why:** Otherwise the money-out recorded in the savings app would not be true.
 
-**Why:** Showing it acknowledges a good find; exporting it would put an amount nobody spent into the savings app's figures.
+**Values:**
+
+| Purchase | Saved price | Exported |
+|---|---|---|
+| Cookies Q 600 g, bought below the saved price (R115) | 1,59 € | 1,29 € |
+| 3 packs at 1,59 € under "3 x 2" | 1,59 € each | 3,18 € |
+| 1 pack at 2,00 € with 25% off | 2,00 € | 1,50 € |
+
+**Acceptance:** Each row's purchase, ticked as bought, exports the amount in its Exported column, and no export carries a difference or a saving as a separate amount.
+
+**Since:** 2026-11-23 · owner · agreed rewording
+
+### Q-R121 · Showing the difference
+
+**Rule:** When the price paid differs from the saved price (R115), does Chatelaine show the difference?
+
+**Default:** Once, when the item is ticked as bought ("0,30 € less than saved"), and nowhere else. Changes: R115's tick step.
+
+**Why:** Showing it acknowledges a good find; not showing it keeps the tick step to one figure.
 
 **Since:** 2026-11-23 · builder · agreed rewording
 
@@ -1630,6 +1649,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R117 · Wishes: Putting a kettle that is not in Inventory on the list creates a wish and no item; search and the object of the day do not show it; ticking it as bought creates the item. Putting batteries that are in Inventory on the list links to that item, and ticking them as bought raises its quantity.
 - R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
+- R116 · Price paid in the savings export: Each row's purchase, ticked as bought, exports the amount in its Exported column, and no export carries a difference or a saving as a separate amount.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and each bought item exports as item, price and date. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
