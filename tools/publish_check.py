@@ -2,14 +2,16 @@
 """publish_check.py -- what a repo would make public, checked for private and sensitive data.
 
     python ~/.claude/tools/publish_check.py <repo>            # scan; exit 1 on any finding
-    python ~/.claude/tools/publish_check.py <repo> --history  # also every blob in every commit
+    python ~/.claude/tools/publish_check.py <repo> --history  # also every commit: blobs, messages, tags
     python ~/.claude/tools/publish_check.py --install-hook <repo>   # run it as the repo's pre-commit and pre-push hooks
 
 Scans the files git would publish (tracked + untracked-not-ignored, as they are on disk), the staged
 copy of every tracked file whose working-tree copy differs from it (the next commit takes that one),
-the repo's author identity and, with --history, every blob in every commit and every author/committer
-line. Exit 0 clean, 1 findings, 2 when the scan could not be completed (a git command failed, an object
-could not be read): a scan that saw nothing must not pass. Rules:
+the repo's author identity and, with --history, every blob in every commit, every author/committer
+line, every commit message (labelled "commit <hash>") and every annotated tag object: its message and
+tagger (labelled "tag <name>"). Messages are checked by the text rules (secret, email, path, private,
+link), the tagger like an author. Exit 0 clean, 1 findings, 2 when the scan could not be completed (a
+git command failed, an object could not be read): a scan that saw nothing must not pass. Rules:
 
   secret      private keys, GitHub/Anthropic/OpenAI/AWS/Google/Slack tokens, literal signing passwords
   email       any address except GitHub noreply (<user>@users.noreply.github.com, noreply@github.com),
@@ -20,19 +22,24 @@ could not be read): a scan that saw nothing must not pass. Rules:
   private     every word in the private deny-list (names, emails, phone serials ...), case-insensitive
   link        claude.ai links (artifacts and chats are private pages)
   exif        JPEG EXIF GPS position, camera or lens serial, camera owner (read from the IFDs)
-  identity    the repo's user.email / commit authors and committers not a GitHub noreply address
+  identity    the repo's user.email / commit authors, committers and taggers not a GitHub noreply address
   large       a text file over 8 MiB: only the deny-list was checked; read it, then allow it by
               rule and path
 
 The deny-list holds the private values themselves, so it lives OUTSIDE every repo:
 ~/.claude/tools/publish_denylist.txt (one term per line, # comments). Per-repo exceptions go in
 <repo>/.publish-allow (one regex per line, matched against "rule|path|text"); that file is public, so it
-must never contain a private value - allow by rule and path, not by quoting the value. It is itself
-checked by every rule; its earlier versions in the history by the secret and private rules only.
+must never contain a private value - allow by rule and path, not by quoting the value. A message is
+allowed by rule and label: ^path\\|commit 1a2b3c4d5e\\| or ^email\\|tag v1\\.0\\|. A pushed message
+cannot be rewritten without rewriting the history, so such a line is how an old one is accepted. The
+allow file is itself checked by every rule; its earlier versions in the history by the secret and
+private rules only.
 
 Stdlib only. Binary files are skipped except JPEG (EXIF) and checked as bytes for the deny-list;
 UTF-16 text is decoded and scanned as text. A symlink is scanned as its link text, which is what git
-stores. Not scanned: commit and tag messages.
+stores. Commits and tags are read as raw objects, a merge commit's copied tag (mergetag) included,
+and git replace stand-ins are ignored (a push sends the originals). A tag's signature block is not
+scanned (it is not text anyone wrote); text after it is.
 """
 import os
 import re
@@ -69,11 +76,15 @@ class GitError(Exception):
     """A git command failed, or answered in a shape this script does not understand."""
 
 
+# git replace makes git show a replacement object, but a push sends the original: read the originals.
+GIT = ("git", "--no-replace-objects")
+
+
 def git(repo, *args, ok=(0,), input=None, raw=False):
     """stdout of `git -C repo args` (bytes if raw); GitError unless the exit status is in ok."""
     text = {} if raw else dict(text=True, encoding="utf-8", errors="replace")
     try:
-        p = subprocess.run(["git", "-C", repo, *args], capture_output=True, input=input, **text)
+        p = subprocess.run([*GIT, "-C", repo, *args], capture_output=True, input=input, **text)
     except OSError as e:
         raise GitError("cannot run git: %s" % e)
     if p.returncode not in ok:
@@ -94,13 +105,13 @@ def shown(s):
     return s.encode("utf-8", "surrogateescape").decode("utf-8", "replace")
 
 
-def read_blobs(repo, oids):
-    """{oid: bytes} for the blobs among oids, from one `git cat-file --batch` stream (not one process per
-    object). GitError if git fails, an object cannot be read, or the stream is malformed."""
+def read_objects(repo, oids, kind=b"blob"):
+    """{oid: bytes} for the objects of type kind among oids, from one `git cat-file --batch` stream (not
+    one process per object). GitError if git fails, an object cannot be read, or the stream is malformed."""
     if not oids:
         return {}
     try:
-        p = subprocess.run(["git", "-C", repo, "cat-file", "--batch"], capture_output=True,
+        p = subprocess.run([*GIT, "-C", repo, "cat-file", "--batch"], capture_output=True,
                            input="\n".join(oids).encode() + b"\n")
     except OSError as e:
         raise GitError("cannot run git: %s" % e)
@@ -122,7 +133,7 @@ def read_blobs(repo, oids):
         size = int(head[2])
         if nl + 1 + size > len(out):
             raise GitError("git cat-file: output ends inside object %s" % head[0].decode()[:10])
-        if head[1] == b"blob":
+        if head[1] == kind:
             blobs[head[0].decode()] = out[nl + 1:nl + 1 + size]
         i = nl + 1 + size + 1
     if unreadable:
@@ -317,12 +328,119 @@ def blobs_to_scan(repo, history, read):
             covered.add(oid)
         else:
             wanted.setdefault(oid, path)
-    if history and git(repo, "rev-parse", "--verify", "-q", "HEAD", ok=(0, 1)).strip():
+    if history and has_history(repo):
         for line in git(repo, "rev-list", "--all", "--objects").splitlines():
             parts = line.split(" ", 1)
             if len(parts) == 2 and parts[0] not in covered and parts[0] not in wanted:
                 wanted[parts[0]] = "history:" + parts[1]
     return wanted
+
+
+COMMIT_HASH = re.compile(r"^[0-9a-f]{40}(?:[0-9a-f]{24})?$")       # SHA-1 or SHA-256
+EMAIL_FIELD = re.compile(rb"<([^>\n]*)>")
+SIG_BEGIN = re.compile(r"^-----BEGIN (PGP SIGNATURE|SSH SIGNATURE|SIGNED MESSAGE)-----$", re.M)
+
+
+def has_history(repo):
+    """True when there are commits to scan: a valid HEAD, or any ref (HEAD may be an unborn branch
+    while other branches, which a push can still send, hold commits)."""
+    return bool(git(repo, "rev-parse", "--verify", "-q", "HEAD", ok=(0, 1)).strip()
+                or git(repo, "for-each-ref", "--count=1").strip())
+
+
+def without_signature(msg):
+    """msg without its signature block: the last BEGIN line, as git finds it, up to its END line. Text
+    after the END line is kept, since it is published like the rest."""
+    starts = list(SIG_BEGIN.finditer(msg))
+    if not starts:
+        return msg
+    begin = starts[-1]
+    end = re.compile(r"^-----END %s-----$" % begin.group(1), re.M).search(msg, begin.end())
+    return msg[:begin.start()] + (msg[end.end():] if end else "")
+
+
+def split_object(data):
+    """(header lines as [(key, value bytes)], message text) of a raw commit or tag object. Continuation
+    lines (a leading space) are joined to their header with newlines. The message is decoded with the
+    object's own encoding header when git would honour one, else as UTF-8."""
+    head, _, msg = data.partition(b"\n\n")
+    fields = []
+    for line in head.split(b"\n"):
+        if line.startswith(b" ") and fields:
+            fields[-1] = (fields[-1][0], fields[-1][1] + b"\n" + line[1:])
+        else:
+            key, _, value = line.partition(b" ")
+            fields.append((key, value))
+    enc = dict(fields).get(b"encoding", b"utf-8").decode("ascii", "replace")
+    try:
+        text = msg.decode(enc, "replace")
+    except LookupError:
+        text = msg.decode("utf-8", "replace")
+    return fields, text
+
+
+def scan_tag_object(label, data, deny, hits):
+    """The tagger and message of a raw tag object (also used for a merge commit's mergetag header).
+    Returns its header fields."""
+    fields, msg = split_object(data)
+    for key, value in fields:
+        if key == b"tagger":
+            m = EMAIL_FIELD.search(value)
+            if not IDENTITY_OK.search(m.group(1).decode("utf-8", "replace") if m else ""):
+                hits.append(("identity", label, 0, "tagger email is not GitHub noreply"))
+    scan_text(label, without_signature(msg), deny, hits)
+    return dict(fields)
+
+
+def scan_messages(repo, deny, hits):
+    """--history: the author and committer emails and the message of every commit, and the tagger and
+    message of every annotated tag object (those a ref points at, and the tags they point at in turn).
+    Commits are read as raw objects, not through git log: a NUL byte in a message, log.showSignature
+    or i18n.logOutputEncoding cannot change or cut what is scanned. Returns (commits, tag objects)."""
+    oids = git(repo, "rev-list", "--all").split()
+    bad = [o for o in oids if not COMMIT_HASH.match(o)]
+    if bad:
+        raise GitError("git rev-list: unexpected line %r" % bad[0][:80])
+    objs = read_objects(repo, oids, b"commit")
+    for oid in oids:
+        if oid not in objs:
+            raise GitError("git cat-file: %s is not a commit" % oid[:10])
+        label = "commit " + oid[:10]
+        fields, msg = split_object(objs[oid])
+        for key, value in fields:
+            if key in (b"author", b"committer"):
+                m = EMAIL_FIELD.search(value)
+                if not IDENTITY_OK.search(m.group(1).decode("utf-8", "replace") if m else ""):
+                    hits.append(("identity", label, 0, "author/committer email is not GitHub noreply"))
+            elif key == b"mergetag":        # a merged signed tag, copied into the commit
+                scan_tag_object(label, value, deny, hits)
+        scan_text(label, msg, deny, hits)
+
+    todo = {}
+    for line in git(repo, "for-each-ref", "--format=%(objecttype) %(objectname) %(refname)").splitlines():
+        parts = line.split(" ", 2)
+        if len(parts) != 3:
+            raise GitError("git for-each-ref: unexpected line %r" % line[:80])
+        if parts[0] == "tag":
+            todo.setdefault(parts[1], "tag " + parts[2].removeprefix("refs/tags/"))
+    done = set()
+    while todo:
+        objs = read_objects(repo, list(todo), b"tag")
+        nested = {}
+        for oid, label in todo.items():
+            if oid not in objs:
+                raise GitError("git cat-file: %s is not a tag object" % oid[:10])
+            done.add(oid)
+            if not label:                   # a nested tag no ref points at: its own name
+                name = dict(split_object(objs[oid])[0]).get(b"tag", oid[:10].encode())
+                label = "tag " + name.decode("utf-8", "replace")
+            fields = scan_tag_object(label, objs[oid], deny, hits)
+            inner = fields.get(b"object", b"").decode("ascii", "replace")
+            # a tag a ref also points at keeps the ref's label, so it is scanned (and allowed) once
+            if fields.get(b"type") == b"tag" and inner and inner not in done and inner not in todo:
+                nested.setdefault(inner, None)
+        todo = nested
+    return len(oids), len(done)
 
 
 def scan(repo, history):
@@ -348,15 +466,12 @@ def scan(repo, history):
     email = git(repo, "config", "user.email", ok=(0, 1)).strip()      # exit 1: not set
     if not IDENTITY_OK.search(email):
         hits.append(("identity", ".git/config", 0, "user.email is not a GitHub noreply address"))
-    if history and git(repo, "rev-parse", "--verify", "-q", "HEAD", ok=(0, 1)).strip():
-        for line in git(repo, "log", "--all", "--format=%H %ae %ce").splitlines():
-            h, ae, ce = line.split(" ", 2)
-            for e in (ae, ce):
-                if not IDENTITY_OK.search(e):
-                    hits.append(("identity", "commit " + h[:10], 0, "author/committer email is not GitHub noreply"))
+    messages = (0, 0)
+    if history and has_history(repo):
+        messages = scan_messages(repo, deny, hits)
 
     wanted = blobs_to_scan(repo, history, read)
-    blobs = read_blobs(repo, list(wanted))
+    blobs = read_objects(repo, list(wanted))
     for oid, data in blobs.items():
         scan_file(wanted[oid], data, deny, hits)
 
@@ -371,8 +486,9 @@ def scan(repo, history):
             kept.append(h)
     for rule, rel, n, what in kept:
         print(shown("%-8s %s%s  %s" % (rule, rel, ":%d" % n if n else "", what)))
-    print("publish_check: %d files%s, %d finding(s)%s" % (
-        scanned, " + %d staged or earlier blobs" % len(blobs) if blobs else "", len(kept),
+    print("publish_check: %d files%s%s, %d finding(s)%s" % (
+        scanned, " + %d staged or earlier blobs" % len(blobs) if blobs else "",
+        " + %d commit and %d tag messages" % messages if history else "", len(kept),
         "" if not deny else ", deny-list %d terms" % len(deny)))
     if not deny:
         print("note: no deny-list at %s - names, serials and private emails are only caught by pattern" % DENYLIST)
