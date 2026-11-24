@@ -58,11 +58,11 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R42 | Proposals from a photo | 4. Items, places and tags |
 | D-R43 | Custom fields | 4. Items, places and tags |
 | D-R44 | Field types | 4. Items, places and tags |
-| Q-R45 | Final field types and presets | 4. Items, places and tags |
+| D-R45 | Field presets | 4. Items, places and tags |
 | D-R46 | Where a field attaches | 4. Items, places and tags |
 | D-R47 | User-editable lists | 4. Items, places and tags |
 | D-R48 | Local database | 5. Storage, sync and backup |
-| Q-R49 | Database library | 5. Storage, sync and backup |
+| D-R49 | Database library | 5. Storage, sync and backup |
 | D-R50 | A database that fails to open | 5. Storage, sync and backup |
 | O-R51 | Folder sync | 5. Storage, sync and backup |
 | D-R52 | Record ids and history | 5. Storage, sync and backup |
@@ -750,32 +750,54 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R44 · Field types
 
-**Rule:** Fields can go on items and on places, with the types below, sized for every module (R97).
+**Rule:** Fields can go on items, places and wishes (R117), with the types below, sized for every module (R97). A wish's fields carry over to the item it becomes.
 
 **Values:**
 
-| Type |
-|---|
-| text |
-| number with a typed unit |
-| date |
-| choice list |
-| checkbox |
-| link to another item or place |
+| Type | Holds |
+|---|---|
+| text | free text |
+| number | a number with an optional unit, picked from g, kg, ml, l, pieces, packs, cm and months or typed by the user |
+| date | a full date, or a month and year only, as labels print it (R109) |
+| choice list | one pick or several, set per field; each option keeps its id (R52) when renamed, so its matches hold (R122) |
+| checkbox | on or off |
+| link to an item or place | one or several, set per field |
+| web link | an address that opens in the browser when tapped |
 
-**Acceptance:** A field of each type can be created on an item and on a place, filled in, and survives export and import.
+**Acceptance:** A field of each type can be created on an item, a place and a wish, filled in, and survives export and import. A date saved as a month and year shows as a month and year. A renamed choice keeps its id. Ticking a wish as bought keeps its fields on the new item.
 
-**Since:** 2026-11-22 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
-### Q-R45 · Final field types and presets
+### D-R45 · Field presets
 
-**Rule:** What is the final list of custom field types and presets, worked out with the owner from use cases? It is needed by stage 1.
+**Rule:** Each module comes with the preset fields below, attached as each row says (R46). Presets can be renamed and hidden and their choices edited; a preset that a view of its module needs, such as expiry date for "expiring soon", cannot be deleted while that module is on. The new-field picker also offers brand, model and purchase date as ready-made fields, none of them on until the user adds them.
 
-**Default:** The types in R44 and the module fields in R97, as drafted.
+**Why:** Pantry covers consumables of every kind, soap and face cream as well as food, so its fields attach to a "consumable" tag.
 
-**Why:** R44 and R97 hold a drafted list; the source settles the final one with the owner, from use cases.
+**Values:**
 
-**Since:** 2026-10-28 · unrecorded · migrated
+| Module | Field | Type | Attaches to |
+|---|---|---|---|
+| Inventory | expiry date | date | single items |
+| Inventory | opened on | date | single items |
+| Inventory | months after opening | number in months | single items |
+| Wardrobe | size | text | the tag "clothes" |
+| Wardrobe | colour | choice list, several picks | the tag "clothes" |
+| Wardrobe | material | choice list, several picks | the tag "clothes" |
+| Wardrobe | season | choice list, several picks: spring, summer, autumn, winter | the tag "clothes" |
+| Wardrobe | occasion | choice list, several picks | the tag "clothes" |
+| Wardrobe | last worn | date | the tag "clothes" |
+| Wardrobe | laundry | choice list, one pick: clean, worn, in the wash | the tag "clothes" |
+| Pantry | counting unit | choice list, one pick: grams, millilitres, pieces, packs (R147) | the tag "consumable" |
+| Pantry | minimum stock | number in the counting unit | the tag "consumable" |
+| Shopping | category | choice list, one pick, from the user's category list; shown only while the savings export is on (R125) | single items and wishes |
+| Shopping | may need a bag | checkbox (R146) | single items and wishes |
+
+**Acceptance:** With each module on, its presets appear on the items carrying the tag in their row, or can be added to single items and wishes as the row says. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
+
+**Not:** Pantry's fields on a "food" tag: soap, cleaning products and other consumables that are not food run out too. Serial number and warranty presets: insurance records are out of scope in v1 (R103).
+
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R46 · Where a field attaches
 
@@ -803,15 +825,19 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-11-22 · owner · own words
 
-### Q-R49 · Database library
+### D-R49 · Database library
 
-**Rule:** Which database library does the app use, SQLDelight or Room KMP? It is needed by stage 1.
+**Rule:** The app's database uses Room KMP 2.8, on Android and on the Windows desktop JVM.
 
-**Default:** Whichever the earlier app's sync code (R58) uses, so reusing it stays simple; decided in stage 1.
+**Why:** The earlier app's sync code (R58) runs on Room KMP for both targets, so it is taken over with no change of library, and its driver that keeps a database that fails to open serves R50.
 
-**Why:** SQLDelight and Room KMP are both named, with no reason given to prefer either.
+**Evidence:** The earlier app, checked 2026-11-24: Room 2.8.4 with KSP for its Android and desktop JVM targets, and a driver that keeps a corrupt database file instead of letting the framework delete it.
 
-**Since:** 2026-11-22 · owner · agreed rewording
+**Acceptance:** The shared data module builds with Room KMP for Android and for the desktop JVM, and stage 1's round-trip tests pass on both (R100).
+
+**Not:** SQLDelight: the earlier app's database layer would have to be rewritten before its sync code could be reused.
+
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R50 · A database that fails to open
 
@@ -1368,8 +1394,8 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 |---|---|---|
 | Inventory | expiry date, opened on, months after opening | expiring soon |
 | Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year, usage rate |
-| Pantry | quantity and unit, minimum stock | usage rate |
-| Shopping | category, shown while the savings export is on (R125); prices live in the price book (R112) | shopping list, store lists, wish list, "already have it" check, price comparison |
+| Pantry | counting unit (R147), minimum stock | usage rate |
+| Shopping | category, shown while the savings export is on (R125); may need a bag (R146); prices live in the price book (R112) | shopping list, store lists, wish list, "already have it" check, price comparison |
 
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
@@ -2086,10 +2112,12 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R40 · Editing suggestions: R07 and R08 pass: suggested tags are cleared in one action, and wrong items are corrected one at a time.
 - R41 · Photos: A photo saves on an item or on a place. A region marked on a place photo opens the item it points to.
 - R42 · Proposals from a photo: R06, R07 and R08 pass, as stage 4's gate requires (R100).
-- R44 · Field types: A field of each type can be created on an item and on a place, filled in, and survives export and import.
+- R44 · Field types: A field of each type can be created on an item, a place and a wish, filled in, and survives export and import. A date saved as a month and year shows as a month and year. A renamed choice keeps its id. Ticking a wish as bought keeps its fields on the new item.
+- R45 · Field presets: With each module on, its presets appear on the items carrying the tag in their row, or can be added to single items and wishes as the row says. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
 - R46 · Where a field attaches: A field attached to a tag appears on every item that carries the tag, including items tagged later. A field added to one item appears only on that item.
 - R47 · User-editable lists: The user can add, rename and remove tag kinds, homepage cards and widget content, and the change shows at once.
 - R48 · Local database: Each device opens its own database with the network off.
+- R49 · Database library: The shared data module builds with Room KMP for Android and for the desktop JVM, and stage 1's round-trip tests pass on both (R100).
 - R50 · A database that fails to open: In stage 1's round-trip tests, a corrupted database is kept, not deleted (R100).
 - R51 · Folder sync: Two-device sync with conflicts passes stage 1's round-trip tests (R100).
 - R52 · Record ids and history: Every record has a unique id, and every change to it adds an entry to its history.
