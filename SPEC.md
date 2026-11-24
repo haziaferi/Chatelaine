@@ -120,7 +120,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R127 | Store lists | 10. Modules and the shopping list |
 | D-R129 | Carried by a store | 10. Modules and the shopping list |
 | D-R130 | One product on several store lists | 10. Modules and the shopping list |
-| Q-R131 | Pinned store lists | 10. Modules and the shopping list |
+| D-R131 | Pinned store lists | 10. Modules and the shopping list |
 | D-R132 | Quick comparison from a list entry | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
@@ -1470,7 +1470,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R127 · Store lists
 
-**Rule:** The user makes shopping lists for one store each, choosing from the shopping list the products that store carries (R129). Every tick on a store list is at that store; a tick on the shopping list itself asks for the store once. A store list goes through the stages below.
+**Rule:** The user makes shopping lists for one store each, choosing among the products that store carries (R129); entries already on the shopping list come pre-selected, and anything picked joins the shopping list too. Every tick on a store list is at that store; a tick on the shopping list itself asks for the store once. A store list goes through the stages below.
 
 **Why:** A store list knows its store, so receipts (R124) and the price book (R115) get one with no extra step, and the user collects what one store sells in one go.
 
@@ -1478,12 +1478,14 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 | Stage | What happens |
 |---|---|
-| made | the user picks entries from the shopping list and confirms; the list stays editable |
+| made | the user picks products and confirms; the list stays editable, and with no receipt it is never archived, so lists can be made ahead of time |
 | receipt | closing a receipt (R124) leaves the list open until the end of that day, for a second payment |
-| archived | at the end of the day of its last receipt, unless pinned (R131); entries not ticked stay on the shopping list |
+| archived | at the end of the day of its last receipt, only once it has produced one, and never when pinned (R131); entries not ticked stay on the shopping list |
 | deleted | 30 days after archiving; its receipts and the prices it recorded stay |
 
-**Acceptance:** A store list for store A offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
+**Evidence:** Not checked: that shopping-list entries come pre-selected and that picked products join the shopping list is the builder's proposal of 2026-11-24.
+
+**Acceptance:** A store list for store A offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. A store list made a day ahead and not used is still there, not archived. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
 
 **Not:** A current store on the shopping list: it can be left on the wrong store.
 
@@ -1491,35 +1493,39 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R129 · Carried by a store
 
-**Rule:** A product counts as carried by a store when the price book has a price for it there or the user has marked it so. Products with no information for that store stay selectable, greyed, below the carried ones; products the user has marked as not carried there are not offered.
+**Rule:** A product counts as carried by a store when the price book has a price for it there or the user has marked it so, and making a store list offers only the products that store carries. A product not offered can still be found by searching in the store list, and adding it marks it as carried there.
 
-**Why:** Shop catalogues are incomplete, so availability is known only from the user's own prices and marks; without the greyed group a new product could go on no store list.
+**Why:** Shop catalogues are incomplete, so availability is known only from the user's own prices and marks. Offering products with no information would list the whole of Inventory; search keeps a new product reachable.
 
-**Acceptance:** Making a store list for store A offers the products with a price at A or marked as carried there first, the products with no information for A greyed below, and none marked as not carried at A.
+**Acceptance:** Making a store list for store A offers only the products with a price at A or marked as carried there. Searching the list for a product with no information for A and adding it marks it as carried at A, and the next store list for A offers it.
+
+**Not:** Products with no information for the store shown greyed: the whole of Inventory would be listed among the relevant entries.
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R130 · One product on several store lists
 
-**Rule:** Ticking a product as bought on one store list removes it from the shopping list and from every other store list that holds it, after a warning the user can dismiss. The warning is flagged when the product costs less per unit at one of those other stores, and names that store without an amount (R121).
+**Rule:** Ticking a product as bought on one store list removes it from the shopping list and from every other store list that holds it except pinned ones (R131), after a warning the user can dismiss. The warning is flagged when the product costs less per unit at one of those other stores, and names that store without an amount (R121).
 
 **Why:** The product is bought, so it is not bought twice; the flag catches a purchase at the dearer store while it can still be put back.
 
-**Acceptance:** With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list. With a lower price per unit at B, the warning is flagged and names B, with no amount.
+**Acceptance:** With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list, but stay on a pinned list that holds them. With a lower price per unit at B, the warning is flagged and names B, with no amount.
 
 **Not:** Showing by how much the other store is cheaper: Chatelaine shows no price differences as amounts (R121).
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
-### Q-R131 · Pinned store lists
+### D-R131 · Pinned store lists
 
-**Rule:** What does a pinned store list do after it produces a receipt?
+**Rule:** A pinned store list is never archived, and its entries leave it only when the user removes them. Opening it shows its entries pre-selected; the user adds and removes entries to fit the run, then confirms. Producing a receipt unticks the entries bought on it, and nothing else moves.
 
-**Default:** It is never archived and keeps its selection, with its ticks cleared. Opening it again shows the remembered products pre-selected; the user deselects what is not needed this time and confirms, which puts the rest back on the shopping list unticked. Changes: R127's archived stage and how a pinned list refills the shopping list.
+**Why:** A repeated run, such as the weekly groceries, is compiled once and adjusted each time instead of built again.
 
-**Why:** Keeping the selection saves compiling the weekly run again; putting everything back on the shopping list on its own would add things not needed that week.
+**Acceptance:** After a pinned weekly list produces a receipt, its bought entries are unticked and still on it, nothing else changes, and it is not archived at the end of the day. Reopening it shows its entries pre-selected; an entry added and confirmed stays for the next run, and a removed one is gone.
 
-**Since:** 2026-11-24 · builder · agreed rewording
+**Not:** Clearing a pinned list's selection after each receipt: the run would be compiled again every week.
+
+**Since:** 2026-11-24 · owner · own words
 
 ### D-R132 · Quick comparison from a list entry
 
@@ -1823,9 +1829,10 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R125 · Item category: With Shopping on and the savings export off, no category field appears, anything can go on the shopping list, and nothing is exported. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
 - R126 · No category, no shopping list: With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; turning the export on with uncategorised entries already on the list flags them, and they cannot be ticked as bought until each has a category; every exported line carries a category.
 - R128 · Savings export prompt: The first entry on either list shows the prompt once; after it is dismissed, later entries show no prompt and no receipt is sent; the export can be turned on from the Shopping settings at any time.
-- R127 · Store lists: A store list for store A offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
-- R129 · Carried by a store: Making a store list for store A offers the products with a price at A or marked as carried there first, the products with no information for A greyed below, and none marked as not carried at A.
-- R130 · One product on several store lists: With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list. With a lower price per unit at B, the warning is flagged and names B, with no amount.
+- R127 · Store lists: A store list for store A offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. A store list made a day ahead and not used is still there, not archived. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
+- R129 · Carried by a store: Making a store list for store A offers only the products with a price at A or marked as carried there. Searching the list for a product with no information for A and adding it marks it as carried at A, and the next store list for A offers it.
+- R130 · One product on several store lists: With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list, but stay on a pinned list that holds them. With a lower price per unit at B, the warning is flagged and names B, with no amount.
+- R131 · Pinned store lists: After a pinned weekly list produces a receipt, its bought entries are unticked and still on it, nothing else changes, and it is not archived at the end of the day. Reopening it shows its entries pre-selected; an entry added and confirmed stays for the next run, and a removed one is gone.
 - R132 · Quick comparison from a list entry: Opening cookies Q 600 g on store A's list shows their price per kg at every store with a price, cheapest first.
 - R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item. Putting batteries that are in Inventory on the shopping list links to that item, and ticking them as bought raises its quantity.
 - R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.

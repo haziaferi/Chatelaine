@@ -379,3 +379,7 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R118 · changed · store lists sync and back up · owner
 - 2026-11-24 · R103 · changed · "receipts" → "proof of purchase", since Receipt is now a glossary term · builder
 - 2026-11-24 · spec · added · glossary: Store list; Shopping module changed · owner
+- 2026-11-24 · R131 · kind · Q → D: pinned lists keep entries until removed; a receipt only unticks · owner
+- 2026-11-24 · R127 · changed · archived only after a receipt; picks from carried products, shopping list pre-selected · owner
+- 2026-11-24 · R129 · changed · products with no information are not offered; search adds and marks them · owner
+- 2026-11-24 · R130 · changed · pinned lists keep a product ticked on another list · owner
