@@ -163,13 +163,13 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
 | Shopping module | The module for what to buy, where and at what price: the shopping list, store lists, the wish list, the price book and the price comparison. |
-| Store list | A shopping list for one store, made from the shopping-list entries that store carries; it produces that store's receipts (R127). |
+| Store list | A shopping list for one store, made from the products that store carries; it produces that store's receipts (R127). |
 | Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack. |
 | Price book | Shop prices recorded by pack, store and date, with promotions and their end dates. |
 | Wish | An entry on the wish list or the shopping list for something not in Inventory; it becomes an item only when ticked as bought (R117). |
 | Wish list | The Shopping module's list of wishes kept for later; a wish moves from it to the shopping list when it is to be bought (R117). |
 | Savings export | The Shopping setting, off by default, that sends each receipt to the savings app and shows the category field (R113, R125). |
-| Receipt | The items bought at one store in one payment; one row in the savings export (R124). |
+| Receipt | The items bought at one store in one payment (R124); while the savings export is on, one row in it. |
 | Category | A label on an item or wish, shown while the savings export is on, that the savings app matches to one of its own categories (R125). |
 | Settled area | An area whose things are where they belong, photographed as a whole. |
 | Place photo | A photo that belongs to a place. |
@@ -253,12 +253,12 @@ The name: a chatelaine was the mistress of a château, in charge of the househol
 | Check before buying | R09 | weekly |
 | Gather things for a project | R05 | monthly |
 | Seasonal swap | R11 | twice a year |
-| Shop from the list, comparing prices | R114, R115 | every shopping trip |
+| Shop from the list, comparing prices | R114, R115 | every time the user shops |
 | The first big tidy | — | once, over some weeks |
 
 **Acceptance:** none: the frequencies guide the stage order (R101); there is nothing in the app to check.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ## 2. Acceptance scenarios
 
@@ -1358,7 +1358,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R112 · Shopping module
 
-**Rule:** The Shopping module holds the shopping list, store lists (R127), the wish list (R117), the price book and the price comparison, and builds on the Inventory module rather than on Pantry, so anything can go on the list. With Pantry on too, low stock appears on the list as a suggestion the user accepts with one tap (flagged instead when it has no category, R126), and the list shows Pantry stock. The price comparison comes from a standalone library the owner's other apps can also use (R119).
+**Rule:** The Shopping module holds the shopping list, store lists (R127), the wish list (R117), the price book and the price comparison, and builds on the Inventory module rather than on Pantry, so anything can go on the list. With Pantry on too, low stock appears on the list as a suggestion the user accepts with one tap (flagged instead when the savings export is on and it has no category, R126), and the list shows Pantry stock. The price comparison comes from a standalone library the owner's other apps can also use (R119).
 
 **Why:** Pantry is about what the user has and how fast it is used; Shopping is about what to buy, where and at what price. Not everything bought is a consumable, and the money bridge (R98) sits where money is spent, so Chatelaine touches money in one module only.
 
@@ -1386,7 +1386,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** Chatelaine stays free of money logic (R98) and the flow stays one way; the user sets up categories in each app and links them once.
 
-**Acceptance:** Every line carries its category's id and name in the receipt file (R123, R126); renaming a category in Chatelaine keeps the savings app's match; Chatelaine reads nothing from the savings app.
+**Acceptance:** Every line carries its category's id and name in the receipt file (R123, R126); after a category is renamed in Chatelaine, the next receipt file carries the same category id with the new name; Chatelaine reads nothing from the savings app.
 
 **Not:** Categories worked out from tags: an item carries tags of several kinds (R37), such as a season or a place, so no tag says which category a line belongs to. Chatelaine reading the savings app's category list: a flow back against R98.
 
@@ -1406,7 +1406,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | date | the day of the payment |
 | currency | an ISO 4217 code, `EUR` in v1 |
 | total paid | in whole cents: the sum of the lines' prices paid |
-| lines | per line: item or wish name, pack when it has one, quantity, price paid with every discount applied (R116), and category (R125, R126) as its unique id (R52) and its name, so a renamed category keeps its match in the savings app (R122) |
+| lines | per line: item name (a wish ticked as bought is an item by then, R117), pack when it has one, quantity, price paid with every discount applied (R116), and category (R125, R126) as its unique id (R52) and its name, so a renamed category keeps its match in the savings app (R122) |
 
 **Acceptance:** An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
 
@@ -1416,7 +1416,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R124 · What makes a receipt
 
-**Rule:** A receipt is one payment: the items ticked as bought at one store (R127) until the user closes the receipt at the till. Without a close, the receipt ends at the end of the day or when an item is ticked as bought at another store; a closed receipt never changes. Ticking an item as bought takes its price paid, pre-filled from the price book for that pack and store (R115) and asked for when there is none.
+**Rule:** A receipt is one payment: the items ticked as bought at one store (R127) until the user closes the receipt at the till. Without a close, the receipt ends at the end of the day or when an item is ticked as bought at another store; a closed receipt never changes. Ticking an item or a wish as bought takes its price paid, pre-filled from the price book for that pack and store (R115) and asked for when there is none.
 
 **Why:** One receipt matches one row of the bank statement. The user knows at the till when they pay twice, while the savings app sees payments only days later, in a statement.
 
@@ -1464,15 +1464,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** The user learns of the export when it first matters, once, without a reminder (R03).
 
-**Acceptance:** The first entry on either list shows the prompt once; after it is dismissed, later entries show no prompt and no receipt is sent; the export can be turned on from the Shopping settings at any time.
+**Acceptance:** The first entry on either list shows the prompt once; accepting it turns the savings export on and opens the category list; after it is dismissed, later entries show no prompt and no receipt is sent; the export can be turned on from the Shopping settings at any time.
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R127 · Store lists
 
-**Rule:** The user makes shopping lists for one store each, choosing among the products that store carries (R129) in a multi-select edit mode, where entries already on the shopping list come pre-selected and any entries can be selected or unselected in bulk before confirming; anything picked joins the shopping list too. Every tick on a store list is at that store; a tick on the shopping list itself asks for the store once. A store list goes through the stages below.
+**Rule:** The user makes shopping lists for one store each, choosing among the products that store carries (R129) in a multi-select edit mode, where entries already on the shopping list come pre-selected and any entries can be selected or unselected in bulk before confirming; anything picked joins the shopping list too. Every tick on a store list is at that store; a tick on the shopping list itself asks for the store, pre-filled with the store of the open receipt when there is one. A store list goes through the stages below.
 
-**Why:** A store list knows its store, so receipts (R124) and the price book (R115) get one with no extra step, and the user collects what one store sells in one go.
+**Why:** A store list knows its store, so receipts (R124) and the price book (R112, R115) get one with no extra step, and the user collects what one store sells in one go.
 
 **Values:**
 
@@ -1503,7 +1503,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R130 · One product on several store lists
 
-**Rule:** Ticking a product as bought on one store list removes it from the shopping list and from every other store list that holds it except pinned ones (R131), after a warning the user can dismiss. The warning is flagged when the product costs less per unit at one of those other stores, and names that store without an amount (R121).
+**Rule:** Ticking a product as bought on one store list removes it from the shopping list and from every other store list that holds it except pinned ones (R131), after a warning the user can dismiss to go on or cancel to leave the product unticked. The warning is flagged when the product costs less per unit at one of those other stores, and names that store without an amount (R121).
 
 **Why:** The product is bought, so it is not bought twice; the flag catches a purchase at the dearer store while it can still be put back.
 
@@ -1527,7 +1527,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R132 · Quick comparison from a list entry
 
-**Rule:** Opening an entry on a store list shows a quick comparison of that product's price per unit at every store with a price in the price book, cheapest first (R119).
+**Rule:** Opening an entry on a store list shows a quick comparison of that product's price per unit at every store with a price in the price book, cheapest first, as in R114, using the library of R119.
 
 **Acceptance:** Opening cookies Q 600 g on store A's list shows their price per kg at every store with a price, cheapest first.
 
@@ -1535,9 +1535,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R117 · Wishes
 
-**Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, and becomes an Inventory item only when it is ticked as bought.
+**Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, and becomes an Inventory item only when it is ticked as bought, in the unplaced state (R30). Ticking an item already in Inventory raises its quantity by the quantity bought, when the item carries one (R26).
 
-**Acceptance:** Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item. Putting batteries that are in Inventory on the shopping list links to that item, and ticking them as bought raises its quantity.
+**Acceptance:** Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2.
 
 **Not:** A "to buy" item state: things not owned would show in search and as the object of the day.
 
@@ -1545,11 +1545,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R118 · Shopping records in sync and backup
 
-**Rule:** Wishes, list entries, store lists, stores, categories, receipts and the price book sync (R51) and back up (R60) like every other record.
+**Rule:** Wishes, list entries, store lists, stores, carried marks (R129), categories, receipts and the price book sync (R51) and back up (R60) like every other record.
 
 **Why:** They hold shop prices and what was bought, not accounts or balances, so the security bar R98 guards against does not rise.
 
-**Acceptance:** A wish and a price added on one device appear on the other after a sync, and both survive export and import.
+**Acceptance:** One record of each kind named in the rule, added on one device, appears on the other after a sync, and survives export and import.
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
@@ -1583,11 +1583,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Chatelaine does not show the difference between the price paid and the saved price (R115). Ticking an item as bought shows only the price paid.
 
-**Acceptance:** Ticking an item as bought below or above its saved price shows no difference or saving, at the tick step or anywhere else.
+**Acceptance:** Ticking an item as bought below or above its saved price shows no difference or saving at the tick step, and reading every Shopping screen's text finds none elsewhere.
 
 **Not:** Showing the difference once at the tick step ("0,30 € less than saved").
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R109 · Expiry dates
 
@@ -1819,22 +1819,22 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
 - R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing, and turning it on later sends none of those receipts.
-- R122 · Savings categories: Every line carries its category's id and name in the receipt file (R123, R126); renaming a category in Chatelaine keeps the savings app's match; Chatelaine reads nothing from the savings app.
+- R122 · Savings categories: Every line carries its category's id and name in the receipt file (R123, R126); after a category is renamed in Chatelaine, the next receipt file carries the same category id with the new name; Chatelaine reads nothing from the savings app.
 - R123 · Receipt file: An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
 - R124 · What makes a receipt: Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file; ticking a pack with no price at that store asks for the price paid before it is ticked.
 - R125 · Item category: With Shopping on and the savings export off, no category field appears, anything can go on the shopping list, and nothing is exported. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
 - R126 · No category, no shopping list: With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; turning the export on with uncategorised entries already on the list flags them, and they cannot be ticked as bought until each has a category; every exported line carries a category.
-- R128 · Savings export prompt: The first entry on either list shows the prompt once; after it is dismissed, later entries show no prompt and no receipt is sent; the export can be turned on from the Shopping settings at any time.
+- R128 · Savings export prompt: The first entry on either list shows the prompt once; accepting it turns the savings export on and opens the category list; after it is dismissed, later entries show no prompt and no receipt is sent; the export can be turned on from the Shopping settings at any time.
 - R127 · Store lists: A store list for store A opens in multi-select edit mode with the shopping-list entries it carries pre-selected; selecting or unselecting several entries at once and confirming gives a list of exactly those. It offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. A store list made a day ahead and not used is still there, not archived. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
 - R129 · Carried by a store: Making a store list for store A offers only the products with a price at A or marked as carried there. Searching the list for a product with no information for A and adding it marks it as carried at A, and the next store list for A offers it.
 - R130 · One product on several store lists: With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list, but stay on a pinned list that holds them. With a lower price per unit at B, the warning is flagged and names B, with no amount.
 - R131 · Pinned store lists: After a pinned weekly list produces a receipt, its bought entries are unticked and still on it, nothing else changes, and it is not archived at the end of the day. Reopening it shows its entries pre-selected; an entry added and confirmed stays for the next run, and a removed one is gone.
 - R132 · Quick comparison from a list entry: Opening cookies Q 600 g on store A's list shows their price per kg at every store with a price, cheapest first.
-- R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item. Putting batteries that are in Inventory on the shopping list links to that item, and ticking them as bought raises its quantity.
-- R118 · Shopping records in sync and backup: A wish and a price added on one device appear on the other after a sync, and both survive export and import.
+- R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2.
+- R118 · Shopping records in sync and backup: One record of each kind named in the rule, added on one device, appears on the other after a sync, and survives export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
-- R121 · Showing the difference: Ticking an item as bought below or above its saved price shows no difference or saving, at the tick step or anywhere else.
+- R121 · Showing the difference: Ticking an item as bought below or above its saved price shows no difference or saving at the tick step, and reading every Shopping screen's text finds none elsewhere.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and with the savings export on (R125) each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
@@ -1847,7 +1847,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R103 · Insurance records
 
-**Rule:** Value, proof of purchase and serial numbers for insurance use are out of scope for v1. The prices kept are shop prices in the price book and the prices of bought items (R112), for comparing and for the savings-app bridge (R98).
+**Rule:** Value, proof of purchase and serial numbers for insurance use are out of scope for v1. The prices kept are shop prices in the price book (R112) and the prices paid on receipts (R124), for comparing and for the savings-app bridge (R98).
 
 **Why:** Value tracking is a different job.
 

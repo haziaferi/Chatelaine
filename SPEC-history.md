@@ -386,3 +386,17 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R127 · changed · picks in a multi-select edit mode, shopping-list entries pre-selected; confirmed · owner
 - 2026-11-24 · R131 · changed · reopening uses the same multi-select edit mode · owner
 - 2026-11-24 · R117 · changed · wish list working confirmed · owner
+- 2026-11-24 · R117 · changed · a bought wish starts unplaced; quantity rises by the quantity bought · builder
+- 2026-11-24 · R118 · changed · carried marks sync; acceptance covers every record kind · builder
+- 2026-11-24 · R130 · changed · the warning can also be cancelled · builder
+- 2026-11-24 · R127 · changed · a main-list tick's store is pre-filled from the open receipt · builder
+- 2026-11-24 · R124 · changed · ticking covers wishes too · builder
+- 2026-11-24 · R123 · changed · lines carry the item name · builder
+- 2026-11-24 · R122 · changed · acceptance tests the file, not the savings app · builder
+- 2026-11-24 · R121 · changed · acceptance reads every Shopping screen · builder
+- 2026-11-24 · R128 · changed · acceptance covers accepting the prompt · builder
+- 2026-11-24 · R112 · changed · the no-category flag applies only with the savings export on · builder
+- 2026-11-24 · R132 · changed · ordering cites R114 · builder
+- 2026-11-24 · R103 · changed · prices paid live on receipts (R124) · builder
+- 2026-11-24 · R04 · changed · "every shopping trip" → "every time the user shops" · builder
+- 2026-11-24 · spec · changed · glossary: Store list, Receipt · builder
