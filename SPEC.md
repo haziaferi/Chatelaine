@@ -138,6 +138,8 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R143 | Finished consumables | 10. Modules and the shopping list |
 | D-R147 | Pantry counting unit | 10. Modules and the shopping list |
 | D-R148 | Estimated run-out | 10. Modules and the shopping list |
+| D-R149 | Run-out notification per item | 10. Modules and the shopping list |
+| Q-R150 | Run-out notification lead time | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
 | O-R116 | Price paid in the savings export | 10. Modules and the shopping list |
@@ -1786,35 +1788,69 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 ### D-R147 · Pantry counting unit
 
-**Rule:** A Pantry item counts its stock in grams, millilitres or pieces, chosen per item (R97), and using it lowers stock in that unit: 200 g of pasta, 1 banana. Ticking it as bought adds the amount bought in that unit, as the table below says.
+**Rule:** A Pantry item counts its stock in grams, millilitres, pieces or packs, chosen per item (R97), and using it lowers stock in that unit: 200 g of pasta, 1 banana, 1 bag of cookies when it is finished. Ticking it as bought adds the amount bought in that unit, as the table below says. A count of pieces or packs, at the tick or in stock, is a box the user can type in with − and + on either side; grams and millilitres are typed only.
 
-**Why:** Use changes stock in the unit it is used in: pasta is cooked by the gram, a banana is eaten whole, and a piece of cheese could be logged by weight only by weighing it every day.
+**Why:** Use changes stock in the unit it is used in: pasta is cooked by the gram, a banana is eaten whole, and a piece of cheese could be logged by weight only by weighing it every day. A user who does not log each plate or handful counts packs and removes one when it is finished.
 
 **Values:**
 
 | Bought | Counted in | Adds |
 |---|---|---|
 | 2 boxes of rice, 1 kg each | grams | 2000 g |
+| 3 bags of cookies Q 600 g | packs | 3 |
 | 1 packet of 30 AA batteries | pieces | 30 |
 | 2 batteries, no pack | pieces | 2 |
-| a pack whose amount is not in the counting unit, such as bananas, 0,865 kg (R145), counted in pieces | pieces | the count asked at the tick, in a box the user can type in with − and + on either side, pre-filled with the last purchase's count |
+| a pack whose amount is not in the counting unit, such as bananas, 0,865 kg (R145), counted in pieces | pieces | the count asked at the tick, pre-filled with the last purchase's count |
 | a piece of cheese, 1,230 kg | pieces | 1, asked as in the row above |
 
-**Acceptance:** Each row's purchase, ticked as bought, adds the amount in its last column. Bananas bought as 4 last time show 4 at the tick, in a box that − and + change by one and that can be typed in.
+**Acceptance:** Each row's purchase, ticked as bought, adds the amount in its last column. Bananas bought as 4 last time show 4 at the tick, in a box that − and + change by one and that can be typed in. Cookies counted in packs at 3 drop to 2 with one − when a bag is finished. Stock in grams or millilitres shows no − or +.
 
-**Not:** Pantry stock by weight for everything bought by weight: the user eats 1 banana, not 0,312 kg of banana.
+**Not:** Pantry stock by weight for everything bought by weight: the user eats 1 banana, not 0,312 kg of banana. Removing a whole pack from stock counted in grams: without each use logged, the gram count is wrong anyway, so such an item is counted in packs. − and + on grams and millilitres: a step of one is too small to be of use.
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R148 · Estimated run-out
 
-**Rule:** For a Pantry item bought by weight and counted in pieces (R147), such as a piece of cheese, Chatelaine works out how many days a kilogram lasted from the last purchase, from its tick until the stock reached zero (R143). It shows the next purchase's estimated run-out day, its weight times that figure after its tick, beside the item's usage rate (R110).
+**Rule:** Every Pantry item shows an estimated run-out day beside its usage rate (R110), worked out as the table below says. The estimate never notifies by itself; its notification is chosen per item (R149).
 
-**Why:** Its weight at purchase and the day it ran out are already recorded, so the estimate asks nothing more of the user (R110).
+**Why:** Its stock, its purchases and the day each ran out are already recorded, so the estimate asks nothing more of the user (R110). Products such as a piece of cheese, used a little at a time and counted as one piece, can be estimated only from how long a kilogram lasted.
 
-**Acceptance:** A 1,200 kg piece of cheese ticked on 1 November and finished on 7 December lasted 30 days per kg; the next piece, 0,800 kg, ticked on 10 December, shows an estimated run-out around 3 January. A first purchase, with none finished before it, shows no estimate.
+**Values:**
+
+| Item | Estimated run-out |
+|---|---|
+| counted in grams, millilitres, pieces or packs (R147) | its stock divided by its usage rate (R110) |
+| bought by weight and counted in pieces (R147), such as a piece of cheese | the days a kilogram of the last purchase lasted, from its tick until the stock reached zero (R143), times the new purchase's weight, counted from its tick |
+
+**Acceptance:** Rice at 1000 g, used at 100 g a day, shows an estimated run-out in 10 days. A 1,200 kg piece of cheese ticked on 1 November and finished on 7 December lasted 30 days per kg; the next piece, 0,800 kg, ticked on 10 December, shows an estimated run-out around 3 January. An item with no usage rate yet, or a first piece with none finished before it, shows no estimate.
+
+**Not:** A switch for the estimate itself: it is information, and the notification is what can be unwanted.
 
 **Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R149 · Run-out notification per item
+
+**Rule:** The run-out notification (R99) arrives only for the Pantry items switched on for it: each item has its own switch, off by default, and a multi-select edit, like that of store lists (R127), switches many on or off at once, for example all those under one tag. It arrives ahead of the item's estimated run-out day (R148), as R150 settles.
+
+**Why:** An estimate exists for every consumable, but a notification for each would be noise; the user picks the few worth one.
+
+**Evidence:** Not checked: provisional, how far ahead follows R150's proposed default.
+
+**Acceptance:** With the run-out notification turned on in the settings and no item switched on, none arrives. Selecting every item under "cleaning" and switching them on makes those items, and only those, notify.
+
+**Not:** A switch per tag: an item carries several tags (R37), which could disagree. A switch for the estimate itself: R148 says why.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### Q-R150 · Run-out notification lead time
+
+**Rule:** How many days before an item's estimated run-out day (R148) does its run-out notification (R149) arrive?
+
+**Default:** 3 days before, leaving time for one shopping trip. Changes: when the notification arrives, and whether the lead time is one setting or set per item.
+
+**Why:** Too short a lead leaves no shopping trip before the item runs out; too long a lead notifies for things that will last until the next usual trip anyway.
+
+**Since:** 2026-11-24 · builder · agreed rewording
 
 ### D-R118 · Shopping records in sync and backup
 
@@ -1914,6 +1950,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 | low stock | Pantry |
 | add to the shopping list | Pantry and Shopping |
 | usage rate rising or falling | Pantry |
+| estimated run-out day approaching, for the items switched on (R148, R149) | Pantry |
 | time to do the laundry | Wardrobe |
 | running out of clean items of a kind, the rest being in the laundry | Wardrobe |
 | usage rate: none, low, medium or high; rising or falling | Wardrobe |
@@ -1923,7 +1960,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 **Not:** Leaving reminders to the owner's earlier app: every reminder about Chatelaine's things belongs to Chatelaine. Reminders that are not about a thing, such as paying a bill: not Chatelaine's.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ## 11. Stages
 
@@ -2118,8 +2155,9 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R142 · Turning Shopping off: With a list, a price and an open receipt, turning Shopping off closes the receipt and hides all three; turning it on shows the list and the price unchanged and the receipt closed.
 - R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2. R143's acceptance covers a finished consumable.
 - R143 · Finished consumables: With Pantry and Shopping on, lowering rice, counted in grams, in its kitchen-shelf place from 250 g to 0 removes it from search and puts a wish for it on the shopping list; ticking 2 boxes of 1 kg as bought brings the rice back on the kitchen shelf with 2000 g (R147), its minimum stock and its usage-rate history. Lowering "headphones ×3" outside Pantry to 0 leaves an item at zero.
-- R147 · Pantry counting unit: Each row's purchase, ticked as bought, adds the amount in its last column. Bananas bought as 4 last time show 4 at the tick, in a box that − and + change by one and that can be typed in.
-- R148 · Estimated run-out: A 1,200 kg piece of cheese ticked on 1 November and finished on 7 December lasted 30 days per kg; the next piece, 0,800 kg, ticked on 10 December, shows an estimated run-out around 3 January. A first purchase, with none finished before it, shows no estimate.
+- R147 · Pantry counting unit: Each row's purchase, ticked as bought, adds the amount in its last column. Bananas bought as 4 last time show 4 at the tick, in a box that − and + change by one and that can be typed in. Cookies counted in packs at 3 drop to 2 with one − when a bag is finished. Stock in grams or millilitres shows no − or +.
+- R148 · Estimated run-out: Rice at 1000 g, used at 100 g a day, shows an estimated run-out in 10 days. A 1,200 kg piece of cheese ticked on 1 November and finished on 7 December lasted 30 days per kg; the next piece, 0,800 kg, ticked on 10 December, shows an estimated run-out around 3 January. An item with no usage rate yet, or a first piece with none finished before it, shows no estimate.
+- R149 · Run-out notification per item: With the run-out notification turned on in the settings and no item switched on, none arrives. Selecting every item under "cleaning" and switching them on makes those items, and only those, notify.
 - R118 · Shopping records in sync and backup: One record of each kind named in the rule, added on one device, appears on the other after a sync, and survives export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.

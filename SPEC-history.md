@@ -429,3 +429,8 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R117 · changed · a tick adds a Pantry item's amount in its counting unit · owner
 - 2026-11-24 · R143 · changed · acceptance counts rice in grams · owner
 - 2026-11-24 · spec · changed · glossary: Product, Pack, Price book; added Price per unit · owner
+- 2026-11-24 · R147 · changed · packs as a counting unit; − and + for pieces and packs, grams and millilitres typed · owner
+- 2026-11-24 · R148 · changed · estimated run-out for every Pantry item; never notifies by itself · owner
+- 2026-11-24 · R149 · added · run-out notification switched on per item, many at once by multi-select · owner
+- 2026-11-24 · R150 · added · open: run-out notification lead time · builder
+- 2026-11-24 · R99 · changed · row for the run-out notification (R149) · owner
