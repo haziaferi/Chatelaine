@@ -414,3 +414,5 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R116 · changed · row for a discount on a whole receipt · owner
 - 2026-11-24 · R98 · changed · receipts go as a file in a chosen folder · owner
 - 2026-11-24 · spec · added · glossary: Product · owner
+- 2026-11-24 · R117 · changed · a bought finished consumable returns to its last place · owner
+- 2026-11-24 · R143 · added · finished Pantry consumables become wishes · owner
