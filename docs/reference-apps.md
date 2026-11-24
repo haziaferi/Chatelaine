@@ -48,7 +48,7 @@ Walked counts are measured; source counts are estimated from the navigation code
 | Usage, purchase and maintenance logs; stock movements | Personal Stuff | Pantry module or out of scope |
 | Scanning a code to open or register a box | Flindex, Prepper | P1 (open a place by its label's QR) — to place when scoring |
 | Product barcode lookup | Personal Stuff | not planned |
-| Price and total value | Personal Stuff, hot-stuff | out of scope (R103) |
+| Price and total value | Personal Stuff, hot-stuff | shop prices: Shopping module's price book (R112); value for insurance: out of scope (R103) |
 | Trip packing (taken / brought back) | StuffList | close to "in use / away" and lending |
 | Calendar entries, in-app help, unit conversion | Who Has My Stuff, hot-stuff, Prepper | not planned; unit handling comes with typed units (R44) |
 

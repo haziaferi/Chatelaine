@@ -91,8 +91,11 @@ How to read it:
 | **Seasonal swap** | Wardrobe | module view | Bulk move (R11) |
 | **Not worn in a year** | Wardrobe | module view | Object of the day |
 | **Expiring soon** | Inventory | module view | Rediscover prompt |
-| **Shopping list**: items below minimum stock | Pantry | module view | — |
-| **Already have it?**: quick check while shopping | Pantry | module view | Search bar (R09) |
+| **Shopping list**: things to buy; with Pantry on, items below minimum stock too | Shopping | module view | — |
+| **Already have it?**: quick check while shopping | Shopping | module view | Search bar (R09) |
+| **Store lists**: one shopping list per store, pinnable for repeat runs (R127) | Shopping | module view | Shopping list |
+| **Wish list**: things not owned, kept for later (R117) | Shopping | module view | Shopping list |
+| **Price comparison**: packs under a tag, cheapest per unit first (R114) | Shopping | module view | Tag results |
 
 ## Overlap candidates to settle when scoring
 

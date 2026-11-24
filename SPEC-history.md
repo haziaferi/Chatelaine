@@ -305,3 +305,112 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-22 · R100 · changed · consumables out of stage 11; label reading in stage 4; notifications in stage 10 · owner
 - 2026-11-23 · R102 · changed · Evidence: KMP spike run · owner
 - 2026-11-23 · R100 · changed · stage 0 done-when points to the KMP spike record · owner
+- 2026-11-23 · R112 · added · Shopping module: list, price book, comparison; built on Inventory, not Pantry · owner
+- 2026-11-23 · R97 · changed · Shopping module added; shopping list moves from Pantry to Shopping · owner
+- 2026-11-23 · R98 · changed · savings bridge through the Shopping module; shop prices stay in Chatelaine · owner
+- 2026-11-23 · R99 · changed · a notification can need several modules; add-to-list needs Pantry and Shopping · owner
+- 2026-11-23 · R103 · changed · prices kept: the price book and bought items · owner
+- 2026-11-23 · R107 · changed · low stock only; shopping lists live in the Shopping module · owner
+- 2026-11-23 · R113 · added · open: export one row per item or per trip · builder
+- 2026-11-23 · R97 · changed · "already have it" check moves from Pantry to Shopping · owner
+- 2026-11-23 · R112 · changed · acceptance names the savings export, not R60's backup export · owner
+- 2026-11-23 · R99 · changed · plural wording for notifications that need several modules · owner
+- 2026-11-23 · spec · changed · glossary: a module can hold records of its own · owner
+- 2026-11-23 · spec · changed · glossary: a user-built module is a Replica; Pack now means one unit of a product with a given size; Wish added · owner
+- 2026-11-23 · R97 · changed · users build their own replicas · owner
+- 2026-11-23 · R117 · added · a list entry not in Inventory is a wish; an item only once bought · owner
+- 2026-11-23 · R118 · added · Shopping records sync and back up like every other record · owner
+- 2026-11-23 · R119 · added · price comparison from a GPL-3.0 library dependency; no online prices · owner
+- 2026-11-23 · R116 · added · open: show or export the difference from the saved price · builder
+- 2026-11-23 · R112 · changed · low stock is a one-tap suggestion; non-consumables go on the list as wishes · owner
+- 2026-11-23 · R120 · added · no Shopping notifications of its own in v1 · owner
+- 2026-11-23 · R114 · added · scenario: cheapest pack under a tag (cookies) · owner
+- 2026-11-23 · R115 · added · scenario: bought below the saved price · owner
+- 2026-11-23 · R04 · changed · job: shop from the list, comparing prices, every trip · owner
+- 2026-11-23 · R91 · changed · coverage and steps count R114 and R115 · owner
+- 2026-11-23 · R100 · changed · stage 10 holds the library and savings export; unlocks R114, R115 · owner
+- 2026-11-23 · R116 · kind · Q → O: the savings export carries the price paid, discounts applied · owner
+- 2026-11-23 · R121 · added · open: show the difference from the saved price at the tick step · builder
+- 2026-11-23 · R121 · kind · Q → D: the difference from the saved price is not shown · owner
+- 2026-11-23 · R113 · kind · Q → D: one export row per trip, split by category when needed · owner
+- 2026-11-23 · R98 · changed · each shopping trip goes to the savings app as store, date and total paid · owner
+- 2026-11-23 · R116 · changed · the price paid is counted in the trip total · owner
+- 2026-11-23 · R115 · changed · the trip's savings export counts the price paid · owner
+- 2026-11-23 · R122 · added · open: how a trip row gets its savings category · builder
+- 2026-11-23 · R122 · kind · Q → D: the savings app picks categories from line tags and remembers them · owner
+- 2026-11-23 · R113 · changed · one row per trip with lines as detail; the savings app splits by category · owner
+- 2026-11-23 · R123 · added · trip file fields and format version · builder
+- 2026-11-23 · R124 · added · open: which bought items form one trip · builder
+- 2026-11-23 · R124 · kind · Q → D: a receipt is one payment, closed at the till or at day's end · owner
+- 2026-11-23 · R113 · changed · one row per receipt instead of per trip · owner
+- 2026-11-23 · R125 · added · optional item category, off by default, a Shopping setting · owner
+- 2026-11-23 · R122 · changed · the savings app splits by line category, matched once per category, not by tags · owner
+- 2026-11-23 · R123 · changed · receipt file: receipt id, line category instead of tags · builder
+- 2026-11-23 · R126 · added · open: how lines with no category are filed · builder
+- 2026-11-23 · R97 · changed · Shopping row gains the category field (R125) · owner
+- 2026-11-23 · R98 · changed · each receipt, not each trip, goes to the savings app · owner
+- 2026-11-23 · R115 · changed · "trip's savings export" → "receipt's savings export" · owner
+- 2026-11-23 · R116 · changed · "trip total" → "receipt total" · owner
+- 2026-11-23 · spec · added · glossary: Receipt, Category · owner
+- 2026-11-24 · R125 · changed · category shown only while the savings export is on, a Shopping setting off by default · owner
+- 2026-11-24 · R126 · kind · Q → D: no category, no shopping list; uncategorised low stock flagged · owner
+- 2026-11-24 · R112 · changed · Shopping holds a wish list; low stock with no category is flagged · owner
+- 2026-11-24 · R117 · changed · wishes kept on the wish list or put straight on the shopping list · owner
+- 2026-11-24 · R113 · changed · export only while the savings export is on · owner
+- 2026-11-24 · R97 · changed · Shopping row: category shown with the savings export; wish list view · owner
+- 2026-11-24 · R98 · changed · receipts export only with the savings export on · owner
+- 2026-11-24 · spec · added · glossary: Wish list, Savings export; Wish, Category, Shopping module changed · owner
+- 2026-11-24 · R113 · changed · receipts closed while the export is off are never sent · builder
+- 2026-11-24 · R122 · changed · lines carry the category's id and name; a rename keeps the match · builder
+- 2026-11-24 · R123 · changed · category as id and name; pack only when the line has one · builder
+- 2026-11-24 · R124 · changed · a tick takes its price paid, asked for when the price book has none · builder
+- 2026-11-24 · R126 · changed · uncategorised entries also cannot be ticked; flagged when left without one · builder
+- 2026-11-24 · R118 · changed · categories and receipts sync and back up · builder
+- 2026-11-24 · R127 · added · open: how a tick knows its store · builder
+- 2026-11-24 · R127 · kind · Q → D: store lists, one per store, archived after their last receipt · owner
+- 2026-11-24 · R128 · added · one-time prompt to turn on the savings export · owner
+- 2026-11-24 · R129 · added · carried by a store: a price there or the user's mark; unknowns greyed · owner
+- 2026-11-24 · R130 · added · a product ticked on one store list leaves the others, after a warning · owner
+- 2026-11-24 · R131 · added · open: what a pinned store list does after a receipt · builder
+- 2026-11-24 · R132 · added · quick price comparison from a store-list entry · owner
+- 2026-11-24 · R133 · added · aisles in store lists not in v1 · owner
+- 2026-11-24 · R112 · changed · Shopping holds store lists · owner
+- 2026-11-24 · R97 · changed · Shopping views gain store lists · owner
+- 2026-11-24 · R118 · changed · store lists sync and back up · owner
+- 2026-11-24 · R103 · changed · "receipts" → "proof of purchase", since Receipt is now a glossary term · builder
+- 2026-11-24 · spec · added · glossary: Store list; Shopping module changed · owner
+- 2026-11-24 · R131 · kind · Q → D: pinned lists keep entries until removed; a receipt only unticks · owner
+- 2026-11-24 · R127 · changed · archived only after a receipt; picks from carried products, shopping list pre-selected · owner
+- 2026-11-24 · R129 · changed · products with no information are not offered; search adds and marks them · owner
+- 2026-11-24 · R130 · changed · pinned lists keep a product ticked on another list · owner
+- 2026-11-24 · R127 · changed · picks in a multi-select edit mode, shopping-list entries pre-selected; confirmed · owner
+- 2026-11-24 · R131 · changed · reopening uses the same multi-select edit mode · owner
+- 2026-11-24 · R117 · changed · wish list working confirmed · owner
+- 2026-11-24 · R117 · changed · a bought wish starts unplaced; quantity rises by the quantity bought · builder
+- 2026-11-24 · R118 · changed · carried marks sync; acceptance covers every record kind · builder
+- 2026-11-24 · R130 · changed · the warning can also be cancelled · builder
+- 2026-11-24 · R127 · changed · a main-list tick's store is pre-filled from the open receipt · builder
+- 2026-11-24 · R124 · changed · ticking covers wishes too · builder
+- 2026-11-24 · R123 · changed · lines carry the item name · builder
+- 2026-11-24 · R122 · changed · acceptance tests the file, not the savings app · builder
+- 2026-11-24 · R121 · changed · acceptance reads every Shopping screen · builder
+- 2026-11-24 · R128 · changed · acceptance covers accepting the prompt · builder
+- 2026-11-24 · R112 · changed · the no-category flag applies only with the savings export on · builder
+- 2026-11-24 · R132 · changed · ordering cites R114 · builder
+- 2026-11-24 · R103 · changed · prices paid live on receipts (R124) · builder
+- 2026-11-24 · R04 · changed · "every shopping trip" → "every time the user shops" · builder
+- 2026-11-24 · spec · changed · glossary: Store list, Receipt · builder
+- 2026-11-24 · R134 · added · a product is an item or a wish; packs are price-book records · owner
+- 2026-11-24 · R135 · added · a discount marked at the tick is a promotion; unmarked prices become current · owner
+- 2026-11-24 · R136 · added · a discount on a whole receipt, spread over its lines · owner
+- 2026-11-24 · R137 · added · how store lists and the shopping list affect each other · owner
+- 2026-11-24 · R138 · added · unticking before close reverses the tick · owner
+- 2026-11-24 · R139 · added · closed receipts written to a chosen folder · owner
+- 2026-11-24 · R140 · added · a receipt belongs to its device; the PC does not tick · owner
+- 2026-11-24 · R141 · added · stores added, renamed, deleted · owner
+- 2026-11-24 · R142 · added · turning Shopping off hides its records and closes the open receipt · owner
+- 2026-11-24 · R86 · changed · exception for one in-context offer, never repeated (R128) · owner
+- 2026-11-24 · R126 · changed · closing a receipt asks for missing categories · owner
+- 2026-11-24 · R116 · changed · row for a discount on a whole receipt · owner
+- 2026-11-24 · R98 · changed · receipts go as a file in a chosen folder · owner
+- 2026-11-24 · spec · added · glossary: Product · owner
