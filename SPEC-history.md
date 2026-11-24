@@ -437,3 +437,13 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R150 · kind · Q → D · owner
 - 2026-11-24 · R150 · changed · 3 days by default, a setting the user can change · owner
 - 2026-11-24 · R149 · changed · lead time from R150 · owner
+- 2026-11-24 · R44 · changed · web link type; fields on wishes; optional units, month-only dates, choice ids, one or several links · owner
+- 2026-11-24 · R45 · kind · Q → D · owner
+- 2026-11-24 · R45 · changed · named Field presets: module presets with types and tags, Pantry on "consumable"; picker extras · owner
+- 2026-11-24 · R49 · kind · Q → D · owner
+- 2026-11-24 · R49 · changed · Room KMP 2.8, as the earlier app's sync code · owner
+- 2026-11-24 · R97 · changed · Pantry's counting unit; Shopping's bag mark · owner
+- 2026-11-25 · R45 · changed · Wardrobe on "wearable"; category on every item and wish; bag mark per item, also in bulk; fixed choices · owner
+- 2026-11-25 · R46 · changed · fields reach sub-tags and wishes; module presets on every item and wish · owner
+- 2026-11-25 · R151 · added · module tags "consumable" and "wearable"; Pantry and Wardrobe items; module off keeps values · owner
+- 2026-11-25 · spec · changed · glossary: Pantry item, Wardrobe module, Wardrobe item · owner
