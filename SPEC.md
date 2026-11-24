@@ -109,6 +109,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R95 | Reach and density | 9. Purpose map and look |
 | D-R96 | Consistent elements | 9. Purpose map and look |
 | O-R97 | Modules | 10. Modules and the shopping list |
+| D-R151 | Module tags | 10. Modules and the shopping list |
 | D-R112 | Shopping module | 10. Modules and the shopping list |
 | D-R113 | Export per receipt | 10. Modules and the shopping list |
 | D-R122 | Savings categories | 10. Modules and the shopping list |
@@ -179,6 +180,9 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Replica | A module a user builds with the same tools as the built-in modules. |
 | Inventory module | The app's foundation: always on and cannot be turned off; the other modules build on it. |
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
+| Pantry item | An item carrying the tag "consumable" or one of its sub-tags (R151). |
+| Wardrobe module | The module for everything worn: clothes, shoes, bags and accessories. |
+| Wardrobe item | An item carrying the tag "wearable" or one of its sub-tags (R151). |
 | Shopping module | The module for what to buy, where and at what price: the shopping list, store lists, the wish list, the price book and the price comparison. |
 | Store list | A shopping list for one store, made from the products that store carries; it produces that store's receipts (R127). |
 | Product | An item or a wish, as something to buy; its packs, or its price per kg or l when it is sold by weight or volume, are in the price book (R134). |
@@ -770,9 +774,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R45 · Field presets
 
-**Rule:** Each module comes with the preset fields below, attached as each row says (R46). Presets can be renamed and hidden and their choices edited; a preset that a view of its module needs, such as expiry date for "expiring soon", cannot be deleted while that module is on. The new-field picker also offers brand, model and purchase date as ready-made fields, none of them on until the user adds them.
+**Rule:** Each module comes with the preset fields below, attached as each row says (R46). Presets can be renamed and hidden and their choices edited, except that the choices of the counting unit and of laundry can only be renamed, since R110, R147 and R148 read them; a preset that a view of its module needs, such as expiry date for "expiring soon", cannot be deleted while that module is on. The new-field picker also offers brand, model and purchase date as ready-made fields, none of them on until the user adds them.
 
-**Why:** Pantry covers consumables of every kind, soap and face cream as well as food, so its fields attach to a "consumable" tag.
+**Why:** Pantry covers consumables of every kind, soap and face cream as well as food, and Wardrobe covers everything worn, shoes and bags as well as clothes, so their fields attach to the tags "consumable" and "wearable" (R151). Only some fruit and vegetables need a bag at the till, so the user adds the bag mark where it applies.
 
 **Values:**
 
@@ -781,31 +785,31 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Inventory | expiry date | date | single items |
 | Inventory | opened on | date | single items |
 | Inventory | months after opening | number in months | single items |
-| Wardrobe | size | text | the tag "clothes" |
-| Wardrobe | colour | choice list, several picks | the tag "clothes" |
-| Wardrobe | material | choice list, several picks | the tag "clothes" |
-| Wardrobe | season | choice list, several picks: spring, summer, autumn, winter | the tag "clothes" |
-| Wardrobe | occasion | choice list, several picks | the tag "clothes" |
-| Wardrobe | last worn | date | the tag "clothes" |
-| Wardrobe | laundry | choice list, one pick: clean, worn, in the wash | the tag "clothes" |
+| Wardrobe | size | text | the tag "wearable" |
+| Wardrobe | colour | choice list, several picks | the tag "wearable" |
+| Wardrobe | material | choice list, several picks | the tag "wearable" |
+| Wardrobe | season | choice list, several picks: spring, summer, autumn, winter | the tag "wearable" |
+| Wardrobe | occasion | choice list, several picks | the tag "wearable" |
+| Wardrobe | last worn | date | the tag "wearable" |
+| Wardrobe | laundry | choice list, one pick: clean, worn, in the wash | the tag "wearable" |
 | Pantry | counting unit | choice list, one pick: grams, millilitres, pieces, packs (R147) | the tag "consumable" |
 | Pantry | minimum stock | number in the counting unit | the tag "consumable" |
-| Shopping | category | choice list, one pick, from the user's category list; shown only while the savings export is on (R125) | single items and wishes |
-| Shopping | may need a bag | checkbox (R146) | single items and wishes |
+| Shopping | category | choice list, one pick, from the user's category list; shown only while the savings export is on (R125) | every item and wish while Shopping is on |
+| Shopping | may need a bag | checkbox (R146) | single items and wishes, added when one is created, edited or bulk-edited |
 
-**Acceptance:** With each module on, its presets appear on the items carrying the tag in their row, or can be added to single items and wishes as the row says. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
+**Acceptance:** With each module on, its presets appear on the items carrying the tag in their row or one of its sub-tags, on every item and wish, or can be added to single items and wishes, as the row says. The bag mark can be added to several wishes in one bulk edit and appears only on those. A renamed counting unit choice still counts stock as before, and the counting unit and laundry offer no choice to add or remove. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
 
-**Not:** Pantry's fields on a "food" tag: soap, cleaning products and other consumables that are not food run out too. Serial number and warranty presets: insurance records are out of scope in v1 (R103).
+**Not:** Pantry's fields on a "food" tag: soap, cleaning products and other consumables that are not food run out too. Wardrobe's fields on a "clothes" tag: shoes, bags and accessories are worn too. The bag mark on every item and wish: no one takes a produce bag for soap. Serial number and warranty presets: insurance records are out of scope in v1 (R103).
 
-**Since:** 2026-11-24 · owner · agreed rewording
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R46 · Where a field attaches
 
-**Rule:** A field can be attached to a tag, so every item carrying that tag gets the field ("clothes" → size), or added to a single item.
+**Rule:** A field can be attached to a tag, so every item or wish carrying that tag or one of its sub-tags gets the field ("wearable" → size), or added to a single item or wish. A module preset can also go on every item and wish while its module is on (R45).
 
-**Acceptance:** A field attached to a tag appears on every item that carries the tag, including items tagged later. A field added to one item appears only on that item.
+**Acceptance:** A field attached to a tag appears on every item that carries the tag or one of its sub-tags, including items tagged later. A field added to one item appears only on that item. A preset for every item and wish appears on each while its module is on, and on none while it is off.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R47 · User-editable lists
 
@@ -1400,6 +1404,14 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
 **Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R151 · Module tags
+
+**Rule:** Turning Pantry or Wardrobe on for the first time creates its tag, "consumable" or "wearable", named in the interface language (R18); renaming it keeps its fields and its module. An item carrying the tag or one of its sub-tags is a Pantry item or a Wardrobe item. Turning either module off hides its presets and keeps their values, which show again when it is turned on.
+
+**Acceptance:** Turning Pantry on for the first time, with the interface in English, creates the tag "consumable"; an item tagged only "soap", inside "consumable", is a Pantry item with Pantry's presets. After the tag is renamed, the item keeps them. Turning Pantry off hides its counting unit and minimum stock, and turning it on again shows their earlier values. Wardrobe behaves the same with "wearable".
+
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R112 · Shopping module
 
@@ -2113,8 +2125,8 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R41 · Photos: A photo saves on an item or on a place. A region marked on a place photo opens the item it points to.
 - R42 · Proposals from a photo: R06, R07 and R08 pass, as stage 4's gate requires (R100).
 - R44 · Field types: A field of each type can be created on an item, a place and a wish, filled in, and survives export and import. A date saved as a month and year shows as a month and year. A renamed choice keeps its id. Ticking a wish as bought keeps its fields on the new item.
-- R45 · Field presets: With each module on, its presets appear on the items carrying the tag in their row, or can be added to single items and wishes as the row says. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
-- R46 · Where a field attaches: A field attached to a tag appears on every item that carries the tag, including items tagged later. A field added to one item appears only on that item.
+- R45 · Field presets: With each module on, its presets appear on the items carrying the tag in their row or one of its sub-tags, on every item and wish, or can be added to single items and wishes, as the row says. The bag mark can be added to several wishes in one bulk edit and appears only on those. A renamed counting unit choice still counts stock as before, and the counting unit and laundry offer no choice to add or remove. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
+- R46 · Where a field attaches: A field attached to a tag appears on every item that carries the tag or one of its sub-tags, including items tagged later. A field added to one item appears only on that item. A preset for every item and wish appears on each while its module is on, and on none while it is off.
 - R47 · User-editable lists: The user can add, rename and remove tag kinds, homepage cards and widget content, and the change shows at once.
 - R48 · Local database: Each device opens its own database with the network off.
 - R49 · Database library: The shared data module builds with Room KMP for Android and for the desktop JVM, and stage 1's round-trip tests pass on both (R100).
@@ -2154,6 +2166,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
+- R151 · Module tags: Turning Pantry on for the first time, with the interface in English, creates the tag "consumable"; an item tagged only "soap", inside "consumable", is a Pantry item with Pantry's presets. After the tag is renamed, the item keeps them. Turning Pantry off hides its counting unit and minimum stock, and turning it on again shows their earlier values. Wardrobe behaves the same with "wearable".
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
 - R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing, and turning it on later sends none of those receipts.
 - R122 · Savings categories: Every line carries its category's id and name in the receipt file (R123, R126); after a category is renamed in Chatelaine, the next receipt file carries the same category id with the new name; Chatelaine reads nothing from the savings app.
