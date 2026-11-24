@@ -122,6 +122,15 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R130 | One product on several store lists | 10. Modules and the shopping list |
 | D-R131 | Pinned store lists | 10. Modules and the shopping list |
 | D-R132 | Quick comparison from a list entry | 10. Modules and the shopping list |
+| D-R134 | Products and packs | 10. Modules and the shopping list |
+| D-R135 | Discounts when ticking | 10. Modules and the shopping list |
+| D-R136 | Discount on a whole receipt | 10. Modules and the shopping list |
+| D-R137 | Shopping list and store lists | 10. Modules and the shopping list |
+| D-R138 | Unticking | 10. Modules and the shopping list |
+| D-R139 | Receipt delivery | 10. Modules and the shopping list |
+| D-R140 | Receipts across devices | 10. Modules and the shopping list |
+| D-R141 | Stores | 10. Modules and the shopping list |
+| D-R142 | Turning Shopping off | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
@@ -164,6 +173,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
 | Shopping module | The module for what to buy, where and at what price: the shopping list, store lists, the wish list, the price book and the price comparison. |
 | Store list | A shopping list for one store, made from the products that store carries; it produces that store's receipts (R127). |
+| Product | An item or a wish, as something to buy; its packs and their prices are in the price book (R134). |
 | Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack. |
 | Price book | Shop prices recorded by pack, store and date, with promotions and their end dates. |
 | Wish | An entry on the wish list or the shopping list for something not in Inventory; it becomes an item only when ticked as bought (R117). |
@@ -1196,13 +1206,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R86 · No push by default
 
-**Rule:** The app never pushes by default. Proactive prompts, such as notifications, are opt-in; the clear-box effect comes from passive surfaces (R87).
+**Rule:** The app never pushes by default. Proactive prompts, such as notifications, are opt-in, except a one-time offer shown in context and never repeated (R128); the clear-box effect comes from passive surfaces (R87).
 
 **Why:** Notifications nag, and R03 rules out nagging, streaks and guilt.
 
-**Acceptance:** A fresh install with default settings sends no notification during a week of use.
+**Acceptance:** A fresh install with default settings sends no notification during a week of use, and shows no prompt other than R128's offer, once.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R87 · Clear-box surfaces
 
@@ -1448,7 +1458,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R126 · No category, no shopping list
 
-**Rule:** While the savings export is on (R125), an item or a wish with no category cannot be added to the shopping list or ticked as bought. A low-stock item with no category (R112), or a list entry left without one (the export turned on later, or its category deleted), shows in Shopping flagged as having none until it is given one, which the flag lets the user do.
+**Rule:** While the savings export is on (R125), an item or a wish with no category cannot be added to the shopping list or ticked as bought. A low-stock item with no category (R112), or a list entry left without one (the export turned on later, or its category deleted), shows in Shopping flagged as having none until it is given one, which the flag lets the user do. Closing a receipt with lines ticked before the export was turned on asks for their categories first.
 
 **Why:** Every receipt line then carries a category, so the savings app never meets a line it cannot file (R122).
 
@@ -1533,6 +1543,102 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
+### D-R134 · Products and packs
+
+**Rule:** A product is an item or a wish; its packs are price-book records holding a size, a unit and a price per store and date (R112). Comparisons group packs by the tags on their products (R114), or show one product's packs across stores (R130, R132).
+
+**Why:** No new kind of record is needed beside the price book, and pack sizes work with Pantry off.
+
+**Acceptance:** With Pantry off, the items "cookies Q" and "cookies S", both tagged "cookies", hold the three packs of R114 in the price book, and selecting the tag ranks them as R114 states.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R135 · Discounts when ticking
+
+**Rule:** When ticking an item or a wish as bought, the user can mark the price paid as discounted, as "% off", "2 x 1" or "3 x 2". A marked discount is recorded in the price book as a promotion and the pack's current price stays; an unmarked price becomes the current price (R115). The price is entered per pack and the line total is worked out.
+
+**Why:** A promotion would otherwise overwrite the normal price, and every later comparison would rank the pack too low.
+
+**Acceptance:** Three packs at 1,59 € ticked under "3 x 2" give a line of 3,18 €, record a "3 x 2" promotion, and leave 1,59 € as the current price; typing 1,29 € unmarked makes 1,29 € the current price.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R136 · Discount on a whole receipt
+
+**Rule:** When closing a receipt, the user can add a discount on its total, as a percentage or an amount off. The discount is spread over the lines in proportion to their totals, rounded to the cent with any remainder on the largest line, so the lines still add up to the total paid (R116, R123); the price book is unchanged.
+
+**Why:** The money-out stays true, and each category in the savings app (R122) carries its share of the discount.
+
+**Values:**
+
+| Lines before | Discount | Lines after | Total paid |
+|---|---|---|---|
+| 10,00 € · 20,00 € · 30,00 € | 5% off | 9,50 € · 19,00 € · 28,50 € | 57,00 € |
+| 10,00 € · 20,00 € · 30,00 € | 10 € off | 8,33 € · 16,67 € · 25,00 € | 50,00 € |
+
+**Acceptance:** Each row's receipt, closed with its discount, exports the lines and total in its last two columns, and no pack's current price changes.
+
+**Not:** The discount as a line of its own: it would carry no category, and a negative line would show as a saving (R116).
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R137 · Shopping list and store lists
+
+**Rule:** The shopping list holds everything to buy, and store lists draw on it with the effects below. A list opens ready for ticking; editing it is a mode of its own.
+
+**Values:**
+
+| Action | Effect |
+|---|---|
+| unselect an entry in a store list | it leaves that store list only |
+| remove an entry from the shopping list | it leaves every store list except pinned ones (R131) |
+| confirm a pinned list | its selected entries join the shopping list |
+| tick an entry as bought | as R130 says |
+
+**Acceptance:** Each row's action has its effect and no other; opening a store list shows its entries ready to tick, and editing starts only from the edit action.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R138 · Unticking
+
+**Rule:** Unticking before the receipt closes reverses everything the tick did: the price recorded, the quantity raised or the item created from a wish, and the removal from other lists. A closed receipt is corrected in the savings app's import review, not in Chatelaine (R124).
+
+**Acceptance:** Ticking a wish and unticking it before the receipt closes leaves no item, no new price and the wish back on every list it was on; a closed receipt offers no untick.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R139 · Receipt delivery
+
+**Rule:** While the savings export is on, each closed receipt is written as a receipt file (R123) to a folder the user chooses. A receipt that closes at the end of the day while the app is not running is written the next time the app opens.
+
+**Acceptance:** Closing a receipt writes one file to the chosen folder; a receipt left open with the app closed overnight is written at the next start, dated the day of its ticks.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R140 · Receipts across devices
+
+**Rule:** A receipt belongs to the device it was opened on, and ticks on the other device start a receipt of their own. The Windows companion edits lists but does not tick (R21); a quantity changed on both devices at once keeps the later change (R54).
+
+**Acceptance:** Ticks on the phone never join a receipt opened on another device, and the Windows companion offers no tick.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R141 · Stores
+
+**Rule:** Stores can be added, renamed and deleted. Deleting a store asks first, then removes its prices, carried marks (R129) and store lists, while past receipts keep its name.
+
+**Acceptance:** Renaming a store shows the new name on its lists and prices; deleting it after confirming removes its prices, marks and lists, and its earlier receipts still show its name.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R142 · Turning Shopping off
+
+**Rule:** Turning the Shopping module off hides its records without deleting them and closes any open receipt (R124); turning it on again shows them as they were.
+
+**Acceptance:** With a list, a price and an open receipt, turning Shopping off closes the receipt and hides all three; turning it on shows the list and the price unchanged and the receipt closed.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
 ### D-R117 · Wishes
 
 **Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, and becomes an Inventory item only when it is ticked as bought, in the unplaced state (R30). Ticking an item already in Inventory raises its quantity by the quantity bought, when the item carries one (R26).
@@ -1574,10 +1680,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Cookies Q 600 g, bought below the saved price (R115) | 1,59 € | 1,29 € |
 | 3 packs at 1,59 € under "3 x 2" | 1,59 € each | 3,18 € |
 | 1 pack at 2,00 € with 25% off | 2,00 € | 1,50 € |
+| A 60,00 € receipt with 10 € off its total (R136) | as each pack's | 50,00 €, spread over its lines |
 
 **Acceptance:** Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R121 · Showing the difference
 
@@ -1618,7 +1725,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### O-R98 · Savings app and the shopping list
 
-**Rule:** Personal savings is a separate app, not a Chatelaine module. The two meet only through the Shopping module's list (R112), so the bridge exists only when Shopping is on: when something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), pantry stock is used first when Pantry is on, and each receipt goes one way to the savings app as store, date and total paid (R113), by export or a shared file. Shop prices used for comparison stay in Chatelaine's price book (R112), while what was spent, budgets and goals stay in the savings app.
+**Rule:** Personal savings is a separate app, not a Chatelaine module. The two meet only through the Shopping module's list (R112), so the bridge exists only when Shopping is on: when something goes on the list, Chatelaine shows what is already owned and where ("you already have 3 of these"), pantry stock is used first when Pantry is on, and each receipt goes one way to the savings app as store, date and total paid (R113), as a file in a folder the user chooses (R139). Shop prices used for comparison stay in Chatelaine's price book (R112), while what was spent, budgets and goals stay in the savings app.
 
 **Why:** Money is a different job (amounts, accounts, budgets) with its own rhythm and tone, and would raise the security bar for app lock, backups and folder sync. Shop prices are not personal finances: no account, balance or budget is involved. Chatelaine owns the shopping list because it knows the stock.
 
@@ -1809,7 +1916,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R82 · Search across languages: With the interface in English, "cucito" finds items tagged "sewing", and the reverse works in Italian. Switching the language changes the built-in kind names but not the user's tags.
 - R83 · Visual place map: R10 passes, as stage 6's gate requires (R100).
 - R85 · Tag card: With "red skirt" inside "sewing", the tag card shows "sewing" and not "red skirt".
-- R86 · No push by default: A fresh install with default settings sends no notification during a week of use.
+- R86 · No push by default: A fresh install with default settings sends no notification during a week of use, and shows no prompt other than R128's offer, once.
 - R87 · Clear-box surfaces: The owner uses the widget and the labels for a week, as stage 7's gate requires (R100).
 - R88 · Labels: The owner uses the labels for a week, as stage 7's gate requires (R100).
 - R90 · Purpose map: The owner approves the spec and the purpose map, as stage 0's gate requires (R100).
@@ -1830,6 +1937,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R130 · One product on several store lists: With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list, but stay on a pinned list that holds them. With a lower price per unit at B, the warning is flagged and names B, with no amount.
 - R131 · Pinned store lists: After a pinned weekly list produces a receipt, its bought entries are unticked and still on it, nothing else changes, and it is not archived at the end of the day. Reopening it shows its entries pre-selected; an entry added and confirmed stays for the next run, and a removed one is gone.
 - R132 · Quick comparison from a list entry: Opening cookies Q 600 g on store A's list shows their price per kg at every store with a price, cheapest first.
+- R134 · Products and packs: With Pantry off, the items "cookies Q" and "cookies S", both tagged "cookies", hold the three packs of R114 in the price book, and selecting the tag ranks them as R114 states.
+- R135 · Discounts when ticking: Three packs at 1,59 € ticked under "3 x 2" give a line of 3,18 €, record a "3 x 2" promotion, and leave 1,59 € as the current price; typing 1,29 € unmarked makes 1,29 € the current price.
+- R136 · Discount on a whole receipt: Each row's receipt, closed with its discount, exports the lines and total in its last two columns, and no pack's current price changes.
+- R137 · Shopping list and store lists: Each row's action has its effect and no other; opening a store list shows its entries ready to tick, and editing starts only from the edit action.
+- R138 · Unticking: Ticking a wish and unticking it before the receipt closes leaves no item, no new price and the wish back on every list it was on; a closed receipt offers no untick.
+- R139 · Receipt delivery: Closing a receipt writes one file to the chosen folder; a receipt left open with the app closed overnight is written at the next start, dated the day of its ticks.
+- R140 · Receipts across devices: Ticks on the phone never join a receipt opened on another device, and the Windows companion offers no tick.
+- R141 · Stores: Renaming a store shows the new name on its lists and prices; deleting it after confirming removes its prices, marks and lists, and its earlier receipts still show its name.
+- R142 · Turning Shopping off: With a list, a price and an open receipt, turning Shopping off closes the receipt and hides all three; turning it on shows the list and the price unchanged and the receipt closed.
 - R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2.
 - R118 · Shopping records in sync and backup: One record of each kind named in the rule, added on one device, appears on the other after a sync, and survives export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.

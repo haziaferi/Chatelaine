@@ -400,3 +400,17 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R103 · changed · prices paid live on receipts (R124) · builder
 - 2026-11-24 · R04 · changed · "every shopping trip" → "every time the user shops" · builder
 - 2026-11-24 · spec · changed · glossary: Store list, Receipt · builder
+- 2026-11-24 · R134 · added · a product is an item or a wish; packs are price-book records · owner
+- 2026-11-24 · R135 · added · a discount marked at the tick is a promotion; unmarked prices become current · owner
+- 2026-11-24 · R136 · added · a discount on a whole receipt, spread over its lines · owner
+- 2026-11-24 · R137 · added · how store lists and the shopping list affect each other · owner
+- 2026-11-24 · R138 · added · unticking before close reverses the tick · owner
+- 2026-11-24 · R139 · added · closed receipts written to a chosen folder · owner
+- 2026-11-24 · R140 · added · a receipt belongs to its device; the PC does not tick · owner
+- 2026-11-24 · R141 · added · stores added, renamed, deleted · owner
+- 2026-11-24 · R142 · added · turning Shopping off hides its records and closes the open receipt · owner
+- 2026-11-24 · R86 · changed · exception for one in-context offer, never repeated (R128) · owner
+- 2026-11-24 · R126 · changed · closing a receipt asks for missing categories · owner
+- 2026-11-24 · R116 · changed · row for a discount on a whole receipt · owner
+- 2026-11-24 · R98 · changed · receipts go as a file in a chosen folder · owner
+- 2026-11-24 · spec · added · glossary: Product · owner
