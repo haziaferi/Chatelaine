@@ -417,3 +417,15 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R117 · changed · a bought finished consumable returns to its last place · owner
 - 2026-11-24 · R143 · added · finished Pantry consumables become wishes · owner
 - 2026-11-24 · R123 · changed · JSON in UTF-8, key names, file name, written under a temporary name then renamed, example file · owner
+- 2026-11-24 · R134 · changed · prices as the shop states them: by pack, or per kg or l for products sold by weight · owner
+- 2026-11-24 · R144 · added · price per unit beside each row sets the order; one unit per tag · owner
+- 2026-11-24 · R145 · added · products sold by weight: price per kg only; the label price is the price paid · owner
+- 2026-11-24 · R146 · added · optional bag at the tick, added to the line's price paid · owner
+- 2026-11-24 · R147 · added · Pantry counting unit: grams, millilitres or pieces; what a tick adds · owner
+- 2026-11-24 · R148 · added · estimated run-out for items bought by weight and counted in pieces · owner
+- 2026-11-24 · R123 · changed · a purchase by weight is one pack of the amount bought; bag in the price paid · owner
+- 2026-11-24 · R124 · changed · products sold by weight ticked as R145 says · owner
+- 2026-11-24 · R135 · changed · label price is the line's price for products sold by weight · owner
+- 2026-11-24 · R117 · changed · a tick adds a Pantry item's amount in its counting unit · owner
+- 2026-11-24 · R143 · changed · acceptance counts rice in grams · owner
+- 2026-11-24 · spec · changed · glossary: Product, Pack, Price book; added Price per unit · owner
