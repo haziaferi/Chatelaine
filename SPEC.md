@@ -132,6 +132,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R141 | Stores | 10. Modules and the shopping list |
 | D-R142 | Turning Shopping off | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
+| D-R143 | Finished consumables | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
 | O-R116 | Price paid in the savings export | 10. Modules and the shopping list |
@@ -176,7 +177,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Product | An item or a wish, as something to buy; its packs and their prices are in the price book (R134). |
 | Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack. |
 | Price book | Shop prices recorded by pack, store and date, with promotions and their end dates. |
-| Wish | An entry on the wish list or the shopping list for something not in Inventory; it becomes an item only when ticked as bought (R117). |
+| Wish | An entry on the wish list or the shopping list for something not in Inventory, including a finished Pantry consumable (R143); it becomes an item only when ticked as bought (R117). |
 | Wish list | The Shopping module's list of wishes kept for later; a wish moves from it to the shopping list when it is to be bought (R117). |
 | Savings export | The Shopping setting, off by default, that sends each receipt to the savings app and shows the category field (R113, R125). |
 | Receipt | The items bought at one store in one payment (R124); while the savings export is on, one row in it. |
@@ -1641,11 +1642,39 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R117 · Wishes
 
-**Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, and becomes an Inventory item only when it is ticked as bought, in the unplaced state (R30). Ticking an item already in Inventory raises its quantity by the quantity bought, when the item carries one (R26).
+**Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, which becomes an Inventory item only when it is ticked as bought, as the table below says. Ticking an item already in Inventory raises its quantity by the quantity bought, when the item carries one (R26).
 
-**Acceptance:** Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2.
+**Values:**
+
+| Wish | Ticked as bought |
+|---|---|
+| a new wish | becomes an item, unplaced (R30) |
+| a finished Pantry consumable (R143) | becomes the same item again, placed in its last place with the quantity bought; unplaced if that place was deleted meanwhile |
+
+**Acceptance:** Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2. R143's acceptance covers a finished consumable.
 
 **Not:** A "to buy" item state: things not owned would show in search and as the object of the day.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R143 · Finished consumables
+
+**Rule:** When a Pantry consumable's quantity reaches zero, the item becomes a wish (R117) and goes straight onto the shopping list. The wish keeps everything the item had, and ticking it as bought brings the same item back (R117). Only Pantry consumables do this: any other item whose count reaches zero stays an item.
+
+**Why:** A finished consumable is no longer owned, so it leaves search and the object of the day like any wish; keeping its facts means rice bought again goes back on its shelf with its minimum stock and price history.
+
+**Values:**
+
+| Case | What happens |
+|---|---|
+| kept by the wish | name, tags, photo, last place, category (R125), Pantry's unit and minimum stock, usage-rate history (R110), packs and their prices (R134) |
+| savings export on, no category | the wish shows on the shopping list flagged as having none, as R126 says |
+| Shopping module off | the item stays in Inventory at zero; it becomes a wish when the Shopping module is turned on |
+| an item outside Pantry at zero, such as "headphones ×3" (R28) all given away | stays an item at zero; the user deletes it if it is gone |
+
+**Acceptance:** With Pantry and Shopping on, lowering rice in its kitchen-shelf place from 1 to 0 removes it from search and puts a wish for it on the shopping list; ticking 2 as bought brings the rice back on the kitchen shelf with a quantity of 2, its minimum stock and its usage-rate history. Lowering "headphones ×3" outside Pantry to 0 leaves an item at zero.
+
+**Not:** A Pantry item kept at zero in Inventory: it would show in search as something the user has.
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
@@ -1946,7 +1975,8 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R140 · Receipts across devices: Ticks on the phone never join a receipt opened on another device, and the Windows companion offers no tick.
 - R141 · Stores: Renaming a store shows the new name on its lists and prices; deleting it after confirming removes its prices, marks and lists, and its earlier receipts still show its name.
 - R142 · Turning Shopping off: With a list, a price and an open receipt, turning Shopping off closes the receipt and hides all three; turning it on shows the list and the price unchanged and the receipt closed.
-- R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2.
+- R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2. R143's acceptance covers a finished consumable.
+- R143 · Finished consumables: With Pantry and Shopping on, lowering rice in its kitchen-shelf place from 1 to 0 removes it from search and puts a wish for it on the shopping list; ticking 2 as bought brings the rice back on the kitchen shelf with a quantity of 2, its minimum stock and its usage-rate history. Lowering "headphones ×3" outside Pantry to 0 leaves an item at zero.
 - R118 · Shopping records in sync and backup: One record of each kind named in the rule, added on one device, appears on the other after a sync, and survives export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
