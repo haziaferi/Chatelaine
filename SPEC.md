@@ -123,6 +123,9 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R131 | Pinned store lists | 10. Modules and the shopping list |
 | D-R132 | Quick comparison from a list entry | 10. Modules and the shopping list |
 | D-R134 | Products and packs | 10. Modules and the shopping list |
+| D-R144 | Price per unit | 10. Modules and the shopping list |
+| D-R145 | Products sold by weight | 10. Modules and the shopping list |
+| D-R146 | Bag at the tick | 10. Modules and the shopping list |
 | D-R135 | Discounts when ticking | 10. Modules and the shopping list |
 | D-R136 | Discount on a whole receipt | 10. Modules and the shopping list |
 | D-R137 | Shopping list and store lists | 10. Modules and the shopping list |
@@ -133,6 +136,10 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R142 | Turning Shopping off | 10. Modules and the shopping list |
 | D-R117 | Wishes | 10. Modules and the shopping list |
 | D-R143 | Finished consumables | 10. Modules and the shopping list |
+| D-R147 | Pantry counting unit | 10. Modules and the shopping list |
+| D-R148 | Estimated run-out | 10. Modules and the shopping list |
+| D-R149 | Run-out notification per item | 10. Modules and the shopping list |
+| D-R150 | Run-out notification lead time | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
 | O-R116 | Price paid in the savings export | 10. Modules and the shopping list |
@@ -174,9 +181,10 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Pantry module | The module for consumables of every kind, from face creams to metal screws, not only food. |
 | Shopping module | The module for what to buy, where and at what price: the shopping list, store lists, the wish list, the price book and the price comparison. |
 | Store list | A shopping list for one store, made from the products that store carries; it produces that store's receipts (R127). |
-| Product | An item or a wish, as something to buy; its packs and their prices are in the price book (R134). |
-| Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack. |
-| Price book | Shop prices recorded by pack, store and date, with promotions and their end dates. |
+| Product | An item or a wish, as something to buy; its packs, or its price per kg or l when it is sold by weight or volume, are in the price book (R134). |
+| Pack | One unit of a product with a given size, as sold, whatever amount it holds: a 500 g bag of cookies, a 6 × 330 ml multipack; a purchase of a product sold by weight is one pack of the amount bought (R145). |
+| Price book | Shop prices as the shop states them, by pack or per kg or l, by store and date, with promotions and their end dates (R134). |
+| Price per unit | A price divided by the amount it buys, per kg, l or piece; it ranks a comparison (R144). |
 | Wish | An entry on the wish list or the shopping list for something not in Inventory, including a finished Pantry consumable (R143); it becomes an item only when ticked as bought (R117). |
 | Wish list | The Shopping module's list of wishes kept for later; a wish moves from it to the shopping list when it is to be bought (R117). |
 | Savings export | The Shopping setting, off by default, that sends each receipt to the savings app and shows the category field (R113, R125). |
@@ -1421,13 +1429,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | `totalPaid` | receipt | in whole cents: the sum of the lines' `pricePaid` |
 | `lines` | receipt | an array with one object per line, holding the keys below |
 | `name` | line | the item's name (a wish ticked as bought is an item by then, R117) |
-| `pack` | line | the pack's size as text, such as `600 g` (R134); absent when the line has no pack |
-| `quantity` | line | the number of packs bought, a whole number |
-| `pricePaid` | line | in whole cents: the price of the whole line with every discount applied (R116, R135, R136), not a price per pack |
+| `pack` | line | the pack's size as text, such as `600 g` (R134), or for a product sold by weight or volume the amount bought, such as `865 g` (R145); absent when the line has no pack |
+| `quantity` | line | the number of packs bought, a whole number; a purchase by weight or volume is one pack (R145) |
+| `pricePaid` | line | in whole cents: the price of the whole line with every discount applied (R116, R135, R136) and any bag added (R146), not a price per pack |
 | `categoryId` | line | the category's unique id (R52), so a renamed category keeps its match in the savings app (R122) |
 | `categoryName` | line | the category's name (R125, R126) |
 
-Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) and two batteries with no pack, at Supermarket A, written as `chatelaine-receipt-3f6c2a9e-8b41-4d27-9c55-0e7a1b2d4f68.json`:
+Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135), two batteries with no pack, and 0,865 kg of bananas at 2,09 €/kg with a 0,02 € bag (R145, R146), at Supermarket A, written as `chatelaine-receipt-3f6c2a9e-8b41-4d27-9c55-0e7a1b2d4f68.json`:
 
 ```json
 {
@@ -1436,7 +1444,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
   "store": "Supermarket A",
   "date": "2026-11-24",
   "currency": "EUR",
-  "totalPaid": 916,
+  "totalPaid": 1099,
   "lines": [
     {
       "name": "cookies Q",
@@ -1452,22 +1460,30 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
       "pricePaid": 598,
       "categoryId": "5e9a0c3d-7f24-4b18-a6e2-1d8c4f0b7a93",
       "categoryName": "Household"
+    },
+    {
+      "name": "bananas",
+      "pack": "865 g",
+      "quantity": 1,
+      "pricePaid": 183,
+      "categoryId": "b7d1e4f0-2c9a-4e63-8f15-6a0d3c7b9e21",
+      "categoryName": "Food"
     }
   ]
 }
 ```
 
-**Evidence:** Not checked: provisional, how a purchase by weight is written, since no rule says how one is ticked (R26, R134); `quantity` as a whole number of packs stands until the owner settles it. Not checked: that every folder the user can choose lets Chatelaine rename a file (on Android, renaming a document is optional for the app that provides the folder). Not checked: that R52's ids hold only characters a file name allows; R52 does not fix their form, and the example's ids are for illustration.
+**Evidence:** Not checked: that every folder the user can choose lets Chatelaine rename a file (on Android, renaming a document is optional for the app that provides the folder). Not checked: that R52's ids hold only characters a file name allows; R52 does not fix their form, and the example's ids are for illustration.
 
 **Acceptance:** An exported receipt file is named `chatelaine-receipt-<receiptId>.json`, parses as UTF-8 JSON holding every key above and no tags, its `totalPaid` equals the sum of its lines' `pricePaid`, a line with no pack has no `pack` key, and exporting the same receipt twice gives the same `receiptId`. While a file is being written, the folder holds no file of it under a name ending in `.json`. The example file above meets every check in this paragraph.
 
-**Not:** Tags on each line: they no longer decide the category (R122), and they would send labels such as projects and places that the savings app has no use for. CSV: lines would repeat the receipt's fields or need a second file, and quoting and the decimal comma make it fragile. XML: heavier, with nothing gained. A binary format: it cannot be read when debugging. Amounts as decimal numbers: the decimal comma and rounding; whole cents have neither.
+**Not:** Tags on each line: they no longer decide the category (R122), and they would send labels such as projects and places that the savings app has no use for. CSV: lines would repeat the receipt's fields or need a second file, and quoting and the decimal comma make it fragile. XML: heavier, with nothing gained. A binary format: it cannot be read when debugging. Amounts as decimal numbers: the decimal comma and rounding; whole cents have neither. A decimal `quantity` with a unit key for purchases by weight: every purchase is a pack of its own size (R145), and the savings app never needs the weight to file a line (R122).
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R124 · What makes a receipt
 
-**Rule:** A receipt is one payment: the items ticked as bought at one store (R127) until the user closes the receipt at the till. Without a close, the receipt ends at the end of the day or when an item is ticked as bought at another store; a closed receipt never changes. Ticking an item or a wish as bought takes its price paid, pre-filled from the price book for that pack and store (R115) and asked for when there is none.
+**Rule:** A receipt is one payment: the items ticked as bought at one store (R127) until the user closes the receipt at the till. Without a close, the receipt ends at the end of the day or when an item is ticked as bought at another store; a closed receipt never changes. Ticking an item or a wish as bought takes its price paid, pre-filled from the price book for that pack and store (R115) and asked for when there is none; a product sold by weight or volume is ticked as R145 says.
 
 **Why:** One receipt matches one row of the bank statement. The user knows at the till when they pay twice, while the savings app sees payments only days later, in a statement.
 
@@ -1586,17 +1602,69 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
 
 ### D-R134 · Products and packs
 
-**Rule:** A product is an item or a wish; its packs are price-book records holding a size, a unit and a price per store and date (R112). Comparisons group packs by the tags on their products (R114), or show one product's packs across stores (R130, R132).
+**Rule:** A product is an item or a wish. The price book (R112) records its prices by store and date as the shop states them: a pack's price for its size and unit (cookies Q 600 g at 1,59 €), or for a product sold by weight or volume its price per kg or l (bananas at 2,09 €/kg, R145). Comparisons group products by their tags (R114) or show one product's prices across stores (R130, R132), ranked by price per unit (R144).
 
-**Why:** No new kind of record is needed beside the price book, and pack sizes work with Pantry off.
+**Why:** No new kind of record is needed beside the price book, and pack sizes work with Pantry off. Shops label prices both ways, and the price book keeps what the label says.
 
-**Acceptance:** With Pantry off, the items "cookies Q" and "cookies S", both tagged "cookies", hold the three packs of R114 in the price book, and selecting the tag ranks them as R114 states.
+**Acceptance:** With Pantry off, the items "cookies Q" and "cookies S", both tagged "cookies", hold the three packs of R114 in the price book, and selecting the tag ranks them as R114 states. Bananas recorded at 2,09 €/kg at Supermarket A are held as that price per kg, with no pack.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R144 · Price per unit
+
+**Rule:** A comparison shows each row's price as the price book holds it and, aligned to its right, its price per unit, which sets the order, cheapest first. Every row under one tag uses the same unit, from the table below. A row whose amount is not known in that unit is listed below the ranked rows with its price only, and joins the ranking once its amount is added.
+
+**Why:** The user records products as the shop sells them but chooses between them by what a kilogram, a litre or a piece costs; one unit per tag keeps the figures in line.
+
+**Values:**
+
+| Amount measured in | Price per | Example |
+|---|---|---|
+| weight | kg | cookies Q 600 g at 1,59 € shows 2,65 €/kg |
+| volume | l | a 6 × 330 ml multipack at 2,97 € shows 1,50 €/l |
+| pieces | piece | a packet of 30 AA batteries at 3,99 € shows 0,13 €/piece |
+
+**Acceptance:** Under "cookies", cookies Q 600 g at 1,59 €, cookies S 1 kg at 2,99 € and a box of 20 cookies with no weight at 1,80 € show those prices, with 2,65 €/kg and 2,99 €/kg on the right, ranked in that order, and the box below them with no price per unit; once the box's weight is added as 250 g, it ranks third at 7,20 €/kg.
+
+**Not:** A unit chosen per row, such as €/kg beside €/100 g: the figures would not line up.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R145 · Products sold by weight
+
+**Rule:** A product sold by weight or volume, such as bananas at 2,09 €/kg, has no pack in the price book, only its price per kg or l at each store; each purchase of it is one pack of the amount bought (R123). Ticking it as bought goes as the table below says, and the price paid (R116) is the price the tick confirms, which the user can always set to the price on the scale's label.
+
+**Why:** The shop states only the price per kg, and the scale measures each purchase anew. The label is what the till charges, and a weight times the price per kg can round differently from the scale.
+
+**Values:**
+
+| At the tick | What happens |
+|---|---|
+| price per kg or l | pre-filled from the price book for that store and editable; a changed value becomes the current price (R115); asked for when the store has none |
+| price on the label | typed by the user; it is the price paid, and the amount bought is worked out from it, to the gram or millilitre |
+| weight or volume, typed instead of the price | the price worked out from it, to the nearest cent, is shown and can be corrected before the tick is confirmed |
+
+**Acceptance:** With bananas at 2,09 €/kg at Supermarket A, typing 0,865 kg shows 1,81 €, which can be changed before the tick is confirmed; typing 1,81 € from the label instead gives a line of 1,81 € and 866 g. Typing 2,19 €/kg over the pre-filled price makes it the current price. Afterwards the price book holds no banana pack.
+
+**Not:** A price-book pack per purchase (bananas 865 g, 792 g and so on): comparisons would fill with one-off sizes.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R146 · Bag at the tick
+
+**Rule:** A product the user marks as possibly needing a bag offers an optional bag when ticked as bought, at that store's bag price: pre-filled with the last one paid there, editable, and asked for the first time. A bag taken adds its price to the line's price paid (R116, R123) and is never recorded in the price book.
+
+**Why:** The till charges the bag; without it the receipt total falls short of the bank's row (R113), and in the price book it would raise the price per kg.
+
+**Acceptance:** Marked bananas ticked at 1,81 € with a 0,02 € bag give a line of 1,83 €, and the price book still holds 2,09 €/kg; an unmarked product offers no bag.
+
+**Not:** The bag as a receipt line of its own: every receipt would ask for its category (R126).
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R135 · Discounts when ticking
 
-**Rule:** When ticking an item or a wish as bought, the user can mark the price paid as discounted, as "% off", "2 x 1" or "3 x 2". A marked discount is recorded in the price book as a promotion and the pack's current price stays; an unmarked price becomes the current price (R115). The price is entered per pack and the line total is worked out.
+**Rule:** When ticking an item or a wish as bought, the user can mark the price paid as discounted, as "% off", "2 x 1" or "3 x 2". A marked discount is recorded in the price book as a promotion and the pack's current price stays; an unmarked price becomes the current price (R115). The price is entered per pack and the line total is worked out; for a product sold by weight or volume, the price on the label is the line's price (R145).
 
 **Why:** A promotion would otherwise overwrite the normal price, and every later comparison would rank the pack too low.
 
@@ -1682,14 +1750,14 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
 
 ### D-R117 · Wishes
 
-**Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, which becomes an Inventory item only when it is ticked as bought, as the table below says. Ticking an item already in Inventory raises its quantity by the quantity bought, when the item carries one (R26).
+**Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, which becomes an Inventory item only when it is ticked as bought, as the table below says. Ticking an item already in Inventory raises its quantity by the quantity bought, when the item carries one (R26), and a Pantry item's by the amount bought in its counting unit (R147).
 
 **Values:**
 
 | Wish | Ticked as bought |
 |---|---|
 | a new wish | becomes an item, unplaced (R30) |
-| a finished Pantry consumable (R143) | becomes the same item again, placed in its last place with the quantity bought; unplaced if that place was deleted meanwhile |
+| a finished Pantry consumable (R143) | becomes the same item again, placed in its last place with the amount bought (R147); unplaced if that place was deleted meanwhile |
 
 **Acceptance:** Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2. R143's acceptance covers a finished consumable.
 
@@ -1712,9 +1780,73 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
 | Shopping module off | the item stays in Inventory at zero; it becomes a wish when the Shopping module is turned on |
 | an item outside Pantry at zero, such as "headphones ×3" (R28) all given away | stays an item at zero; the user deletes it if it is gone |
 
-**Acceptance:** With Pantry and Shopping on, lowering rice in its kitchen-shelf place from 1 to 0 removes it from search and puts a wish for it on the shopping list; ticking 2 as bought brings the rice back on the kitchen shelf with a quantity of 2, its minimum stock and its usage-rate history. Lowering "headphones ×3" outside Pantry to 0 leaves an item at zero.
+**Acceptance:** With Pantry and Shopping on, lowering rice, counted in grams, in its kitchen-shelf place from 250 g to 0 removes it from search and puts a wish for it on the shopping list; ticking 2 boxes of 1 kg as bought brings the rice back on the kitchen shelf with 2000 g (R147), its minimum stock and its usage-rate history. Lowering "headphones ×3" outside Pantry to 0 leaves an item at zero.
 
 **Not:** A Pantry item kept at zero in Inventory: it would show in search as something the user has.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R147 · Pantry counting unit
+
+**Rule:** A Pantry item counts its stock in grams, millilitres, pieces or packs, chosen per item (R97), and using it lowers stock in that unit: 200 g of pasta, 1 banana, 1 bag of cookies when it is finished. Ticking it as bought adds the amount bought in that unit, as the table below says. A count of pieces or packs, at the tick or in stock, is a box the user can type in with − and + on either side; grams and millilitres are typed only.
+
+**Why:** Use changes stock in the unit it is used in: pasta is cooked by the gram, a banana is eaten whole, and a piece of cheese could be logged by weight only by weighing it every day. A user who does not log each plate or handful counts packs and removes one when it is finished.
+
+**Values:**
+
+| Bought | Counted in | Adds |
+|---|---|---|
+| 2 boxes of rice, 1 kg each | grams | 2000 g |
+| 3 bags of cookies Q 600 g | packs | 3 |
+| 1 packet of 30 AA batteries | pieces | 30 |
+| 2 batteries, no pack | pieces | 2 |
+| a pack whose amount is not in the counting unit, such as bananas, 0,865 kg (R145), counted in pieces | pieces | the count asked at the tick, pre-filled with the last purchase's count |
+| a piece of cheese, 1,230 kg | pieces | 1, asked as in the row above |
+
+**Acceptance:** Each row's purchase, ticked as bought, adds the amount in its last column. Bananas bought as 4 last time show 4 at the tick, in a box that − and + change by one and that can be typed in. Cookies counted in packs at 3 drop to 2 with one − when a bag is finished. Stock in grams or millilitres shows no − or +.
+
+**Not:** Pantry stock by weight for everything bought by weight: the user eats 1 banana, not 0,312 kg of banana. Removing a whole pack from stock counted in grams: without each use logged, the gram count is wrong anyway, so such an item is counted in packs. − and + on grams and millilitres: a step of one is too small to be of use.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R148 · Estimated run-out
+
+**Rule:** Every Pantry item shows an estimated run-out day beside its usage rate (R110), worked out as the table below says. The estimate never notifies by itself; its notification is chosen per item (R149).
+
+**Why:** Its stock, its purchases and the day each ran out are already recorded, so the estimate asks nothing more of the user (R110). Products such as a piece of cheese, used a little at a time and counted as one piece, can be estimated only from how long a kilogram lasted.
+
+**Values:**
+
+| Item | Estimated run-out |
+|---|---|
+| counted in grams, millilitres, pieces or packs (R147) | its stock divided by its usage rate (R110) |
+| bought by weight and counted in pieces (R147), such as a piece of cheese | the days a kilogram of the last purchase lasted, from its tick until the stock reached zero (R143), times the new purchase's weight, counted from its tick |
+
+**Acceptance:** Rice at 1000 g, used at 100 g a day, shows an estimated run-out in 10 days. A 1,200 kg piece of cheese ticked on 1 November and finished on 7 December lasted 30 days per kg; the next piece, 0,800 kg, ticked on 10 December, shows an estimated run-out around 3 January. An item with no usage rate yet, or a first piece with none finished before it, shows no estimate.
+
+**Not:** A switch for the estimate itself: it is information, and the notification is what can be unwanted.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R149 · Run-out notification per item
+
+**Rule:** The run-out notification (R99) arrives only for the Pantry items switched on for it: each item has its own switch, off by default, and a multi-select edit, like that of store lists (R127), switches many on or off at once, for example all those under one tag. It arrives ahead of the item's estimated run-out day (R148) by the lead time of R150.
+
+**Why:** An estimate exists for every consumable, but a notification for each would be noise; the user picks the few worth one.
+
+**Acceptance:** With the run-out notification turned on in the settings and no item switched on, none arrives. Selecting every item under "cleaning" and switching them on makes those items, and only those, notify.
+
+**Not:** A switch per tag: an item carries several tags (R37), which could disagree. A switch for the estimate itself: R148 says why.
+
+**Since:** 2026-11-24 · owner · agreed rewording
+
+### D-R150 · Run-out notification lead time
+
+**Rule:** The run-out notification (R149) arrives 3 days before an item's estimated run-out day (R148) by default. The number of days is a setting the user can change, beside the notification's own switch, and applies to every item switched on.
+
+**Why:** Three days leave time for one shopping trip before the item runs out; a user who shops more or less often sets their own.
+
+**Acceptance:** With the setting untouched, an item estimated to run out on 20 December notifies on 17 December; with the setting changed to 5, it notifies on 15 December.
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
@@ -1816,6 +1948,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
 | low stock | Pantry |
 | add to the shopping list | Pantry and Shopping |
 | usage rate rising or falling | Pantry |
+| estimated run-out day approaching, for the items switched on (R148, R149) | Pantry |
 | time to do the laundry | Wardrobe |
 | running out of clean items of a kind, the rest being in the laundry | Wardrobe |
 | usage rate: none, low, medium or high; rising or falling | Wardrobe |
@@ -1825,7 +1958,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
 
 **Not:** Leaving reminders to the owner's earlier app: every reminder about Chatelaine's things belongs to Chatelaine. Reminders that are not about a thing, such as paying a bill: not Chatelaine's.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ## 11. Stages
 
@@ -2006,7 +2139,10 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
 - R130 · One product on several store lists: With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list, but stay on a pinned list that holds them. With a lower price per unit at B, the warning is flagged and names B, with no amount.
 - R131 · Pinned store lists: After a pinned weekly list produces a receipt, its bought entries are unticked and still on it, nothing else changes, and it is not archived at the end of the day. Reopening it shows its entries pre-selected; an entry added and confirmed stays for the next run, and a removed one is gone.
 - R132 · Quick comparison from a list entry: Opening cookies Q 600 g on store A's list shows their price per kg at every store with a price, cheapest first.
-- R134 · Products and packs: With Pantry off, the items "cookies Q" and "cookies S", both tagged "cookies", hold the three packs of R114 in the price book, and selecting the tag ranks them as R114 states.
+- R134 · Products and packs: With Pantry off, the items "cookies Q" and "cookies S", both tagged "cookies", hold the three packs of R114 in the price book, and selecting the tag ranks them as R114 states. Bananas recorded at 2,09 €/kg at Supermarket A are held as that price per kg, with no pack.
+- R144 · Price per unit: Under "cookies", cookies Q 600 g at 1,59 €, cookies S 1 kg at 2,99 € and a box of 20 cookies with no weight at 1,80 € show those prices, with 2,65 €/kg and 2,99 €/kg on the right, ranked in that order, and the box below them with no price per unit; once the box's weight is added as 250 g, it ranks third at 7,20 €/kg.
+- R145 · Products sold by weight: With bananas at 2,09 €/kg at Supermarket A, typing 0,865 kg shows 1,81 €, which can be changed before the tick is confirmed; typing 1,81 € from the label instead gives a line of 1,81 € and 866 g. Typing 2,19 €/kg over the pre-filled price makes it the current price. Afterwards the price book holds no banana pack.
+- R146 · Bag at the tick: Marked bananas ticked at 1,81 € with a 0,02 € bag give a line of 1,83 €, and the price book still holds 2,09 €/kg; an unmarked product offers no bag.
 - R135 · Discounts when ticking: Three packs at 1,59 € ticked under "3 x 2" give a line of 3,18 €, record a "3 x 2" promotion, and leave 1,59 € as the current price; typing 1,29 € unmarked makes 1,29 € the current price.
 - R136 · Discount on a whole receipt: Each row's receipt, closed with its discount, exports the lines and total in its last two columns, and no pack's current price changes.
 - R137 · Shopping list and store lists: Each row's action has its effect and no other; opening a store list shows its entries ready to tick, and editing starts only from the edit action.
@@ -2016,7 +2152,11 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) 
 - R141 · Stores: Renaming a store shows the new name on its lists and prices; deleting it after confirming removes its prices, marks and lists, and its earlier receipts still show its name.
 - R142 · Turning Shopping off: With a list, a price and an open receipt, turning Shopping off closes the receipt and hides all three; turning it on shows the list and the price unchanged and the receipt closed.
 - R117 · Wishes: Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item, unplaced. Putting batteries that are in Inventory on the shopping list links to that item, and ticking 2 of them as bought raises its quantity by 2. R143's acceptance covers a finished consumable.
-- R143 · Finished consumables: With Pantry and Shopping on, lowering rice in its kitchen-shelf place from 1 to 0 removes it from search and puts a wish for it on the shopping list; ticking 2 as bought brings the rice back on the kitchen shelf with a quantity of 2, its minimum stock and its usage-rate history. Lowering "headphones ×3" outside Pantry to 0 leaves an item at zero.
+- R143 · Finished consumables: With Pantry and Shopping on, lowering rice, counted in grams, in its kitchen-shelf place from 250 g to 0 removes it from search and puts a wish for it on the shopping list; ticking 2 boxes of 1 kg as bought brings the rice back on the kitchen shelf with 2000 g (R147), its minimum stock and its usage-rate history. Lowering "headphones ×3" outside Pantry to 0 leaves an item at zero.
+- R147 · Pantry counting unit: Each row's purchase, ticked as bought, adds the amount in its last column. Bananas bought as 4 last time show 4 at the tick, in a box that − and + change by one and that can be typed in. Cookies counted in packs at 3 drop to 2 with one − when a bag is finished. Stock in grams or millilitres shows no − or +.
+- R148 · Estimated run-out: Rice at 1000 g, used at 100 g a day, shows an estimated run-out in 10 days. A 1,200 kg piece of cheese ticked on 1 November and finished on 7 December lasted 30 days per kg; the next piece, 0,800 kg, ticked on 10 December, shows an estimated run-out around 3 January. An item with no usage rate yet, or a first piece with none finished before it, shows no estimate.
+- R149 · Run-out notification per item: With the run-out notification turned on in the settings and no item switched on, none arrives. Selecting every item under "cleaning" and switching them on makes those items, and only those, notify.
+- R150 · Run-out notification lead time: With the setting untouched, an item estimated to run out on 20 December notifies on 17 December; with the setting changed to 5, it notifies on 15 December.
 - R118 · Shopping records in sync and backup: One record of each kind named in the rule, added on one device, appears on the other after a sync, and survives export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
