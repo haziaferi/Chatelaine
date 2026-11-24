@@ -447,3 +447,5 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-25 · R46 · changed · fields reach sub-tags and wishes; module presets on every item and wish · owner
 - 2026-11-25 · R151 · added · module tags "consumable" and "wearable"; Pantry and Wardrobe items; module off keeps values · owner
 - 2026-11-25 · spec · changed · glossary: Pantry item, Wardrobe module, Wardrobe item · owner
+- 2026-11-25 · R91 · changed · measures for every axis, controls and three candidate maps, plateau test; acceptance can fail · owner
+- 2026-11-25 · spec · changed · glossary: Function, Facet, Home; purpose map generated from its JSON · owner

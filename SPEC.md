@@ -202,7 +202,10 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | Right, close, wrong | The owner's marks for an answer line in a blind review, given without knowing which recogniser wrote it. |
 | Tightened instructions | The instructions sent with each photo that ask for the most specific label name, counts one by one ("about N" when things overlap), and nothing that cannot be seen. |
 | Object of the day | A random stored thing shown on the homepage, chosen from the least searched-for first. |
-| Purpose map | The companion document `docs/purpose-map.md`. |
+| Purpose map | The companion document `docs/purpose-map.md`, generated from `docs/purpose-map.json`. |
+| Function | One thing a person does or reads in an app: a row of the purpose map, from a reference app or from this spec. |
+| Facet | A label for what a function is about; a function has one or more, the first being its main facet. A purpose is a set of facets. |
+| Home | The one screen where a thing lives; a shortcut to it on the homepage is not a repeat (R92). |
 | Reference app | Another app scored beside Chatelaine's plans, as a baseline to improve upon or as a control that must lose. |
 | Stage | One step of the stage plan. |
 | Done-when | The check that ends a stage. |
@@ -1306,25 +1309,27 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R91 · Scoring axes
 
-**Rule:** The purpose map is scored on the axes below, agreed with the owner before scoring, with equal weights and ties shown as ties. Layout axes are set per screen from stage 2.
+**Rule:** The purpose map is scored on the axes below, agreed with the owner before scoring: each axis from 0 to 1, with equal weights, raw values shown beside the scores and ties shown as ties. The walked reference apps' functions, each tagged with facets, feed the purpose-set axes, and their own screen structures are scored as controls on the screens-and-homes axes beside three candidate maps: by module, by purpose and a hybrid. A plateau test re-scores with each constant below moved up and down by a third and reports how often each map comes first; layout axes are set per screen from stage 2.
 
 **Values:**
 
 | Axis | Measures | Chooses |
 |---|---|---|
-| Coverage | every reference-app function and every step of R05 to R11, R114 and R115 lands in a purpose | the purpose set |
-| Exclusivity | — | the purpose set |
-| Balance | — | the purpose set |
-| Fit | fit to Chatelaine's intent | the purpose set |
-| Potential | potential improvement over the reference apps | the purpose set |
-| Screen count | fewer is better | screens and homes |
-| One home per thing | repeats count against | screens and homes |
-| Steps per scenario | taps from the homepage through R05 to R11, R114 and R115 | screens and homes |
-| Recall load | steps that ask the user to remember what the screen does not show | screens and homes |
+| Coverage | the share of functions whose main facet falls in a purpose, per reference app and then the mean; every step of R05 to R11, R114 and R115 counts as a function | the purpose set |
+| Exclusivity | the share of functions whose facets all fall in one purpose | the purpose set |
+| Balance | the entropy of main-facet counts over the purposes, divided by its maximum (1 = an even spread) | the purpose set |
+| Fit | the mean of coverage and exclusivity over Chatelaine's own functions | the purpose set |
+| Potential | the share of reference functions Chatelaine lacks or only partly has whose main facet lands in a named purpose | the purpose set |
+| Screen count | the number of screens, absolute: 1 at 8 or fewer, 0 at 24 or more, linear between | screens and homes |
+| One home per thing | r = repeats outside a thing's home, not counting homepage shortcuts (R92), over things placed; score = max(0, 1 − 4r) | screens and homes |
+| Steps per scenario | taps from the homepage through R05 to R11, R114 and R115: 0.5 · clip((5 − mean) / 4) + 0.5 · clip((6 − max) / 5) | screens and homes |
+| Recall load | 1 − the share of scenario steps that need a rule or gesture the screen does not draw, or a value carried from an earlier screen | screens and homes |
 
-**Acceptance:** Every reference app, scored as a control, loses: a control that scores well means the axes are wrong.
+**Acceptance:** Scored as controls, every reference app's total is below the chosen map's; while one is not, the axes are revised with the owner before the map is approved.
 
-**Since:** 2026-11-23 · owner · own words
+**Not:** Screen count relative to the map with the fewest screens: a control with almost no screens would set the baseline and win. Fit and potential as ratings: both can be counted from the functions.
+
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R92 · Homepage shortcuts in scoring
 
@@ -2162,7 +2167,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R87 · Clear-box surfaces: The owner uses the widget and the labels for a week, as stage 7's gate requires (R100).
 - R88 · Labels: The owner uses the labels for a week, as stage 7's gate requires (R100).
 - R90 · Purpose map: The owner approves the spec and the purpose map, as stage 0's gate requires (R100).
-- R91 · Scoring axes: Every reference app, scored as a control, loses: a control that scores well means the axes are wrong.
+- R91 · Scoring axes: Scored as controls, every reference app's total is below the chosen map's; while one is not, the axes are revised with the owner before the map is approved.
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
