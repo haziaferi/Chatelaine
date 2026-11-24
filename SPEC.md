@@ -1470,7 +1470,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R127 · Store lists
 
-**Rule:** The user makes shopping lists for one store each, choosing among the products that store carries (R129); entries already on the shopping list come pre-selected, and anything picked joins the shopping list too. Every tick on a store list is at that store; a tick on the shopping list itself asks for the store once. A store list goes through the stages below.
+**Rule:** The user makes shopping lists for one store each, choosing among the products that store carries (R129) in a multi-select edit mode, where entries already on the shopping list come pre-selected and any entries can be selected or unselected in bulk before confirming; anything picked joins the shopping list too. Every tick on a store list is at that store; a tick on the shopping list itself asks for the store once. A store list goes through the stages below.
 
 **Why:** A store list knows its store, so receipts (R124) and the price book (R115) get one with no extra step, and the user collects what one store sells in one go.
 
@@ -1483,9 +1483,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | archived | at the end of the day of its last receipt, only once it has produced one, and never when pinned (R131); entries not ticked stay on the shopping list |
 | deleted | 30 days after archiving; its receipts and the prices it recorded stay |
 
-**Evidence:** Not checked: that shopping-list entries come pre-selected and that picked products join the shopping list is the builder's proposal of 2026-11-24.
-
-**Acceptance:** A store list for store A offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. A store list made a day ahead and not used is still there, not archived. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
+**Acceptance:** A store list for store A opens in multi-select edit mode with the shopping-list entries it carries pre-selected; selecting or unselecting several entries at once and confirming gives a list of exactly those. It offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. A store list made a day ahead and not used is still there, not archived. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
 
 **Not:** A current store on the shopping list: it can be left on the wrong store.
 
@@ -1517,7 +1515,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R131 · Pinned store lists
 
-**Rule:** A pinned store list is never archived, and its entries leave it only when the user removes them. Opening it shows its entries pre-selected; the user adds and removes entries to fit the run, then confirms. Producing a receipt unticks the entries bought on it, and nothing else moves.
+**Rule:** A pinned store list is never archived, and its entries leave it only when the user removes them. Opening it shows its entries pre-selected in the same multi-select edit mode (R127); the user adds and removes entries to fit the run, then confirms. Producing a receipt unticks the entries bought on it, and nothing else moves.
 
 **Why:** A repeated run, such as the weekly groceries, is compiled once and adjusted each time instead of built again.
 
@@ -1538,8 +1536,6 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 ### D-R117 · Wishes
 
 **Rule:** A shopping-list entry for something already in Inventory links to that item. Anything else is a wish, a record of its own kept on the wish list or put straight on the shopping list, and becomes an Inventory item only when it is ticked as bought.
-
-**Evidence:** Not checked: how the wish list works (wishes kept for later, moved to the shopping list when they are to be bought) is the builder's proposal of 2026-11-24; the owner named the wish list as part of Shopping.
 
 **Acceptance:** Putting a kettle that is not in Inventory on the wish list creates a wish and no item; search and the object of the day do not show it; moving it to the shopping list and ticking it as bought creates the item. Putting batteries that are in Inventory on the shopping list links to that item, and ticking them as bought raises its quantity.
 
@@ -1829,7 +1825,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R125 · Item category: With Shopping on and the savings export off, no category field appears, anything can go on the shopping list, and nothing is exported. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
 - R126 · No category, no shopping list: With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; turning the export on with uncategorised entries already on the list flags them, and they cannot be ticked as bought until each has a category; every exported line carries a category.
 - R128 · Savings export prompt: The first entry on either list shows the prompt once; after it is dismissed, later entries show no prompt and no receipt is sent; the export can be turned on from the Shopping settings at any time.
-- R127 · Store lists: A store list for store A offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. A store list made a day ahead and not used is still there, not archived. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
+- R127 · Store lists: A store list for store A opens in multi-select edit mode with the shopping-list entries it carries pre-selected; selecting or unselecting several entries at once and confirming gives a list of exactly those. It offers only the products R129 allows, and its ticks record store A; a tick on the shopping list asks for the store. A store list made a day ahead and not used is still there, not archived. After a receipt the list takes a second receipt the same day, is archived at the end of that day with its unticked entries still on the shopping list, and is deleted 30 days later while its receipts and prices remain.
 - R129 · Carried by a store: Making a store list for store A offers only the products with a price at A or marked as carried there. Searching the list for a product with no information for A and adding it marks it as carried at A, and the next store list for A offers it.
 - R130 · One product on several store lists: With cookies on the lists of stores A and B, ticking them on A's list warns first, and once the warning is dismissed they leave the shopping list and B's list, but stay on a pinned list that holds them. With a lower price per unit at B, the warning is flagged and names B, with no amount.
 - R131 · Pinned store lists: After a pinned weekly list produces a receipt, its bought entries are unticked and still on it, nothing else changes, and it is not archived at the end of the day. Reopening it shows its entries pre-selected; an entry added and confirmed stays for the next run, and a removed one is gone.

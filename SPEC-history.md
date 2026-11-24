@@ -383,3 +383,6 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R127 · changed · archived only after a receipt; picks from carried products, shopping list pre-selected · owner
 - 2026-11-24 · R129 · changed · products with no information are not offered; search adds and marks them · owner
 - 2026-11-24 · R130 · changed · pinned lists keep a product ticked on another list · owner
+- 2026-11-24 · R127 · changed · picks in a multi-select edit mode, shopping-list entries pre-selected; confirmed · owner
+- 2026-11-24 · R131 · changed · reopening uses the same multi-select edit mode · owner
+- 2026-11-24 · R117 · changed · wish list working confirmed · owner
