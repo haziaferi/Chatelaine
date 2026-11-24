@@ -139,7 +139,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R147 | Pantry counting unit | 10. Modules and the shopping list |
 | D-R148 | Estimated run-out | 10. Modules and the shopping list |
 | D-R149 | Run-out notification per item | 10. Modules and the shopping list |
-| Q-R150 | Run-out notification lead time | 10. Modules and the shopping list |
+| D-R150 | Run-out notification lead time | 10. Modules and the shopping list |
 | D-R118 | Shopping records in sync and backup | 10. Modules and the shopping list |
 | D-R119 | Price-comparison library | 10. Modules and the shopping list |
 | O-R116 | Price paid in the savings export | 10. Modules and the shopping list |
@@ -1830,11 +1830,9 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 ### D-R149 · Run-out notification per item
 
-**Rule:** The run-out notification (R99) arrives only for the Pantry items switched on for it: each item has its own switch, off by default, and a multi-select edit, like that of store lists (R127), switches many on or off at once, for example all those under one tag. It arrives ahead of the item's estimated run-out day (R148), as R150 settles.
+**Rule:** The run-out notification (R99) arrives only for the Pantry items switched on for it: each item has its own switch, off by default, and a multi-select edit, like that of store lists (R127), switches many on or off at once, for example all those under one tag. It arrives ahead of the item's estimated run-out day (R148) by the lead time of R150.
 
 **Why:** An estimate exists for every consumable, but a notification for each would be noise; the user picks the few worth one.
-
-**Evidence:** Not checked: provisional, how far ahead follows R150's proposed default.
 
 **Acceptance:** With the run-out notification turned on in the settings and no item switched on, none arrives. Selecting every item under "cleaning" and switching them on makes those items, and only those, notify.
 
@@ -1842,15 +1840,15 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 **Since:** 2026-11-24 · owner · agreed rewording
 
-### Q-R150 · Run-out notification lead time
+### D-R150 · Run-out notification lead time
 
-**Rule:** How many days before an item's estimated run-out day (R148) does its run-out notification (R149) arrive?
+**Rule:** The run-out notification (R149) arrives 3 days before an item's estimated run-out day (R148) by default. The number of days is a setting the user can change, beside the notification's own switch, and applies to every item switched on.
 
-**Default:** 3 days before, leaving time for one shopping trip. Changes: when the notification arrives, and whether the lead time is one setting or set per item.
+**Why:** Three days leave time for one shopping trip before the item runs out; a user who shops more or less often sets their own.
 
-**Why:** Too short a lead leaves no shopping trip before the item runs out; too long a lead notifies for things that will last until the next usual trip anyway.
+**Acceptance:** With the setting untouched, an item estimated to run out on 20 December notifies on 17 December; with the setting changed to 5, it notifies on 15 December.
 
-**Since:** 2026-11-24 · builder · agreed rewording
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R118 · Shopping records in sync and backup
 
@@ -2158,6 +2156,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R147 · Pantry counting unit: Each row's purchase, ticked as bought, adds the amount in its last column. Bananas bought as 4 last time show 4 at the tick, in a box that − and + change by one and that can be typed in. Cookies counted in packs at 3 drop to 2 with one − when a bag is finished. Stock in grams or millilitres shows no − or +.
 - R148 · Estimated run-out: Rice at 1000 g, used at 100 g a day, shows an estimated run-out in 10 days. A 1,200 kg piece of cheese ticked on 1 November and finished on 7 December lasted 30 days per kg; the next piece, 0,800 kg, ticked on 10 December, shows an estimated run-out around 3 January. An item with no usage rate yet, or a first piece with none finished before it, shows no estimate.
 - R149 · Run-out notification per item: With the run-out notification turned on in the settings and no item switched on, none arrives. Selecting every item under "cleaning" and switching them on makes those items, and only those, notify.
+- R150 · Run-out notification lead time: With the setting untouched, an item estimated to run out on 20 December notifies on 17 December; with the setting changed to 5, it notifies on 15 December.
 - R118 · Shopping records in sync and backup: One record of each kind named in the rule, added on one device, appears on the other after a sync, and survives export and import.
 - R119 · Price-comparison library: The library's licence is GPL-3.0, and with the network off every price comparison works.
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.

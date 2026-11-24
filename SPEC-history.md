@@ -434,3 +434,6 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R149 · added · run-out notification switched on per item, many at once by multi-select · owner
 - 2026-11-24 · R150 · added · open: run-out notification lead time · builder
 - 2026-11-24 · R99 · changed · row for the run-out notification (R149) · owner
+- 2026-11-24 · R150 · kind · Q → D · owner
+- 2026-11-24 · R150 · changed · 3 days by default, a setting the user can change · owner
+- 2026-11-24 · R149 · changed · lead time from R150 · owner
