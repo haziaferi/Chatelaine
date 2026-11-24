@@ -1405,25 +1405,65 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R123 · Receipt file
 
-**Rule:** The receipt file Chatelaine writes for the savings app carries the fields below. The savings app's spec cites this rule, and a change to a field's meaning raises the format version.
+**Rule:** The receipt file Chatelaine writes for the savings app is one JSON file per receipt, encoded in UTF-8, named `chatelaine-receipt-<receiptId>.json` and holding the keys below; the savings app's spec cites this rule, and a change to a key's meaning raises `format`. Chatelaine writes the file under a temporary name that does not end in `.json` and renames it once it is complete, so a file under its final name is always whole.
+
+**Why:** A receipt's lines nest inside it, and JSON keeps them in one file; amounts in whole cents avoid the decimal comma, the file stays readable when debugging, and both apps can read it with the same serialization library. The savings app or a folder-sync tool (R57) may read the folder while a file is being written.
 
 **Values:**
 
-| Field | Holds |
-|---|---|
-| format version | a whole number, starting at 1 |
-| receipt id | the receipt's unique id (R52), so a second import of the same receipt is recognised |
-| store | the store's name |
-| date | the day of the payment |
-| currency | an ISO 4217 code, `EUR` in v1 |
-| total paid | in whole cents: the sum of the lines' prices paid |
-| lines | per line: item name (a wish ticked as bought is an item by then, R117), pack when it has one, quantity, price paid with every discount applied (R116), and category (R125, R126) as its unique id (R52) and its name, so a renamed category keeps its match in the savings app (R122) |
+| Key | In | Holds |
+|---|---|---|
+| `format` | receipt | the format version: a whole number, starting at 1 |
+| `receiptId` | receipt | the receipt's unique id (R52), so a second import of the same receipt is recognised; the file name carries it too |
+| `store` | receipt | the store's name |
+| `date` | receipt | the day of the payment, as `YYYY-MM-DD` |
+| `currency` | receipt | an ISO 4217 code, `EUR` in v1 |
+| `totalPaid` | receipt | in whole cents: the sum of the lines' `pricePaid` |
+| `lines` | receipt | an array with one object per line, holding the keys below |
+| `name` | line | the item's name (a wish ticked as bought is an item by then, R117) |
+| `pack` | line | the pack's size as text, such as `600 g` (R134); absent when the line has no pack |
+| `quantity` | line | the number of packs bought, a whole number |
+| `pricePaid` | line | in whole cents: the price of the whole line with every discount applied (R116, R135, R136), not a price per pack |
+| `categoryId` | line | the category's unique id (R52), so a renamed category keeps its match in the savings app (R122) |
+| `categoryName` | line | the category's name (R125, R126) |
 
-**Acceptance:** An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
+Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135) and two batteries with no pack, at Supermarket A, written as `chatelaine-receipt-3f6c2a9e-8b41-4d27-9c55-0e7a1b2d4f68.json`:
 
-**Not:** Tags on each line: they no longer decide the category (R122), and they would send labels such as projects and places that the savings app has no use for.
+```json
+{
+  "format": 1,
+  "receiptId": "3f6c2a9e-8b41-4d27-9c55-0e7a1b2d4f68",
+  "store": "Supermarket A",
+  "date": "2026-11-24",
+  "currency": "EUR",
+  "totalPaid": 916,
+  "lines": [
+    {
+      "name": "cookies Q",
+      "pack": "600 g",
+      "quantity": 3,
+      "pricePaid": 318,
+      "categoryId": "b7d1e4f0-2c9a-4e63-8f15-6a0d3c7b9e21",
+      "categoryName": "Food"
+    },
+    {
+      "name": "batteries",
+      "quantity": 2,
+      "pricePaid": 598,
+      "categoryId": "5e9a0c3d-7f24-4b18-a6e2-1d8c4f0b7a93",
+      "categoryName": "Household"
+    }
+  ]
+}
+```
 
-**Since:** 2026-11-24 · builder · agreed rewording
+**Evidence:** Not checked: provisional, how a purchase by weight is written, since no rule says how one is ticked (R26, R134); `quantity` as a whole number of packs stands until the owner settles it. Not checked: that every folder the user can choose lets Chatelaine rename a file (on Android, renaming a document is optional for the app that provides the folder). Not checked: that R52's ids hold only characters a file name allows; R52 does not fix their form, and the example's ids are for illustration.
+
+**Acceptance:** An exported receipt file is named `chatelaine-receipt-<receiptId>.json`, parses as UTF-8 JSON holding every key above and no tags, its `totalPaid` equals the sum of its lines' `pricePaid`, a line with no pack has no `pack` key, and exporting the same receipt twice gives the same `receiptId`. While a file is being written, the folder holds no file of it under a name ending in `.json`. The example file above meets every check in this paragraph.
+
+**Not:** Tags on each line: they no longer decide the category (R122), and they would send labels such as projects and places that the savings app has no use for. CSV: lines would repeat the receipt's fields or need a second file, and quoting and the decimal comma make it fragile. XML: heavier, with nothing gained. A binary format: it cannot be read when debugging. Amounts as decimal numbers: the decimal comma and rounding; whole cents have neither.
+
+**Since:** 2026-11-24 · owner · agreed rewording
 
 ### D-R124 · What makes a receipt
 
@@ -1956,7 +1996,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
 - R113 · Export per receipt: A receipt of five items exports one row with the store, the date, the total paid and five lines, and no line is exported as an expense of its own. With the savings export off, ticking items as bought exports nothing, and turning it on later sends none of those receipts.
 - R122 · Savings categories: Every line carries its category's id and name in the receipt file (R123, R126); after a category is renamed in Chatelaine, the next receipt file carries the same category id with the new name; Chatelaine reads nothing from the savings app.
-- R123 · Receipt file: An exported receipt file holds every field above and no tags, its total paid equals the sum of its lines, and exporting the same receipt twice gives the same receipt id.
+- R123 · Receipt file: An exported receipt file is named `chatelaine-receipt-<receiptId>.json`, parses as UTF-8 JSON holding every key above and no tags, its `totalPaid` equals the sum of its lines' `pricePaid`, a line with no pack has no `pack` key, and exporting the same receipt twice gives the same `receiptId`. While a file is being written, the folder holds no file of it under a name ending in `.json`. The example file above meets every check in this paragraph.
 - R124 · What makes a receipt: Two closes at one store on one day give two receipts with different ids; with no close, the items ticked at one store on one day make one receipt; ticking an item at a second store starts a new receipt; re-exporting a closed receipt gives the same file; ticking a pack with no price at that store asks for the price paid before it is ticked.
 - R125 · Item category: With Shopping on and the savings export off, no category field appears, anything can go on the shopping list, and nothing is exported. With it on, an item or a wish can be given one category, and ticking a wish as bought keeps its category on the new item.
 - R126 · No category, no shopping list: With the savings export on, adding a wish with no category to the shopping list asks for a category first; a low-stock item with no category shows flagged and joins the list only after it is given one from the flag; turning the export on with uncategorised entries already on the list flags them, and they cannot be ticked as bought until each has a category; every exported line carries a category.
