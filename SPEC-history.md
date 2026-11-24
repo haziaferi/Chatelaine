@@ -367,3 +367,15 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-24 · R126 · changed · uncategorised entries also cannot be ticked; flagged when left without one · builder
 - 2026-11-24 · R118 · changed · categories and receipts sync and back up · builder
 - 2026-11-24 · R127 · added · open: how a tick knows its store · builder
+- 2026-11-24 · R127 · kind · Q → D: store lists, one per store, archived after their last receipt · owner
+- 2026-11-24 · R128 · added · one-time prompt to turn on the savings export · owner
+- 2026-11-24 · R129 · added · carried by a store: a price there or the user's mark; unknowns greyed · owner
+- 2026-11-24 · R130 · added · a product ticked on one store list leaves the others, after a warning · owner
+- 2026-11-24 · R131 · added · open: what a pinned store list does after a receipt · builder
+- 2026-11-24 · R132 · added · quick price comparison from a store-list entry · owner
+- 2026-11-24 · R133 · added · aisles in store lists not in v1 · owner
+- 2026-11-24 · R112 · changed · Shopping holds store lists · owner
+- 2026-11-24 · R97 · changed · Shopping views gain store lists · owner
+- 2026-11-24 · R118 · changed · store lists sync and back up · owner
+- 2026-11-24 · R103 · changed · "receipts" → "proof of purchase", since Receipt is now a glossary term · builder
+- 2026-11-24 · spec · added · glossary: Store list; Shopping module changed · owner
