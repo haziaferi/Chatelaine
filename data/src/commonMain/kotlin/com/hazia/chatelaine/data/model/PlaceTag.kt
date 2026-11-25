@@ -45,6 +45,9 @@ internal interface PlaceTagDao {
     @Query("SELECT * FROM place_tag ORDER BY id")
     suspend fun allLinks(): List<PlaceTagEntity>
 
+    @Query("SELECT * FROM place_tag WHERE tag_id = :tagId ORDER BY id")
+    suspend fun linksOfTag(tagId: String): List<PlaceTagEntity>
+
     @Query("SELECT * FROM place_tag WHERE place_id = :placeId ORDER BY id")
     suspend fun linksOfPlace(placeId: String): List<PlaceTagEntity>
 

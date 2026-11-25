@@ -3,6 +3,7 @@ package com.hazia.chatelaine.data
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
@@ -26,7 +27,7 @@ internal const val AWAY = "away"
 internal const val PHOTO_OUTDATED = "photoOutdated"
 
 /** A thing the household owns (R25). Only [name] is required (R29). */
-@Entity(tableName = ITEM)
+@Entity(tableName = ITEM, indices = [Index("place_id")])
 internal data class ItemEntity(
     @PrimaryKey val id: String,
     val name: String,

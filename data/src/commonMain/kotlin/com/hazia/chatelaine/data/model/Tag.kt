@@ -68,6 +68,9 @@ internal interface TagDao {
     @Query("SELECT * FROM tag WHERE kind = :kindId ORDER BY id")
     suspend fun tagsOfKind(kindId: String): List<TagEntity>
 
+    @Query("SELECT * FROM tag WHERE home_place_id = :placeId ORDER BY id")
+    suspend fun tagsWithHome(placeId: String): List<TagEntity>
+
     @Query("SELECT * FROM tag WHERE name = :name COLLATE NOCASE ORDER BY id")
     suspend fun named(name: String): List<TagEntity>
 
@@ -132,6 +135,6 @@ data class Tag(
     val moduleKey: String?,
 )
 
-/** [parent] and [kind] are what exist: an id that names a row not here (yet, or any more) reads as none. */
-internal fun TagEntity.toTag(parent: Boolean = true, kindExists: Boolean = true) =
-    Tag(id, name, parentId.takeIf { parent }, kind.takeIf { kindExists }, kept, homePlaceId, moduleKey)
+/** [parent], [kind] and [homeExists] say what exists: an id that names a row not here (yet, or any more) reads as none. */
+internal fun TagEntity.toTag(parent: Boolean = true, kindExists: Boolean = true, homeExists: Boolean = true) =
+    Tag(id, name, parentId.takeIf { parent }, kind.takeIf { kindExists }, kept, homePlaceId.takeIf { homeExists }, moduleKey)

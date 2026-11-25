@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "96c3a82ef193e757c50ad7306aca1677",
+    "identityHash": "52d822fae2eb0457f5fd5d4c6cd31421",
     "entities": [
       {
         "tableName": "purge_registry",
@@ -604,7 +604,18 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_item_place_id",
+            "unique": false,
+            "columnNames": [
+              "place_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_item_place_id` ON `${TABLE_NAME}` (`place_id`)"
+          }
+        ]
       },
       {
         "tableName": "item_tag",
@@ -956,7 +967,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96c3a82ef193e757c50ad7306aca1677')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '52d822fae2eb0457f5fd5d4c6cd31421')"
     ]
   }
 }

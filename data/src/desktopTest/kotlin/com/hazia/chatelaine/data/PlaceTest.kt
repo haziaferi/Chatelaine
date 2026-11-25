@@ -1,7 +1,9 @@
 package com.hazia.chatelaine.data
 
 import com.hazia.chatelaine.core.sync.HybridClock
+import androidx.room.useWriterConnection
 import kotlinx.coroutines.runBlocking
+import kotlin.test.assertFails
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.AfterTest
@@ -143,14 +145,25 @@ class PlaceTest {
         assertNull(inventory.getPlace(room)?.parentId)
     }
 
+    /** One transaction: a failure after half the moves leaves nothing moved; the success is one batch of outbox rows. */
     @Test
-    fun deletingPlaceWithThousandItemsIsOneTransaction() = run {
+    fun deletingPlaceWithThousandItemsIsAllOrNothing() = run {
         val chest = inventory.addPlace("chest")
         val drawer = inventory.addPlace("drawer", chest)
         val ids = (1..1000).map { inventory.addItem("item $it") }
         inventory.moveItems(ids, drawer)
         assertEquals(1000, inventory.contents(drawer).items.size)
         db.syncDao().clearOutbox(Long.MAX_VALUE)
+
+        db.useWriterConnection {
+            it.usePrepared("CREATE TRIGGER boom BEFORE UPDATE ON item WHEN NEW.name = 'item 500' AND NEW.place_id IS NOT OLD.place_id BEGIN SELECT RAISE(ABORT, 'boom'); END") { s -> s.step() }
+        }
+        assertFails { inventory.deletePlace(drawer) }
+        assertEquals(1000, inventory.contents(drawer).items.size, "nothing moved")
+        assertNotNull(inventory.getPlace(drawer))
+        assertTrue(db.syncDao().outbox().isEmpty(), "nothing queued")
+        assertFalse(drawer in db.syncDao().purges().map { it.id })
+        db.useWriterConnection { it.usePrepared("DROP TRIGGER boom") { s -> s.step() } }
 
         inventory.deletePlace(drawer)
 
@@ -196,14 +209,102 @@ class PlaceTest {
         val a = inventory.addPlace("a")
         val b = inventory.addPlace("b", a)
         writes.edit(PLACE_TABLE, a, PARENT) { mapOf("parentId" to b) } // the other device's move
-        inventory.path(b)
-        inventory.contents(a)
+        assertEquals(listOf("a", "b"), inventory.path(b))
+        assertEquals(listOf(b), inventory.contents(a).places.map { it.id })
 
         val t1 = inventory.addTag("t1")
         val t2 = inventory.addTag("t2", t1)
         writes.edit(TAG, t1, PARENT) { mapOf("parentId" to t2) }
         inventory.setKeptTogether(t1, true, a)
-        inventory.awayFromHome(t1)
+        val item = inventory.addItem("thing")
+        inventory.tag(listOf(item), t2)
+        assertEquals(listOf(item), inventory.awayFromHome(t1))
         assertTrue(inventory.awayFromHome(t2).isEmpty())
+    }
+
+    /** A purge for the place link goes out with its tag, or a peer brings the link back pointing at a purged tag. */
+    @Test
+    fun deletingTagPurgesItsPlaceLinks() = run {
+        val place = inventory.addPlace("shelf")
+        val tag = inventory.addTag("books")
+        inventory.tagPlace(place, tag)
+        val link = db.placeTagDao().linksOfPlace(place).single().id
+
+        inventory.deleteTag(tag)
+
+        assertTrue(link in db.syncDao().purges().map { it.id })
+        assertTrue(db.placeTagDao().allLinks().isEmpty())
+    }
+
+    /** A missing parent, place or home reads as none. */
+    @Test
+    fun danglingPlaceIdsReadAsNone() = run {
+        val place = inventory.addPlace("shelf")
+        val item = inventory.addItem("book")
+        val tag = inventory.addTag("books")
+        inventory.setKeptTogether(tag, true, place)
+        writes.edit(PLACE_TABLE, place, PARENT) { mapOf("parentId" to "gone") }
+        writes.edit(ITEM, item, PLACE) { mapOf("placeId" to "gone") }
+        writes.edit(TAG, tag, HOME) { mapOf("homePlaceId" to "gone") }
+
+        assertNull(inventory.getPlace(place)?.parentId)
+        assertNull(inventory.getItem(item)?.placeId)
+        assertEquals(ItemState.UNPLACED, inventory.state(item))
+        assertNull(inventory.items().single().placeId)
+        assertNull(inventory.getTag(tag)?.homePlaceId)
+        assertNull(inventory.places().single().parentId)
+    }
+
+    @Test
+    fun deletingPlaceClearsTheHomeOfTagsThatKeptThingsThere() = run {
+        val box = inventory.addPlace("box")
+        val tag = inventory.addTag("winter")
+        inventory.setKeptTogether(tag, true, box)
+
+        inventory.deletePlace(box)
+
+        assertNull(db.tagDao().tag(tag)?.homePlaceId)
+        assertEquals(true, inventory.getTag(tag)?.kept)
+    }
+
+    /** A site is a top-level place. */
+    @Test
+    fun sitesStayTopLevel() = run {
+        val house = inventory.addPlace("house")
+        assertFailsWith<IllegalArgumentException> { inventory.addPlace("flat", house, isSite = true) }
+        val site = inventory.addPlace("flat", isSite = true)
+        assertFailsWith<IllegalArgumentException> { inventory.movePlace(site, house) }
+        inventory.movePlace(site, null)
+
+        val room = inventory.addPlace("room", house)
+        writes.edit(PLACE_TABLE, site, PARENT) { mapOf("parentId" to room) } // a peer's move, as it can arrive
+        inventory.deletePlace(room)
+        assertNull(inventory.getPlace(site)?.parentId)
+    }
+
+    @Test
+    fun movingPlaceToItsParentWritesNothing() = run {
+        val house = inventory.addPlace("house")
+        val room = inventory.addPlace("room", house)
+        db.syncDao().clearOutbox(Long.MAX_VALUE)
+        inventory.movePlace(room, house)
+        assertTrue(db.syncDao().outbox().isEmpty())
+    }
+
+    /** Items that are unplaced or taken out count as away from the home. */
+    @Test
+    fun unplacedAndAwayItemsCountAsAwayFromHome() = run {
+        val tag = inventory.addTag("winter")
+        val box = inventory.addPlace("box")
+        val unplaced = inventory.addItem("hat")
+        val out = inventory.addItem("coat")
+        val inside = inventory.addItem("scarf")
+        inventory.placeItem(out, box)
+        inventory.placeItem(inside, box)
+        inventory.setAway(out, true)
+        inventory.tag(listOf(unplaced, out, inside), tag)
+        inventory.setKeptTogether(tag, true, box)
+
+        assertEquals(listOf(unplaced, out).sorted(), inventory.awayFromHome(tag))
     }
 }

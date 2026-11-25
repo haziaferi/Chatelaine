@@ -78,7 +78,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     }
 
     suspend fun state(itemId: String): ItemState {
-        val item = requireNotNull(items.item(itemId)) { "no item $itemId" }
+        val item = requireNotNull(getItem(itemId)) { "no item $itemId" }
         return when {
             item.away -> ItemState.AWAY
             item.placeId != null -> ItemState.PLACED
@@ -101,9 +101,9 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         }
     }
 
-    suspend fun getItem(itemId: String): Item? = items.item(itemId)?.toItem()
+    suspend fun getItem(itemId: String): Item? = items.item(itemId)?.let { listOf(it).toItems().single() }
 
-    suspend fun items(): List<Item> = items.allItems().map { it.toItem() }
+    suspend fun items(): List<Item> = items.allItems().toItems()
 
     // ---- tags ----
 
@@ -231,12 +231,15 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     suspend fun deleteTag(tagId: String) {
         val childIds = mutableListOf<String>()
         val linkIds = mutableListOf<String>()
+        val placeLinkIds = mutableListOf<String>()
         writes.write({
             requireNotNull(tags.tag(tagId)) { "no tag $tagId" }
             childIds += tags.childrenOf(tagId).map { it.id }
             linkIds += links.linksOfTag(tagId).map { it.id }
-            mapOf(TAG to listOf(tagId) + childIds, ITEM_TAG to linkIds.toList())
+            placeLinkIds += placeLinks.linksOfTag(tagId).map { it.id }
+            mapOf(TAG to listOf(tagId) + childIds, ITEM_TAG to linkIds.toList(), PLACE_TAG to placeLinkIds.toList())
         }) { store, _ ->
+            placeLinkIds.forEach { writes.merger.purge(store, it) }
             val up = requireNotNull(store.row(tagId)).groups.getValue(PARENT).values["parentId"] as String?
             val s = writes.clock.tick()
             for (child in childIds) store.put(requireNotNull(store.row(child)).edit(PARENT, s, mapOf("parentId" to up)))
@@ -260,7 +263,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     /** The items carrying a tag. */
     suspend fun itemsWith(tagId: String): List<Item> {
         val ids = links.linksOfTag(tagId).map { it.itemId }
-        return readChunked(ids) { items.items(it) }.map { it.toItem() }.sortedBy { it.id }
+        return readChunked(ids) { items.items(it) }.toItems().sortedBy { it.id }
     }
 
     // ---- tag kinds ----
@@ -311,6 +314,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     suspend fun addPlace(name: String, parentId: String? = null, isSite: Boolean = false): String {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "a place needs a name" }
+        require(!isSite || parentId == null) { "a site is at the top of a place tree" }
         val id = Ids.new()
         writes.write({
             if (parentId != null) requireNotNull(places.place(parentId)) { "no place $parentId" }
@@ -321,8 +325,10 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
 
     /** Moves [placeId] under [parentId], or to the top for null; never into itself or one of its places (R32). */
     suspend fun movePlace(placeId: String, parentId: String?) {
-        writes.edit(PLACE_TABLE, placeId, PARENT, {
-            requireNotNull(places.place(placeId)) { "no place $placeId" }
+        var changes = false
+        writes.write({
+            val place = requireNotNull(places.place(placeId)) { "no place $placeId" }
+            require(!place.isSite || parentId == null) { "a site is at the top of a place tree" }
             if (parentId != null) {
                 requireNotNull(places.place(parentId)) { "no place $parentId" }
                 val seen = mutableSetOf<String>()
@@ -332,7 +338,11 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
                     up = places.place(up)?.parentId
                 }
             }
-        }) { mapOf("parentId" to parentId) }
+            changes = place.parentId != parentId
+            mapOf(PLACE_TABLE to if (changes) listOf(placeId) else emptyList())
+        }) { store, _ ->
+            if (changes) store.put(requireNotNull(store.row(placeId)).edit(PARENT, writes.clock.tick(), mapOf("parentId" to parentId)))
+        }
     }
 
     /** Puts [itemId] in [placeId], or takes it out of any place for null (R30, R111). */
@@ -365,7 +375,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     /** What [placeId] holds directly: its items and its places (R32, R111). */
     suspend fun contents(placeId: String): PlaceContents {
         requireNotNull(places.place(placeId)) { "no place $placeId" }
-        return PlaceContents(places.itemsIn(placeId).map { it.toItem() }, places.childrenOf(placeId).map { it.toPlace() })
+        return PlaceContents(places.itemsIn(placeId).toItems(), places.childrenOf(placeId).toPlaces())
     }
 
     /** The names from the top of the tree down to [placeId] (R32). The walk stops at a place it has met, so a cycle cannot loop it. */
@@ -381,7 +391,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     }
 
     /**
-     * Deletes the place and its tag links (R152). Its items and places move to its parent; for a site, or a place
+     * Deletes the place and its tag links (R152). Its items and places move to its parent (a site in it goes to the top); tags that had it as home lose the home; for a site, or a place
      * with no parent, the items become unplaced and the places lose their parent. This is one write, however many
      * items it holds. The places and items moved count as changed, as moving them would (R31).
      */
@@ -389,16 +399,20 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         val childIds = mutableListOf<String>()
         val itemIds = mutableListOf<String>()
         val linkIds = mutableListOf<String>()
+        val siteIds = mutableSetOf<String>()
+        val homeTagIds = mutableListOf<String>()
         var up: String? = null
         writes.write({
             val place = requireNotNull(places.place(placeId)) { "no place $placeId" }
             up = place.parentId?.takeIf { !place.isSite && it != placeId && places.place(it) != null }
-            childIds += places.childrenOf(placeId).map { it.id }
+            places.childrenOf(placeId).forEach { childIds += it.id; if (it.isSite) siteIds += it.id }
+            homeTagIds += tags.tagsWithHome(placeId).map { it.id }
             itemIds += places.itemsIn(placeId).map { it.id }
             linkIds += placeLinks.linksOfPlace(placeId).map { it.id }
             mapOf(
                 PLACE_TABLE to (listOf(placeId) + listOfNotNull(up) + childIds).distinct(),
                 ITEM to itemIds.toList(),
+                TAG to homeTagIds.toList(),
                 PLACE_TAG to linkIds.toList(),
             )
         }) { store, _ ->
@@ -406,19 +420,20 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             val parent = up
             for (id in itemIds) store.put(requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to parent)).raised(s))
             for (id in childIds) {
-                store.put(requireNotNull(store.row(id)).edit(PARENT, s, mapOf("parentId" to parent.takeIf { it != id })))
+                store.put(requireNotNull(store.row(id)).edit(PARENT, s, mapOf("parentId" to parent.takeIf { it != id && id !in siteIds })))
             }
             if (parent != null && (itemIds.isNotEmpty() || childIds.isNotEmpty())) {
                 store.put(requireNotNull(store.row(parent)).raised(s))
             }
+            for (id in homeTagIds) store.put(requireNotNull(store.row(id)).edit(HOME, s, mapOf("homePlaceId" to null)))
             linkIds.forEach { writes.merger.purge(store, it) }
             writes.merger.purge(store, placeId)
         }
     }
 
-    suspend fun getPlace(placeId: String): Place? = places.place(placeId)?.toPlace()
+    suspend fun getPlace(placeId: String): Place? = places.place(placeId)?.let { listOf(it).toPlaces().single() }
 
-    suspend fun places(): List<Place> = places.allPlaces().map { it.toPlace() }
+    suspend fun places(): List<Place> = places.allPlaces().toPlaces()
 
     /** Puts [tagId] on [placeId] (R33, R34); a place that carries it already is left alone. */
     suspend fun tagPlace(placeId: String, tagId: String) {
@@ -520,11 +535,27 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         PHOTO_OUTDATED to Group(s, mapOf("outdated" to false)),
     ))
 
-    /** Tags as the app reads them: a parent or kind that is not here reads as none. */
+    /** Tags as the app reads them: a parent, kind or home place that is not here reads as none. */
     private suspend fun List<TagEntity>.toTags(): List<Tag> {
         val parents = readChunked(mapNotNull { it.parentId }.distinct()) { tags.tags(it) }.map { it.id }.toSet()
         val kindIds = kinds.allKinds().map { it.id }.toSet()
-        return map { it.toTag(it.parentId in parents, it.kind in kindIds) }
+        val homes = existingPlaces(map { it.homePlaceId })
+        return map { it.toTag(it.parentId in parents, it.kind in kindIds, it.homePlaceId in homes) }
+    }
+
+    private suspend fun existingPlaces(ids: List<String?>): Set<String> =
+        readChunked(ids.filterNotNull().distinct()) { places.places(it) }.map { it.id }.toSet()
+
+    /** Items as the app reads them: a place that is not here reads as none. */
+    private suspend fun List<ItemEntity>.toItems(): List<Item> {
+        val here = existingPlaces(map { it.placeId })
+        return map { it.toItem().let { i -> i.copy(placeId = i.placeId?.takeIf { p -> p in here }) } }
+    }
+
+    /** Places as the app reads them: a parent that is not here reads as none, so the place lists as top-level. */
+    private suspend fun List<PlaceEntity>.toPlaces(): List<Place> {
+        val here = existingPlaces(map { it.parentId })
+        return map { it.toPlace().let { p -> p.copy(parentId = p.parentId?.takeIf { x -> x in here }) } }
     }
 
     /** Writes rows made with one stamp; [make] gets that stamp. */
