@@ -45,15 +45,22 @@ object Presets {
     val ALL: List<PresetDef> = listOf(
         PresetDef(INVENTORY, "expiry_date", "expiry date", FieldType.DATE, attaches = PresetAttach.SINGLE_ITEMS),
         PresetDef(INVENTORY, "opened_on", "opened on", FieldType.DATE, attaches = PresetAttach.SINGLE_ITEMS),
-        PresetDef(INVENTORY, "months_after_opening", "months after opening", FieldType.NUMBER, unit = "months", attaches = PresetAttach.SINGLE_ITEMS),
+        PresetDef(
+            INVENTORY, "months_after_opening", "months after opening", FieldType.NUMBER, unit = "months",
+            attaches = PresetAttach.SINGLE_ITEMS,
+        ),
         PresetDef(WARDROBE, "size", "size", FieldType.TEXT, attaches = PresetAttach.WEARABLE_TAG),
         PresetDef(WARDROBE, "colour", "colour", FieldType.CHOICE, multi = true, attaches = PresetAttach.WEARABLE_TAG),
-        PresetDef(WARDROBE, "material", "material", FieldType.CHOICE, multi = true, attaches = PresetAttach.WEARABLE_TAG),
+        PresetDef(
+            WARDROBE, "material", "material", FieldType.CHOICE, multi = true, attaches = PresetAttach.WEARABLE_TAG,
+        ),
         PresetDef(
             WARDROBE, "season", "season", FieldType.CHOICE, multi = true,
             choices = listOf("spring", "summer", "autumn", "winter"), attaches = PresetAttach.WEARABLE_TAG,
         ),
-        PresetDef(WARDROBE, "occasion", "occasion", FieldType.CHOICE, multi = true, attaches = PresetAttach.WEARABLE_TAG),
+        PresetDef(
+            WARDROBE, "occasion", "occasion", FieldType.CHOICE, multi = true, attaches = PresetAttach.WEARABLE_TAG,
+        ),
         PresetDef(WARDROBE, "last_worn", "last worn", FieldType.DATE, attaches = PresetAttach.WEARABLE_TAG),
         PresetDef(
             WARDROBE, "laundry", "laundry", FieldType.CHOICE,
@@ -61,13 +68,17 @@ object Presets {
         ),
         PresetDef(
             PANTRY, "counting_unit", "counting unit", FieldType.CHOICE,
-            choices = listOf("grams", "millilitres", "pieces", "packs"), fixedChoices = true, attaches = PresetAttach.CONSUMABLE_TAG,
+            choices = listOf("grams", "millilitres", "pieces", "packs"), fixedChoices = true,
+            attaches = PresetAttach.CONSUMABLE_TAG,
         ),
         // In the counting unit: the unit is the item's own counting unit, so none is stored here.
         PresetDef(PANTRY, "minimum_stock", "minimum stock", FieldType.NUMBER, attaches = PresetAttach.CONSUMABLE_TAG),
         // One pick from the person's category list (R122); shown only while the savings export is on (R125).
         PresetDef(SHOPPING, "category", "category", FieldType.CHOICE, attaches = PresetAttach.EVERY_ITEM),
-        PresetDef(SHOPPING, "may_need_bag", "may need a bag", FieldType.CHECKBOX, attaches = PresetAttach.SINGLE_ITEMS_AND_WISHES),
+        PresetDef(
+            SHOPPING, "may_need_bag", "may need a bag", FieldType.CHECKBOX,
+            attaches = PresetAttach.SINGLE_ITEMS_AND_WISHES,
+        ),
     )
 
     /** The row a field was made from, or null for a field of the person's own or a row this version does not know. */

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f175a98711382d9ea69f2134b9ac4cb7",
+    "identityHash": "0cd67763bed28bec4ee7b26e1ca8c872",
     "entities": [
       {
         "tableName": "purge_registry",
@@ -278,7 +278,20 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_sync_lost_tbl_row_id_grp",
+            "unique": false,
+            "columnNames": [
+              "tbl",
+              "row_id",
+              "grp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sync_lost_tbl_row_id_grp` ON `${TABLE_NAME}` (`tbl`, `row_id`, `grp`)"
+          }
+        ]
       },
       {
         "tableName": "tag_kind",
@@ -1208,7 +1221,7 @@
       },
       {
         "tableName": "field_def",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `name_hlc` INTEGER NOT NULL, `name_device` TEXT NOT NULL, `type` TEXT NOT NULL, `type_hlc` INTEGER NOT NULL, `type_device` TEXT NOT NULL, `unit` TEXT, `unit_hlc` INTEGER NOT NULL, `unit_device` TEXT NOT NULL, `multi` INTEGER NOT NULL, `multi_hlc` INTEGER NOT NULL, `multi_device` TEXT NOT NULL, `options` TEXT NOT NULL, `options_hlc` INTEGER NOT NULL, `options_device` TEXT NOT NULL, `preset_module` TEXT, `preset_key` TEXT, `preset_hlc` INTEGER NOT NULL, `preset_device` TEXT NOT NULL, `hidden` INTEGER NOT NULL, `hidden_hlc` INTEGER NOT NULL, `hidden_device` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `name_hlc` INTEGER NOT NULL, `name_device` TEXT NOT NULL, `type` TEXT NOT NULL, `type_hlc` INTEGER NOT NULL, `type_device` TEXT NOT NULL, `unit` TEXT, `unit_hlc` INTEGER NOT NULL, `unit_device` TEXT NOT NULL, `multi` INTEGER NOT NULL, `multi_hlc` INTEGER NOT NULL, `multi_device` TEXT NOT NULL, `preset_module` TEXT, `preset_key` TEXT, `preset_hlc` INTEGER NOT NULL, `preset_device` TEXT NOT NULL, `hidden` INTEGER NOT NULL, `hidden_hlc` INTEGER NOT NULL, `hidden_device` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -1288,24 +1301,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "options",
-            "columnName": "options",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "optionsHlc",
-            "columnName": "options_hlc",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "optionsDevice",
-            "columnName": "options_device",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "presetModule",
             "columnName": "preset_module",
             "affinity": "TEXT"
@@ -1352,6 +1347,90 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "field_option",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `def_id` TEXT NOT NULL, `name` TEXT NOT NULL, `name_hlc` INTEGER NOT NULL, `name_device` TEXT NOT NULL, `position` INTEGER NOT NULL, `order_hlc` INTEGER NOT NULL, `order_device` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`def_id`) REFERENCES `field_def`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defId",
+            "columnName": "def_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameHlc",
+            "columnName": "name_hlc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameDevice",
+            "columnName": "name_device",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderHlc",
+            "columnName": "order_hlc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderDevice",
+            "columnName": "order_device",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_field_option_def_id",
+            "unique": false,
+            "columnNames": [
+              "def_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_field_option_def_id` ON `${TABLE_NAME}` (`def_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "field_def",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "def_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "field_attach",
@@ -1536,7 +1615,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f175a98711382d9ea69f2134b9ac4cb7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0cd67763bed28bec4ee7b26e1ca8c872')"
     ]
   }
 }

@@ -14,6 +14,7 @@ import com.hazia.chatelaine.core.sync.Stamp
 import com.hazia.chatelaine.data.sync.EntityTable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
@@ -34,7 +35,9 @@ internal const val VALUE = "value"
  */
 @Entity(
     tableName = FIELD_VALUE,
-    foreignKeys = [ForeignKey(FieldDefEntity::class, ["id"], ["def_id"], onDelete = ForeignKey.CASCADE, deferred = true)],
+    foreignKeys = [
+        ForeignKey(FieldDefEntity::class, ["id"], ["def_id"], onDelete = ForeignKey.CASCADE, deferred = true),
+    ],
     indices = [Index("owner_id"), Index("def_id")],
 )
 internal data class FieldValueEntity(
@@ -57,6 +60,9 @@ internal interface FieldValueDao {
     @Query("SELECT * FROM field_value WHERE id = :id")
     suspend fun value(id: String): FieldValueEntity?
 
+    @Query("SELECT * FROM field_value WHERE owner_id = :ownerId ORDER BY id")
+    suspend fun valuesOfOwner(ownerId: String): List<FieldValueEntity>
+
     @Upsert
     suspend fun putValues(rows: List<FieldValueEntity>)
 
@@ -65,7 +71,10 @@ internal interface FieldValueDao {
 }
 
 internal fun fieldValueTable(dao: FieldValueDao) =
-    EntityTable(dao::values, dao::allValues, dao::putValues, dao::deleteValues, FieldValueEntity::toRow, Row::toFieldValueEntity) {
+    EntityTable(
+        dao::values, dao::allValues, dao::putValues, dao::deleteValues,
+        FieldValueEntity::toRow, Row::toFieldValueEntity,
+    ) {
         listOf(FIELD_DEF to it.defId)
     }
 
@@ -134,7 +143,8 @@ private fun two(n: Int) = n.toString().padStart(2, '0')
 internal fun encodeInput(input: FieldInput): String {
     val (kind, v) = when (input) {
         is FieldInput.Text -> "text" to JsonPrimitive(input.s)
-        is FieldInput.Number -> "number" to JsonObject(mapOf("n" to JsonPrimitive(input.n), "u" to JsonPrimitive(input.unit)))
+        is FieldInput.Number ->
+            "number" to JsonObject(mapOf("n" to JsonPrimitive(input.n), "u" to JsonPrimitive(input.unit)))
         is FieldInput.Date -> "date" to JsonPrimitive(
             "${input.year.toString().padStart(4, '0')}-${two(input.month)}" + (input.day?.let { "-${two(it)}" } ?: ""),
         )
@@ -153,7 +163,8 @@ internal fun decodeInput(json: String): FieldInput {
     return when (val kind = o.getValue("k").jsonPrimitive.content) {
         "text" -> FieldInput.Text(v.jsonPrimitive.content)
         "number" -> v.jsonObject.let {
-            FieldInput.Number(it.getValue("n").jsonPrimitive.double, it.getValue("u").jsonPrimitive.let { u -> if (u is kotlinx.serialization.json.JsonNull) null else u.content })
+            val unit = it.getValue("u").jsonPrimitive
+            FieldInput.Number(it.getValue("n").jsonPrimitive.double, if (unit is JsonNull) null else unit.content)
         }
         "date" -> v.jsonPrimitive.content.split('-').map { it.toInt() }.let {
             require(it.size in 2..3) { "date $v" }

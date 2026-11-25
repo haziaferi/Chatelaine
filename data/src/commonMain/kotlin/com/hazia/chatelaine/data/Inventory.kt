@@ -22,6 +22,8 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     private val placeLinks get() = db.placeTagDao()
     private val photos get() = db.photoDao()
     private val regions get() = db.photoRegionDao()
+    private val fieldValues get() = db.fieldValueDao()
+    private val fieldAttaches get() = db.fieldAttachDao()
 
     // ---- items ----
 
@@ -74,7 +76,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
                 val groups = original.groups.mapValues { (_, g) -> Group(s, g.values) } + (QUANTITY to one)
                 writes.merger.created(store, Row(ITEM, copy, groups))
             }
-            for (c in linkCopies) writes.merger.created(store, linkRow(s, c.item, c.tag, c.suggested))
+            for (c in linkCopies) writes.createDerived(store, linkRow(s, c.item, c.tag, c.suggested))
         }
         return listOf(itemId) + copies
     }
@@ -95,14 +97,24 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         val linkIds = mutableListOf<String>()
         val photoIds = mutableListOf<String>()
         val regionIds = mutableSetOf<String>()
+        val valueIds = mutableListOf<String>()
+        val attachIds = mutableListOf<String>()
         writes.write({
             requireNotNull(items.item(itemId)) { "no item $itemId" }
+            valueIds += fieldValues.valuesOfOwner(itemId).map { it.id }
+            attachIds += fieldAttaches.attachesToItem(itemId).map { it.id }
             linkIds += links.linksOfItem(itemId).map { it.id }
             photoIds += photos.photosOfItem(itemId).map { it.id }
             photoIds.forEach { p -> regionIds += regions.regionsOfPhoto(p).map { it.id } }
             regionIds += regions.regionsOfItem(itemId).map { it.id }
-            mapOf(ITEM to listOf(itemId), ITEM_TAG to linkIds.toList(), PHOTO to photoIds.toList(), PHOTO_REGION to regionIds.toList())
+            mapOf(
+                ITEM to listOf(itemId), ITEM_TAG to linkIds.toList(), PHOTO to photoIds.toList(),
+                PHOTO_REGION to regionIds.toList(),
+                FIELD_VALUE to valueIds.toList(), FIELD_ATTACH to attachIds.toList(),
+            )
         }) { store, _ ->
+            valueIds.forEach { writes.merger.purge(store, it) }
+            attachIds.forEach { writes.merger.purge(store, it) }
             regionIds.forEach { writes.merger.purge(store, it) }
             photoIds.forEach { writes.merger.purge(store, it) }
             linkIds.forEach { writes.merger.purge(store, it) }
@@ -176,8 +188,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             val s = writes.clock.tick()
             for (item in fresh) {
                 // The pair may have been untagged before: its purge ends with the new link.
-                store.removePurge(linkId(item, tagId))
-                writes.merger.created(store, linkRow(s, item, tagId))
+                writes.createDerived(store, linkRow(s, item, tagId))
             }
             for (id in accepted) store.put(requireNotNull(store.row(id)).edit(SUGGESTED, s, mapOf("suggested" to false)))
         }
@@ -214,8 +225,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             val s = writes.clock.tick()
             if (newTag) writes.merger.created(store, tagRow(tagId, s, trimmed))
             if (newLink) {
-                store.removePurge(linkId(itemId, tagId))
-                writes.merger.created(store, linkRow(s, itemId, tagId, suggested = true))
+                writes.createDerived(store, linkRow(s, itemId, tagId, suggested = true))
             }
         }
         return tagId
@@ -418,6 +428,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         val homeTagIds = mutableListOf<String>()
         val photoIds = mutableListOf<String>()
         val regionIds = mutableListOf<String>()
+        val valueIds = mutableListOf<String>()
         val photographed = mutableSetOf<String>() // the items and the parent place that have a photo
         var up: String? = null
         writes.write({
@@ -428,6 +439,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             itemIds += places.itemsIn(placeId).map { it.id }
             linkIds += placeLinks.linksOfPlace(placeId).map { it.id }
             photoIds += photos.photosOfPlace(placeId).map { it.id }
+            valueIds += fieldValues.valuesOfOwner(placeId).map { it.id }
             photoIds.forEach { p -> regionIds += regions.regionsOfPhoto(p).map { it.id } }
             photographed += readChunked(itemIds.toList()) { photos.itemIdsWithPhotos(it) }
             photographed += readChunked(listOfNotNull(up)) { photos.placeIdsWithPhotos(it) }
@@ -438,9 +450,11 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
                 PLACE_TAG to linkIds.toList(),
                 PHOTO to photoIds.toList(),
                 PHOTO_REGION to regionIds.toList(),
+                FIELD_VALUE to valueIds.toList(),
             )
         }) { store, _ ->
             val s = writes.clock.tick()
+            valueIds.forEach { writes.merger.purge(store, it) }
             val parent = up
             regionIds.forEach { writes.merger.purge(store, it) }
             photoIds.forEach { writes.merger.purge(store, it) }
@@ -476,8 +490,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         }) { store, _ ->
             if (fresh) {
                 // The pair may have been untagged before: its purge ends with the new link.
-                store.removePurge(id)
-                writes.merger.created(store, Row(PLACE_TAG, id, mapOf(
+                writes.createDerived(store, Row(PLACE_TAG, id, mapOf(
                     LINK to Group(writes.clock.tick(), mapOf("placeId" to placeId, "tagId" to tagId)),
                 )))
             }

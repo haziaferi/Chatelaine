@@ -13,6 +13,7 @@ import com.hazia.chatelaine.data.sync.readChunked
 class Fields internal constructor(private val db: ChatelaineDatabase, private val writes: LocalWrites) {
 
     private val defs get() = db.fieldDefDao()
+    private val fieldOptions get() = db.fieldOptionDao()
     private val attaches get() = db.fieldAttachDao()
     private val values get() = db.fieldValueDao()
     private val items get() = db.itemDao()
@@ -32,64 +33,110 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
         unit: String? = null,
         multi: Boolean = false,
         options: List<String> = emptyList(),
-    ): String = create(name, type, unit, multi, options, null)
+    ): String = create(Ids.new(), name, type, unit, multi, options, null)
 
     /**
      * The field R45's [preset] describes, with its choices, not yet attached anywhere: turning its module on does
-     * that. A field made from a preset with fixed choices takes no choice added or removed.
+     * that. Its id comes from the module and key, and so do its choices' ids, so two devices that make it make the
+     * same rows; made again, it is left as it is. A field made from a preset with fixed choices takes no choice
+     * added or removed.
      */
     suspend fun definePreset(preset: PresetDef): String =
-        create(preset.name, preset.type, preset.unit, preset.multi, preset.choices, preset)
+        create(
+            linkId("preset:${preset.module}", preset.key), preset.name, preset.type, preset.unit, preset.multi,
+            preset.choices, preset,
+        )
 
-    private suspend fun create(name: String, type: FieldType, unit: String?, multi: Boolean, options: List<String>, preset: PresetDef?): String {
+    @Suppress("LongParameterList")
+    private suspend fun create(
+        id: String,
+        name: String,
+        type: FieldType,
+        unit: String?,
+        multi: Boolean,
+        options: List<String>,
+        preset: PresetDef?,
+    ): String {
         val trimmed = name.trim()
+        val unitName = unit?.trim()
+        val choices = options.map { it.trim() }
         require(trimmed.isNotEmpty()) { "a field needs a name" }
-        require(unit == null || (type == FieldType.NUMBER && unit.isNotBlank())) { "only a number has a unit" }
-        require(!multi || type == FieldType.CHOICE || type == FieldType.LINK) { "only a choice list or a link takes several" }
-        require(options.isEmpty() || type == FieldType.CHOICE) { "only a choice list has options" }
-        require(options.all { it.isNotBlank() }) { "a choice needs a name" }
-        val id = Ids.new()
-        val list = options.map { FieldOption(Ids.new(), it.trim()) }
-        writes.write(mapOf(FIELD_DEF to listOf(id))) { store ->
+        require(unitName == null || (type == FieldType.NUMBER && unitName.isNotEmpty())) { "only a number has a unit" }
+        require(!multi || type == FieldType.CHOICE || type == FieldType.LINK) {
+            "only a choice list or a link takes several"
+        }
+        require(choices.isEmpty() || type == FieldType.CHOICE) { "only a choice list has options" }
+        require(choices.all { it.isNotEmpty() }) { "a choice needs a name" }
+        require(choices.map { it.lowercase() }.toSet().size == choices.size) { "a choice is listed once" }
+        val optionIds = choices.map { choiceId(id, it, preset) }
+        var fresh = true
+        writes.write({
+            fresh = preset == null || defs.def(id) == null
+            mapOf(
+                FIELD_DEF to if (fresh) listOf(id) else emptyList(),
+                FIELD_OPTION to if (fresh) optionIds else emptyList(),
+            )
+        }) { store, _ ->
+            if (!fresh) return@write
             val s = writes.clock.tick()
-            writes.merger.created(store, Row(FIELD_DEF, id, mapOf(
+            val row = Row(FIELD_DEF, id, mapOf(
                 NAME to Group(s, mapOf("name" to trimmed)),
                 TYPE to Group(s, mapOf("type" to type.name)),
-                UNIT to Group(s, mapOf("unit" to unit)),
+                UNIT to Group(s, mapOf("unit" to unitName)),
                 MULTI to Group(s, mapOf("multi" to multi)),
-                OPTIONS to Group(s, mapOf("options" to encodeOptions(list))),
                 PRESET to Group(s, mapOf("module" to preset?.module, "key" to preset?.key)),
                 HIDDEN to Group(s, mapOf("hidden" to false)),
-            )))
+            ))
+            if (preset == null) writes.merger.created(store, row) else writes.createDerived(store, row)
+            choices.forEachIndexed { position, choice ->
+                val option = choiceRow(optionIds[position], id, choice, position.toLong(), s)
+                if (preset == null) writes.merger.created(store, option) else writes.createDerived(store, option)
+            }
         }
         return id
     }
 
+    private fun choiceId(defId: String, name: String, preset: PresetDef?) =
+        if (preset == null) Ids.new() else presetOptionId(defId, name)
+
+    private fun choiceRow(id: String, defId: String, name: String, position: Long, s: Stamp) =
+        Row(FIELD_OPTION, id, mapOf(
+        NAME to Group(s, mapOf("defId" to defId, "name" to name)),
+        ORDER to Group(s, mapOf("position" to position)),
+        ))
+
     suspend fun getDef(defId: String): FieldDef? = defs.def(defId)?.toFieldDef()
 
     /** Every field, hidden ones included, by name. */
-    suspend fun allDefs(): List<FieldDef> = defs.allDefs().map { it.toFieldDef() }.sortedWith(compareBy({ it.name.lowercase() }, { it.id }))
+    suspend fun allDefs(): List<FieldDef> =
+        defs.allDefs().map { it.toFieldDef() }.sortedWith(compareBy({ it.name.lowercase() }, { it.id }))
 
     /** The choices of a choice list, in order. */
-    suspend fun options(defId: String): List<FieldOption> = requireNotNull(defs.def(defId)) { "no field $defId" }.let { parseOptions(it.options) }
+    suspend fun options(defId: String): List<FieldOption> {
+        requireNotNull(defs.def(defId)) { "no field $defId" }
+        return fieldOptions.optionsOf(defId).map { it.toOption() }
+    }
 
     suspend fun rename(defId: String, name: String) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "a field needs a name" }
-        writes.edit(FIELD_DEF, defId, NAME, { requireNotNull(defs.def(defId)) { "no field $defId" } }) { mapOf("name" to trimmed) }
+        writes.edit(FIELD_DEF, defId, NAME, { requireNotNull(defs.def(defId)) { "no field $defId" } }) {
+            mapOf("name" to trimmed)
+        }
     }
 
     /** A hidden field is not offered on items, and keeps its values (R45). */
     suspend fun setHidden(defId: String, hidden: Boolean) =
-        writes.edit(FIELD_DEF, defId, HIDDEN, { requireNotNull(defs.def(defId)) { "no field $defId" } }) { mapOf("hidden" to hidden) }
+        writes.edit(FIELD_DEF, defId, HIDDEN, { requireNotNull(defs.def(defId)) { "no field $defId" } }) {
+            mapOf("hidden" to hidden)
+        }
 
     /** Renames a choice; its id stays, so every value that names it still does (R44, R122). */
     suspend fun renameOption(defId: String, optionId: String, name: String) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "a choice needs a name" }
-        changeOptions(defId, fixedAllowed = true) { list ->
-            require(list.any { it.id == optionId }) { "no choice $optionId in field $defId" }
-            list.map { if (it.id == optionId) it.copy(name = trimmed) else it }
+        writes.edit(FIELD_OPTION, optionId, NAME, { choiceOf(defId, optionId, fixedAllowed = true) }) {
+            mapOf("name" to trimmed)
         }
     }
 
@@ -98,7 +145,12 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "a choice needs a name" }
         val id = Ids.new()
-        changeOptions(defId, fixedAllowed = false) { it + FieldOption(id, trimmed) }
+        var position = 0L
+        writes.write({
+            choiceListOf(defId, fixedAllowed = false)
+            position = (fieldOptions.optionsOf(defId).maxOfOrNull { it.position } ?: -1L) + 1
+            mapOf(FIELD_OPTION to listOf(id))
+        }) { store, _ -> writes.merger.created(store, choiceRow(id, defId, trimmed, position, writes.clock.tick())) }
         return id
     }
 
@@ -107,24 +159,25 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
      * reads without it.
      */
     suspend fun removeOption(defId: String, optionId: String) =
-        changeOptions(defId, fixedAllowed = false) { list ->
-            require(list.any { it.id == optionId }) { "no choice $optionId in field $defId" }
-            list.filter { it.id != optionId }
-        }
-
-    private suspend fun changeOptions(defId: String, fixedAllowed: Boolean, change: (List<FieldOption>) -> List<FieldOption>) =
         writes.write({
-            val def = requireNotNull(defs.def(defId)) { "no field $defId" }
-            require(def.type == FieldType.CHOICE.name) { "field $defId is not a choice list" }
-            require(fixedAllowed || Presets.of(def.presetModule, def.presetKey)?.fixedChoices != true) {
-                "the choices of ${def.name} are fixed: they can be renamed, not added to or removed"
-            }
-            mapOf(FIELD_DEF to listOf(defId))
-        }) { store, _ ->
-            val row = requireNotNull(store.row(defId)) { "no field $defId" }
-            val now = parseOptions(row.groups.getValue(OPTIONS).values["options"] as String)
-            store.put(row.edit(OPTIONS, writes.clock.tick(), mapOf("options" to encodeOptions(change(now)))))
+            choiceOf(defId, optionId, fixedAllowed = false)
+            mapOf(FIELD_OPTION to listOf(optionId))
+        }) { store, _ -> writes.merger.purge(store, optionId) }
+
+    private suspend fun choiceListOf(defId: String, fixedAllowed: Boolean) {
+        val def = requireNotNull(defs.def(defId)) { "no field $defId" }
+        require(def.type == FieldType.CHOICE.name) { "field $defId is not a choice list" }
+        require(fixedAllowed || Presets.of(def.presetModule, def.presetKey)?.fixedChoices != true) {
+            "the choices of ${def.name} are fixed: they can be renamed, not added to or removed"
         }
+    }
+
+    private suspend fun choiceOf(defId: String, optionId: String, fixedAllowed: Boolean) {
+        choiceListOf(defId, fixedAllowed)
+        require(fieldOptions.options(listOf(optionId)).any { it.defId == defId }) {
+            "no choice $optionId in field $defId"
+        }
+    }
 
     // ---- where a field attaches (R46) ----
 
@@ -134,27 +187,35 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
 
     /** Puts [defId] on this one item. */
     suspend fun attachToItem(defId: String, itemId: String) =
-        attach(defId, "item:$itemId", { requireNotNull(items.item(itemId)) { "no item $itemId" } }) { it.copy(itemId = itemId) }
+        attach(defId, "item:$itemId", { requireNotNull(items.item(itemId)) { "no item $itemId" } }) {
+            it.copy(itemId = itemId)
+        }
 
-    private suspend fun attach(defId: String, target: String, check: suspend () -> Unit, with: (Target) -> Target) {
+    private suspend fun attach(defId: String, target: String, exists: suspend () -> Unit, aim: (Target) -> Target) {
         val id = attachId(defId, target)
         writes.write({
             requireNotNull(defs.def(defId)) { "no field $defId" }
-            check()
+            exists()
             mapOf(FIELD_ATTACH to listOf(id))
         }) { store, _ ->
-            // Attached already, on this or another device: one row per pair.
+            // Attached already, here or by another device: one row per pair.
             if (store.row(id) != null) return@write
-            val t = with(Target())
-            writes.merger.created(store, Row(FIELD_ATTACH, id, mapOf(
+            val t = aim(Target())
+            writes.createDerived(store, Row(FIELD_ATTACH, id, mapOf(
                 TARGET to Group(writes.clock.tick(), mapOf(
-                    "defId" to defId, "tagId" to t.tagId, "itemId" to t.itemId, "wishId" to t.wishId, "everyItem" to t.everyItem,
+                    "defId" to defId, "tagId" to t.tagId, "itemId" to t.itemId, "wishId" to t.wishId,
+                    "everyItem" to t.everyItem,
                 )),
             )))
         }
     }
 
-    private data class Target(val tagId: String? = null, val itemId: String? = null, val wishId: String? = null, val everyItem: Boolean = false)
+    private data class Target(
+        val tagId: String? = null,
+        val itemId: String? = null,
+        val wishId: String? = null,
+        val everyItem: Boolean = false,
+    )
 
     /**
      * The fields on an item, each once, by name (R46): those attached to a tag the item carries or to any of that
@@ -189,12 +250,12 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
         writes.write({
             val def = requireNotNull(defs.def(defId)) { "no field $defId" }.toFieldDef()
             require(items.item(ownerId) != null || places.place(ownerId) != null) { "no item or place $ownerId" }
-            check(def, value)
+            requireFits(def, fieldOptions.optionsOf(defId).map { it.toOption() }, value)
             mapOf(FIELD_VALUE to listOf(id))
         }) { store, _ ->
             val row = store.row(id)
             if (row == null) {
-                writes.merger.created(store, Row(FIELD_VALUE, id, mapOf(
+                writes.createDerived(store, Row(FIELD_VALUE, id, mapOf(
                     VALUE to Group(writes.clock.tick(), mapOf("ownerId" to ownerId, "defId" to defId, "json" to json)),
                 )))
             } else if (row.groups.getValue(VALUE).values["json"] != json) {
@@ -203,7 +264,7 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
         }
     }
 
-    private fun check(def: FieldDef, value: FieldInput) {
+    private fun requireFits(def: FieldDef, options: List<FieldOption>, value: FieldInput) {
         val fits = when (value) {
             is FieldInput.Text -> def.type == FieldType.TEXT
             is FieldInput.Number -> def.type == FieldType.NUMBER
@@ -216,7 +277,7 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
         require(fits) { "${def.name} is a ${def.type} field: it does not take $value" }
         when (value) {
             is FieldInput.Choice -> {
-                val known = def.options.map { it.id }.toSet()
+                val known = options.map { it.id }.toSet()
                 require(value.optionIds.all { it in known }) { "${def.name} has no such choice" }
                 require(value.optionIds.distinct().size == value.optionIds.size) { "a choice is picked once" }
                 require(def.multi || value.optionIds.size <= 1) { "${def.name} takes one pick" }
@@ -235,11 +296,12 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
         val row = values.value(valueId(ownerId, defId)) ?: return null
         return when (val input = decodeInput(row.json)) {
             is FieldInput.Choice -> {
-                val known = defs.def(defId)?.let { parseOptions(it.options) }.orEmpty().map { it.id }.toSet()
+                val known = fieldOptions.optionsOf(defId).map { it.id }.toSet()
                 FieldInput.Choice(input.optionIds.filter { it in known })
             }
             is FieldInput.Link -> {
-                val here = readChunked(input.ids) { items.items(it) }.map { it.id } + readChunked(input.ids) { places.places(it) }.map { it.id }
+                val here = readChunked(input.ids) { items.items(it) }.map { it.id } +
+                    readChunked(input.ids) { places.places(it) }.map { it.id }
                 FieldInput.Link(input.ids.filter { it in here })
             }
             else -> input

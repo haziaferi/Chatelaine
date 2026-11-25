@@ -25,7 +25,9 @@ const val FIELD_ATTACH = "field_attach"
  */
 @Entity(
     tableName = FIELD_ATTACH,
-    foreignKeys = [ForeignKey(FieldDefEntity::class, ["id"], ["def_id"], onDelete = ForeignKey.CASCADE, deferred = true)],
+    foreignKeys = [
+        ForeignKey(FieldDefEntity::class, ["id"], ["def_id"], onDelete = ForeignKey.CASCADE, deferred = true),
+    ],
     indices = [Index("def_id"), Index("tag_id"), Index("item_id")],
 )
 internal data class FieldAttachEntity(
@@ -64,7 +66,10 @@ internal interface FieldAttachDao {
 }
 
 internal fun fieldAttachTable(dao: FieldAttachDao) =
-    EntityTable(dao::attaches, dao::allAttaches, dao::putAttaches, dao::deleteAttaches, FieldAttachEntity::toRow, Row::toFieldAttachEntity) {
+    EntityTable(
+        dao::attaches, dao::allAttaches, dao::putAttaches, dao::deleteAttaches,
+        FieldAttachEntity::toRow, Row::toFieldAttachEntity,
+    ) {
         listOf(FIELD_DEF to it.defId)
     }
 
@@ -89,5 +94,8 @@ internal fun Row.toFieldAttachEntity(): FieldAttachEntity {
     )
 }
 
-/** The id of the attachment of [defId] to [target] (`tag:<id>`, `item:<id>`, `wish:<id>` or `every`), the same on every device. */
+/**
+ * The id of the attachment of [defId] to [target] (`tag:<id>`, `item:<id>`, `wish:<id>` or `every`), the same on
+ * every device.
+ */
 internal fun attachId(defId: String, target: String): String = linkId("attach:$defId", target)

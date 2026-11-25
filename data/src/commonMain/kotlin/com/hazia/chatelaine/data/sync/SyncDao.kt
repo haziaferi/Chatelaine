@@ -87,7 +87,7 @@ internal data class WaitingEntity(
  * A version the merge replaced in a keep-loser group (`SyncStore.lost`), local only,
  * waiting for the after-import step to keep it in the page's History and raise its notice.
  */
-@Entity(tableName = "sync_lost")
+@Entity(tableName = "sync_lost", indices = [Index(value = ["tbl", "row_id", "grp"])])
 internal data class LostEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "row_id") val rowId: String,
@@ -104,6 +104,12 @@ internal interface SyncDao {
 
     @Query("SELECT * FROM sync_lost ORDER BY id")
     suspend fun lost(): List<LostEntity>
+
+    @Query("SELECT * FROM sync_lost WHERE tbl = :table AND row_id = :rowId AND grp = :group ORDER BY id")
+    suspend fun lostFor(table: String, rowId: String, group: String): List<LostEntity>
+
+    @Query("SELECT * FROM sync_lost WHERE id = :id")
+    suspend fun lostById(id: Long): LostEntity?
 
     @Query("DELETE FROM sync_lost WHERE id IN (:ids)")
     suspend fun clearLost(ids: List<Long>)

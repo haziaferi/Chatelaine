@@ -4,6 +4,7 @@ import androidx.room.immediateTransaction
 import androidx.room.useWriterConnection
 import com.hazia.chatelaine.core.sync.HybridClock
 import com.hazia.chatelaine.core.sync.Merger
+import com.hazia.chatelaine.core.sync.Row
 import com.hazia.chatelaine.core.sync.Stamp
 import com.hazia.chatelaine.data.sync.StagedStore
 import com.hazia.chatelaine.data.sync.saveClock
@@ -18,6 +19,16 @@ internal class LocalWrites(private val db: ChatelaineDatabase, val clock: Hybrid
     private val sync = db.syncDao()
     /** The synced tables, as the merge sees them; a restore checks a backup's rows against them. */
     val tables = db.syncedTables()
+
+    /**
+     * Makes a row whose id comes from what it joins ([linkId]), the same on every device. It has no base: two devices
+     * that make it first each hold a version the other has not seen, so the peer's first version meets this one as a
+     * clash and the earlier of the two goes to history (R54). A purge left by an earlier delete of the same pair ends.
+     */
+    fun createDerived(store: StagedStore, row: Row) {
+        store.removePurge(row.id)
+        store.put(row)
+    }
 
     /** Writes the rows [ids] names, table by table, as [block] changes them. */
     suspend fun write(ids: Map<String, List<String>>, block: (StagedStore) -> Unit) = write({ ids }) { store, _ -> block(store) }

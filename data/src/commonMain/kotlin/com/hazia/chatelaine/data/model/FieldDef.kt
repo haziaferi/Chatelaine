@@ -10,13 +10,6 @@ import com.hazia.chatelaine.core.sync.Group
 import com.hazia.chatelaine.core.sync.Row
 import com.hazia.chatelaine.core.sync.Stamp
 import com.hazia.chatelaine.data.sync.EntityTable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 /** The field-definition table's name. */
 const val FIELD_DEF = "field_def"
@@ -24,7 +17,6 @@ const val FIELD_DEF = "field_def"
 internal const val TYPE = "type"
 internal const val UNIT = "unit"
 internal const val MULTI = "multi"
-internal const val OPTIONS = "options"
 internal const val PRESET = "preset"
 internal const val HIDDEN = "hidden"
 
@@ -35,9 +27,9 @@ enum class FieldType { TEXT, NUMBER, DATE, CHOICE, CHECKBOX, LINK, WEB_LINK }
 data class FieldOption(val id: String, val name: String)
 
 /**
- * A custom field (R43, R44), defined once and attached to tags or items. Each part is its own sync group. [options]
- * is the whole choice list as a JSON array of `{id, name}`, one group, so two devices that edit the list at once keep
- * the later list and the earlier one in history. [presetModule] and [presetKey] name the R45 row a preset field was
+ * A custom field (R43, R44), defined once and attached to tags or items. Each part is its own sync group. The
+ * choices of a choice list are rows of their own ([FieldOptionEntity]). [presetModule] and [presetKey] name the R45
+ * row a preset field was
  * made from, and are null for a field of the person's own.
  */
 @Entity(tableName = FIELD_DEF)
@@ -55,9 +47,6 @@ internal data class FieldDefEntity(
     val multi: Boolean,
     @ColumnInfo(name = "multi_hlc") val multiHlc: Long,
     @ColumnInfo(name = "multi_device") val multiDevice: String,
-    val options: String,
-    @ColumnInfo(name = "options_hlc") val optionsHlc: Long,
-    @ColumnInfo(name = "options_device") val optionsDevice: String,
     @ColumnInfo(name = "preset_module") val presetModule: String?,
     @ColumnInfo(name = "preset_key") val presetKey: String?,
     @ColumnInfo(name = "preset_hlc") val presetHlc: Long,
@@ -86,31 +75,29 @@ internal interface FieldDefDao {
 }
 
 internal fun fieldDefTable(dao: FieldDefDao) =
-    EntityTable(dao::defs, dao::allDefs, dao::putDefs, dao::deleteDefs, FieldDefEntity::toRow, Row::toFieldDefEntity) { emptyList() }
+    EntityTable(
+        dao::defs, dao::allDefs, dao::putDefs, dao::deleteDefs, FieldDefEntity::toRow, Row::toFieldDefEntity,
+    ) { emptyList() }
 
 internal fun FieldDefEntity.toRow() = Row(FIELD_DEF, id, mapOf(
     NAME to Group(Stamp(nameHlc, nameDevice), mapOf("name" to name)),
     TYPE to Group(Stamp(typeHlc, typeDevice), mapOf("type" to type)),
     UNIT to Group(Stamp(unitHlc, unitDevice), mapOf("unit" to unit)),
     MULTI to Group(Stamp(multiHlc, multiDevice), mapOf("multi" to multi)),
-    OPTIONS to Group(Stamp(optionsHlc, optionsDevice), mapOf("options" to options)),
     PRESET to Group(Stamp(presetHlc, presetDevice), mapOf("module" to presetModule, "key" to presetKey)),
     HIDDEN to Group(Stamp(hiddenHlc, hiddenDevice), mapOf("hidden" to hidden)),
 ))
 
-/** Throws when [this] is not a field definition this version can read: an unknown type, or options that are not a list. */
+/** Throws when [this] is not a field definition this version can read, such as one of an unknown type. */
 internal fun Row.toFieldDefEntity(): FieldDefEntity {
     val name = groups.getValue(NAME)
     val type = groups.getValue(TYPE)
     val unit = groups.getValue(UNIT)
     val multi = groups.getValue(MULTI)
-    val options = groups.getValue(OPTIONS)
     val preset = groups.getValue(PRESET)
     val hidden = groups.getValue(HIDDEN)
     val typeName = type.values["type"] as String
     FieldType.valueOf(typeName)
-    val optionsJson = options.values["options"] as String
-    parseOptions(optionsJson)
     return FieldDefEntity(
         id = id,
         name = name.values["name"] as String,
@@ -125,9 +112,6 @@ internal fun Row.toFieldDefEntity(): FieldDefEntity {
         multi = multi.values["multi"] as Boolean,
         multiHlc = multi.stamp.hlc,
         multiDevice = multi.stamp.device,
-        options = optionsJson,
-        optionsHlc = options.stamp.hlc,
-        optionsDevice = options.stamp.device,
         presetModule = preset.values["module"] as String?,
         presetKey = preset.values["key"] as String?,
         presetHlc = preset.stamp.hlc,
@@ -145,20 +129,10 @@ data class FieldDef(
     val type: FieldType,
     val unit: String?,
     val multi: Boolean,
-    val options: List<FieldOption>,
     val presetModule: String?,
     val presetKey: String?,
     val hidden: Boolean,
 )
 
 internal fun FieldDefEntity.toFieldDef() =
-    FieldDef(id, name, FieldType.valueOf(type), unit, multi, parseOptions(options), presetModule, presetKey, hidden)
-
-internal fun encodeOptions(options: List<FieldOption>): String =
-    JsonArray(options.map { JsonObject(mapOf("id" to JsonPrimitive(it.id), "name" to JsonPrimitive(it.name))) }).toString()
-
-internal fun parseOptions(json: String): List<FieldOption> =
-    Json.parseToJsonElement(json).jsonArray.map {
-        val o = it.jsonObject
-        FieldOption(o.getValue("id").jsonPrimitive.content, o.getValue("name").jsonPrimitive.content)
-    }
+    FieldDef(id, name, FieldType.valueOf(type), unit, multi, presetModule, presetKey, hidden)

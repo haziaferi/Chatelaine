@@ -27,7 +27,7 @@ import com.hazia.chatelaine.data.sync.WaitingEntity
         WaitingEntity::class, LostEntity::class,
         TagKindEntity::class, TagEntity::class, ItemEntity::class, ItemTagEntity::class,
         PlaceEntity::class, PlaceTagEntity::class, PhotoEntity::class, PhotoRegionEntity::class,
-        FieldDefEntity::class, FieldAttachEntity::class, FieldValueEntity::class,
+        FieldDefEntity::class, FieldOptionEntity::class, FieldAttachEntity::class, FieldValueEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -44,6 +44,7 @@ abstract class ChatelaineDatabase : RoomDatabase() {
     internal abstract fun photoDao(): PhotoDao
     internal abstract fun photoRegionDao(): PhotoRegionDao
     internal abstract fun fieldDefDao(): FieldDefDao
+    internal abstract fun fieldOptionDao(): FieldOptionDao
     internal abstract fun fieldAttachDao(): FieldAttachDao
     internal abstract fun fieldValueDao(): FieldValueDao
 }
@@ -60,6 +61,7 @@ internal fun ChatelaineDatabase.syncedTables(): Map<String, RowTable> =
         PHOTO to photoTable(photoDao()),
         PHOTO_REGION to photoRegionTable(photoRegionDao()),
         FIELD_DEF to fieldDefTable(fieldDefDao()),
+        FIELD_OPTION to fieldOptionTable(fieldOptionDao()),
         FIELD_ATTACH to fieldAttachTable(fieldAttachDao()),
         FIELD_VALUE to fieldValueTable(fieldValueDao()),
     ).also { check(it.keys.toList() == SYNCED_TABLES) { "every synced table needs its export triggers" } }
@@ -77,7 +79,7 @@ internal val KEEP_LOSER_GROUPS: Set<String> = setOf(
     LINK, SUGGESTED, ORDER, // item_tag, tag_kind
     SITE, SIZE, MAP_POSITION, // place (name, parent, notes and photoOutdated are shared with items and tags)
     OWNER, BLOB, TAKEN, AREA, TARGET, // photo, photo_region, field_attach (target)
-    TYPE, UNIT, MULTI, OPTIONS, PRESET, HIDDEN, // field_def (its name is shared)
+    TYPE, UNIT, MULTI, PRESET, HIDDEN, // field_def; field_option has name and order, both shared
     VALUE, // field_value
 )
 
