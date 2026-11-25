@@ -43,3 +43,6 @@ models/
 *.gguf
 *.tflite
 *.onnx
+
+# Gradle build logs
+build-logs/
