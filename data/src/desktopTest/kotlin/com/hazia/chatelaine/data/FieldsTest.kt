@@ -180,7 +180,8 @@ class FieldsTest {
         val expected = mapOf(
             "inventory/expiry_date" to Row9("expiry_date", FieldType.DATE, null, false, none, false, s),
             "inventory/opened_on" to Row9("opened_on", FieldType.DATE, null, false, none, false, s),
-            "inventory/months_after_opening" to Row9("months_after_opening", FieldType.NUMBER, "months", false, none, false, s),
+            "inventory/months_after_opening" to
+                Row9("months_after_opening", FieldType.NUMBER, "months", false, none, false, s),
             "wardrobe/size" to Row9("size", FieldType.TEXT, null, false, none, false, w),
             "wardrobe/colour" to Row9("colour", FieldType.CHOICE, null, true, none, false, w),
             "wardrobe/material" to Row9("material", FieldType.CHOICE, null, true, none, false, w),
@@ -190,8 +191,10 @@ class FieldsTest {
             "wardrobe/laundry" to Row9("laundry", FieldType.CHOICE, null, false, laundry.choices, true, w),
             "pantry/counting_unit" to Row9("counting_unit", FieldType.CHOICE, null, false, unit.choices, true, c),
             "pantry/minimum_stock" to Row9("minimum_stock", FieldType.NUMBER, null, false, none, false, c),
-            "shopping/category" to Row9("category", FieldType.CHOICE, null, false, none, false, PresetAttach.EVERY_ITEM),
-            "shopping/may_need_bag" to Row9("may_need_bag", FieldType.CHECKBOX, null, false, none, false, PresetAttach.SINGLE_ITEMS_AND_WISHES),
+            "shopping/category" to
+                Row9("category", FieldType.CHOICE, null, false, none, false, PresetAttach.EVERY_ITEM),
+            "shopping/may_need_bag" to
+                Row9("may_need_bag", FieldType.CHECKBOX, null, false, none, false, PresetAttach.SINGLE_ITEMS_AND_WISHES),
         )
         for (p in Presets.ALL) {
             val e = expected.getValue("${p.module}/${p.key}")
@@ -221,7 +224,7 @@ class FieldsTest {
         assertEquals(4, fields.options(first).size)
     }
 
-    /** A field refuses a value of another type, several picks where it takes one, duplicate choices, and unknown owners. */
+    /** A field refuses a value of another type, several picks where it takes one, duplicate choices, unknown owners. */
     @Test
     fun refusals() = run {
         val item = inventory.addItem("hat")
@@ -233,8 +236,10 @@ class FieldsTest {
         assertFailsWith<IllegalArgumentException> { fields.set(item, one, FieldInput.Choice(ids.take(2))) }
         assertFailsWith<IllegalArgumentException> { fields.set(item, oneLink, FieldInput.Link(listOf(item, item))) }
         assertFailsWith<IllegalArgumentException> { fields.set("no-owner", text, FieldInput.Text("x")) }
-        assertFailsWith<IllegalArgumentException> { fields.define("bad", FieldType.CHOICE, options = listOf("a", " A ")) }
-        assertEquals(" kg ".trim(), fields.getDef(fields.define("w", FieldType.NUMBER, unit = " kg "))?.unit)
+        assertFailsWith<IllegalArgumentException> {
+            fields.define("bad", FieldType.CHOICE, options = listOf("a", " A "))
+        }
+        assertEquals("kg", fields.getDef(fields.define("w", FieldType.NUMBER, unit = " kg "))?.unit)
     }
 
     /** R46: a field attached to every item is on each, read through the attach row (nothing makes one yet). */
@@ -274,10 +279,23 @@ class FieldsTest {
         fields.addOption(def, "green")
         val row = db.syncedTables().getValue(FIELD_OPTION).load(listOf(red.id)).single()
         val theirs = row.edit(NAME, com.hazia.chatelaine.core.sync.Stamp(5_000, "device-b"), mapOf("name" to "crimson"))
-        writes.write(mapOf(FIELD_OPTION to listOf(red.id))) { store -> writes.merger.import(store, listOf(theirs), emptyMap()) }
+        writes.write(mapOf(FIELD_OPTION to listOf(red.id))) { store ->
+            writes.merger.import(store, listOf(theirs), emptyMap())
+        }
 
         assertEquals(listOf("crimson", "blue", "green"), fields.options(def).map { it.name })
         assertEquals(red.id, fields.options(def).first().id)
+    }
+
+    /** A choice list has each name once: adding or renaming to a name it has is refused. */
+    @Test
+    fun choiceNamesStayUnique() = run {
+        val def = fields.define("colour", FieldType.CHOICE, options = listOf("red", "blue"))
+        val red = fields.options(def).first { it.name == "red" }
+        assertFailsWith<IllegalArgumentException> { fields.addOption(def, " BLUE ") }
+        assertFailsWith<IllegalArgumentException> { fields.renameOption(def, red.id, "Blue") }
+        fields.renameOption(def, red.id, "RED")
+        assertEquals(listOf("RED", "blue"), fields.options(def).map { it.name })
     }
 
     /** R152: deleting a place takes its values with it. */

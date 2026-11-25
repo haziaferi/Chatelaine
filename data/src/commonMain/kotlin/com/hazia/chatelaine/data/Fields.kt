@@ -101,8 +101,8 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
 
     private fun choiceRow(id: String, defId: String, name: String, position: Long, s: Stamp) =
         Row(FIELD_OPTION, id, mapOf(
-        NAME to Group(s, mapOf("defId" to defId, "name" to name)),
-        ORDER to Group(s, mapOf("position" to position)),
+            NAME to Group(s, mapOf("defId" to defId, "name" to name)),
+            ORDER to Group(s, mapOf("position" to position)),
         ))
 
     suspend fun getDef(defId: String): FieldDef? = defs.def(defId)?.toFieldDef()
@@ -135,7 +135,10 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
     suspend fun renameOption(defId: String, optionId: String, name: String) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "a choice needs a name" }
-        writes.edit(FIELD_OPTION, optionId, NAME, { choiceOf(defId, optionId, fixedAllowed = true) }) {
+        writes.edit(FIELD_OPTION, optionId, NAME, {
+            choiceOf(defId, optionId, fixedAllowed = true)
+            requireNewName(defId, trimmed, optionId)
+        }) {
             mapOf("name" to trimmed)
         }
     }
@@ -148,6 +151,7 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
         var position = 0L
         writes.write({
             choiceListOf(defId, fixedAllowed = false)
+            requireNewName(defId, trimmed, null)
             position = (fieldOptions.optionsOf(defId).maxOfOrNull { it.position } ?: -1L) + 1
             mapOf(FIELD_OPTION to listOf(id))
         }) { store, _ -> writes.merger.created(store, choiceRow(id, defId, trimmed, position, writes.clock.tick())) }
@@ -163,6 +167,12 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
             choiceOf(defId, optionId, fixedAllowed = false)
             mapOf(FIELD_OPTION to listOf(optionId))
         }) { store, _ -> writes.merger.purge(store, optionId) }
+
+    /** A list has each name once, as when it is made; [exceptId] is the choice being renamed. */
+    private suspend fun requireNewName(defId: String, name: String, exceptId: String?) =
+        require(fieldOptions.optionsOf(defId).none { it.id != exceptId && it.name.equals(name, ignoreCase = true) }) {
+            "the list already has a choice named $name"
+        }
 
     private suspend fun choiceListOf(defId: String, fixedAllowed: Boolean) {
         val def = requireNotNull(defs.def(defId)) { "no field $defId" }

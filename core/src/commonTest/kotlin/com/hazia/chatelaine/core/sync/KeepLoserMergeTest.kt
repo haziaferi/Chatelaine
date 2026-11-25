@@ -43,6 +43,35 @@ class KeepLoserMergeTest {
         }
     }
 
+    /** A version this device minted itself, coming back after a later local edit, is not a loser. */
+    @Test
+    fun aDevicesOwnOlderVersionEchoedBackIsNotLost() {
+        val (merger, store) = device("A")
+        store.put(version(1, "A", "first")) // a row made without a base, as for a derived id
+        store.put(version(5, "A", "second"))
+
+        merger.import(store, listOf(version(1, "A", "first")), emptyMap())
+
+        assertEquals("second", store.text())
+        assertEquals(emptyList(), store.losses)
+    }
+
+    /** After a clash the winner edits again; its winning version echoing back from the peer records nothing. */
+    @Test
+    fun theWinnerEchoedBackAfterAClashIsNotLost() {
+        val (merger, store) = device("A")
+        merger.created(store, version(1, "A", "start"))
+        store.put(version(5, "A", "mine"))
+        merger.import(store, listOf(version(3, "B", "theirs")), emptyMap())
+        assertEquals(listOf<Any?>("theirs"), store.losses.map { it.second.values["text"] })
+        store.put(version(9, "A", "mine again"))
+
+        merger.import(store, listOf(version(5, "A", "mine")), emptyMap())
+
+        assertEquals("mine again", store.text())
+        assertEquals(1, store.losses.size)
+    }
+
     private companion object {
         const val TEXT = "text"
     }

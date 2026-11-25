@@ -14,7 +14,7 @@ data class Stamp(val hlc: Long, val device: String) : Comparable<Stamp> {
  * so a wall clock set backwards across a restart cannot issue an older stamp.
  */
 class HybridClock(
-    private val device: String,
+    val device: String,
     private val wallMillis: () -> Long,
     last: Long = 0,
 ) {

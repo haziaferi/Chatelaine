@@ -31,7 +31,7 @@ class HistoryTest {
 
     private fun <T> run(block: suspend () -> T): T = runBlocking { block() }
 
-    /** R54: A names the item "clip", B later "hair clip"; the merge keeps "hair clip" and "clip" can be brought back. */
+    /** R54: A names the item "clip", B later "hair clip"; the merge keeps "hair clip", and "clip" can be restored. */
     @Test
     fun overwrittenValueCanBeRestored() = run {
         val id = inventory.addItem("start")
@@ -122,6 +122,65 @@ class HistoryTest {
 
         assertFalse(inventory.isSuggested(item, tag))
         assertEquals(true, history.overwritten(ITEM_TAG, id, SUGGESTED).single().values["suggested"])
+    }
+
+    /** A value this device set, edited again before its echo from a peer arrives, loses nothing to the echo. */
+    @Test
+    fun ownEchoAfterALocalEditIsNotAHistoryEntry() = run {
+        val item = inventory.addItem("jar")
+        val def = fields.define("note", FieldType.TEXT)
+        fields.set(item, def, FieldInput.Text("one"))
+        val id = valueId(item, def)
+        val echo = db.syncedTables().getValue(FIELD_VALUE).load(listOf(id)).single()
+        fields.set(item, def, FieldInput.Text("two"))
+
+        importRow(FIELD_VALUE, echo)
+
+        assertEquals(FieldInput.Text("two"), fields.get(item, def))
+        assertTrue(history.overwritten(FIELD_VALUE, id, VALUE).isEmpty())
+    }
+
+    /** R54: two devices first-set one value; each, receiving the other's row, shows the later and keeps the earlier. */
+    @Test
+    fun firstSetsKeepTheEarlierOnBothDevices() = run {
+        val dirB = Files.createTempDirectory("chatelaine-history-b").toFile().also { it.deleteOnExit() }
+        val dbB = openChatelaineDatabase(File(dirB, DATABASE_NAME)).database
+        try {
+            var nowB = 50_000L
+            val writesB = LocalWrites(dbB, HybridClock("device-b", { nowB++ }))
+            val fieldsB = Fields(dbB, writesB)
+            val historyB = History(dbB, writesB)
+            suspend fun ship(table: String, id: String, from: ChatelaineDatabase, to: LocalWrites) {
+                val row = from.syncedTables().getValue(table).load(listOf(id)).single()
+                to.write(mapOf(table to listOf(id))) { store -> to.merger.import(store, listOf(row), emptyMap()) }
+            }
+            val item = inventory.addItem("jar")
+            val def = fields.define("note", FieldType.TEXT)
+            ship(ITEM, item, db, writesB)
+            ship(FIELD_DEF, def, db, writesB)
+            val id = valueId(item, def)
+
+            fields.set(item, def, FieldInput.Text("a, earlier"))
+            fieldsB.set(item, def, FieldInput.Text("b, later"))
+            // Both rows are taken before either device merges, as two exports written before the import.
+            val fromA = db.syncedTables().getValue(FIELD_VALUE).load(listOf(id)).single()
+            val fromB = dbB.syncedTables().getValue(FIELD_VALUE).load(listOf(id)).single()
+            writes.write(mapOf(FIELD_VALUE to listOf(id))) { store ->
+                writes.merger.import(store, listOf(fromB), emptyMap())
+            }
+            writesB.write(mapOf(FIELD_VALUE to listOf(id))) { store ->
+                writesB.merger.import(store, listOf(fromA), emptyMap())
+            }
+
+            assertEquals(FieldInput.Text("b, later"), fields.get(item, def))
+            assertEquals(FieldInput.Text("b, later"), fieldsB.get(item, def))
+            val onA = history.overwritten(FIELD_VALUE, id, VALUE).single()
+            val onB = historyB.overwritten(FIELD_VALUE, id, VALUE).single()
+            assertEquals(encodeInput(FieldInput.Text("a, earlier")), onA.values["json"])
+            assertEquals(encodeInput(FieldInput.Text("a, earlier")), onB.values["json"])
+        } finally {
+            dbB.close()
+        }
     }
 
     /** A lost version is restored once; a second restore of the same entry, or one whose row is gone, is refused. */
