@@ -24,7 +24,7 @@ fun deviceId(file: File, now: () -> Long = System::currentTimeMillis): String {
     }
     val dir = requireNotNull(file.absoluteFile.parentFile) { "no directory for ${file.path}" }.apply { mkdirs() }
     val tmp = Files.createTempFile(dir.toPath(), file.name, ".tmp")
-    // Files.write, not Files.writeString: Android before API 33 has no writeString (found on the 6T, Android 11).
+    // Files.write, not Files.writeString: Android before API 33 has no writeString.
     Files.write(tmp, Ids.new().encodeToByteArray())
     try {
         Files.move(tmp, file.toPath())

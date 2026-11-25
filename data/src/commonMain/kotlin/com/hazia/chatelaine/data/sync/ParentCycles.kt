@@ -1,6 +1,7 @@
 package com.hazia.chatelaine.data.sync
 
 import com.hazia.chatelaine.core.sync.Row
+import com.hazia.chatelaine.data.ChatelaineDatabase
 import com.hazia.chatelaine.data.LocalWrites
 import com.hazia.chatelaine.data.PARENT
 import com.hazia.chatelaine.data.PLACE_TABLE
@@ -27,6 +28,16 @@ internal suspend fun repairParentCycles(tables: Map<String, RowTable>, writes: L
             }
         }
     }
+}
+
+/**
+ * Deletes, on this device, the field values of an item or place that was purged and the attachments to an item or tag
+ * that was purged (R152). They name their owner by a plain id, so the purge does not cascade to them; every device
+ * does this itself when it applies the purge, so no purge record is needed for them.
+ */
+internal suspend fun sweepPurgedOwners(db: ChatelaineDatabase) {
+    db.fieldValueDao().deleteOfPurgedOwners()
+    db.fieldAttachDao().deleteOfPurgedTargets()
 }
 
 private fun Row.parentId(): String? = groups[PARENT]?.values?.get("parentId") as String?

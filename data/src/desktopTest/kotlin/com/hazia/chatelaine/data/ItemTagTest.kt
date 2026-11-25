@@ -134,6 +134,7 @@ class ItemTagTest {
         assertEquals(listOf(shelf), fields.fieldsFor(item).map { it.id })
         val linkIds = db.itemTagDao().linksOfItem(item).map { it.id }.toSet()
         val before = db.syncDao().purges().map { it.id }.toSet()
+        val attachment = db.fieldAttachDao().allAttaches().single().id
 
         inventory.deleteTag(pantry)
 
@@ -146,7 +147,8 @@ class ItemTagTest {
         val purged = db.syncDao().purges().map { it.id }.toSet() - before
         val remaining = db.itemTagDao().linksOfItem(item).single().id
         assertEquals(2, linkIds.size)
-        assertEquals(setOf(pantry) + (linkIds - remaining), purged)
+        // The tag's attachment goes with it, on every device; the values stay.
+        assertEquals(setOf(pantry, attachment) + (linkIds - remaining), purged)
         assertNotNull(inventory.getItem(item))
         assertEquals(listOf(other), inventory.tagsOf(item).map { it.id })
     }

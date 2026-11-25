@@ -63,6 +63,10 @@ internal interface FieldValueDao {
     @Query("SELECT * FROM field_value WHERE owner_id = :ownerId ORDER BY id")
     suspend fun valuesOfOwner(ownerId: String): List<FieldValueEntity>
 
+    /** Removes the values whose owner was purged: the owner is an id with no foreign key, so nothing cascades. */
+    @Query("DELETE FROM field_value WHERE owner_id IN (SELECT id FROM purge_registry)")
+    suspend fun deleteOfPurgedOwners()
+
     @Upsert
     suspend fun putValues(rows: List<FieldValueEntity>)
 

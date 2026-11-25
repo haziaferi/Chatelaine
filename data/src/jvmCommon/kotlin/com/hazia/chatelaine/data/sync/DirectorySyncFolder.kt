@@ -1,9 +1,14 @@
 package com.hazia.chatelaine.data.sync
 
+import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption.ATOMIC_MOVE
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import java.nio.file.StandardOpenOption.CREATE
+import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
+import java.nio.file.StandardOpenOption.WRITE
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
@@ -23,7 +28,11 @@ class DirectorySyncFolder(private val root: Path) : SyncFolder {
         val target = root.resolve(path)
         val dir = requireNotNull(target.parent) { "no directory for $path" }.also { Files.createDirectories(it) }
         val tmp = dir.resolve(TEMP_PREFIX + target.name)
-        Files.write(tmp, bytes)
+        // Forced to disk before the move: a crash then leaves the old file or the whole new one, never an empty one.
+        FileChannel.open(tmp, CREATE, TRUNCATE_EXISTING, WRITE).use { channel ->
+            channel.write(ByteBuffer.wrap(bytes))
+            channel.force(true)
+        }
         Files.move(tmp, target, ATOMIC_MOVE, REPLACE_EXISTING)
     }
 

@@ -468,6 +468,11 @@ class FolderSyncTest {
         assertNull(a.rows(table)[childId], "the $table row of a purged parent is not applied")
         assertEquals(emptyList(), a.waiting())
         assertEquals(1, report.skipped, "it is dropped and counted")
+
+        // Both devices end without it: the one that applies the purge removes what it still holds under it.
+        w.settle(listOf(a, b))
+        assertNull(a.rows(table)[childId], "A: $table")
+        assertNull(b.rows(table)[childId], "B: $table")
     }
 
     private fun World.Device.purgeRow(table: String, id: String) =
@@ -621,6 +626,199 @@ class FolderSyncTest {
             purge = { it.purge(item) },
             child = { runBlocking { it.fields.attachToItem(def, item) }; it.rows(FIELD_ATTACH).keys.single() },
         )
+    }
+
+    /** R152: a value B made before A deleted the item (A never saw it) is gone from both devices. */
+    @Test
+    fun aValueMadeBeforeTheItemWasDeletedElsewhereIsGoneFromBoth() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = a.create("lamp")
+        val def = runBlocking { a.fields.define("colour", FieldType.TEXT) }
+        w.settle(listOf(a, b))
+
+        w.syncthing.now = 5
+        runBlocking { b.fields.set(item, def, FieldInput.Text("brass")) }
+        w.syncthing.now = 10
+        a.purge(item)
+        w.settle(listOf(a, b))
+
+        for (d in listOf(a, b)) {
+            assertTrue(d.rows(FIELD_VALUE).isEmpty(), "${d.name} still holds a value of the deleted item")
+            assertTrue(d.rows().isEmpty(), d.name)
+        }
+    }
+
+    /** B edits a value that A already purged along with its item: both devices end without it. */
+    @Test
+    fun aValueEditedAfterItsPurgeIsGoneFromBoth() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = a.create("lamp")
+        val def = runBlocking { a.fields.define("colour", FieldType.TEXT) }
+        runBlocking { a.fields.set(item, def, FieldInput.Text("brass")) }
+        w.settle(listOf(a, b))
+        assertEquals(1, b.rows(FIELD_VALUE).size)
+
+        w.syncthing.now = 10
+        a.purge(item)
+        w.syncthing.now = 20
+        runBlocking { b.fields.set(item, def, FieldInput.Text("gold")) }
+        w.settle(listOf(a, b))
+
+        for (d in listOf(a, b)) {
+            assertTrue(d.rows(FIELD_VALUE).isEmpty(), "${d.name} still holds the value")
+            assertTrue(d.rows().isEmpty(), d.name)
+        }
+    }
+
+    /** A snapshot can hold a row beside the purge of its owner in one chunk: the row is dropped, not applied. */
+    @Test
+    fun aRowAndThePurgeOfItsOwnerInOneFileLeaveNoRow() {
+        val w = world()
+        val a = w.Device("A")
+        val def = runBlocking { a.fields.define("colour", FieldType.TEXT) }
+        a.export()
+        val c = w.Device("C")
+        w.syncthing.session("A", "C")
+        c.import()
+        val attach = Row(FIELD_ATTACH, "x-attach", mapOf(
+            TARGET to Group(Stamp(5, "X"), mapOf(
+                "defId" to def, "tagId" to null, "itemId" to "gone-item", "wishId" to null, "everyItem" to false,
+            )),
+        ))
+        val purge = PurgeRecord("gone-item", Stamp(4, "X"))
+        w.syncthing.folder("C").replace(
+            FolderLayout.snapshot("X", 0),
+            (w.sealed(RecordCodec.encode(RowRecord(attach))) + w.sealed(RecordCodec.encode(purge))).encodeToByteArray(),
+        )
+
+        val report = c.import()
+
+        assertEquals(1, report.skipped)
+        assertTrue(c.rows(FIELD_ATTACH).isEmpty())
+    }
+
+    /** An attachment to a tag that was deleted goes on every device, those made before and after the delete. */
+    @Test
+    fun attachmentsToADeletedTagAreGoneFromBothDevices() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val tag = runBlocking { a.inventory.addTag("light") }
+        val first = runBlocking { a.fields.define("colour", FieldType.TEXT) }
+        val second = runBlocking { a.fields.define("weight", FieldType.TEXT) }
+        runBlocking { a.fields.attachToTag(first, tag) }
+        w.settle(listOf(a, b))
+        assertEquals(1, b.rows(FIELD_ATTACH).size)
+
+        w.syncthing.now = 10
+        runBlocking { a.inventory.deleteTag(tag) }
+        assertTrue(a.rows(FIELD_ATTACH).isEmpty(), "deleting the tag purges its attachments")
+        w.syncthing.now = 20
+        runBlocking { b.fields.attachToTag(second, tag) }
+        w.settle(listOf(a, b))
+
+        for (d in listOf(a, b)) assertTrue(d.rows(FIELD_ATTACH).isEmpty(), "${d.name} still holds an attachment to the tag")
+    }
+
+    // ---- held lines, from the earlier app's cases ----
+
+    private fun World.Device.itemName(id: String) = rows().getValue(id).groups.getValue(NAME).values["name"]
+
+    @Test
+    fun futureLineWaitsUntilPlausible() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        w.syncthing.now = 3 * day
+        b.skew = -2 * day
+        val id = a.create("lamp")
+        val stamp = a.rows().getValue(id).newest
+        a.export()
+        w.syncthing.session("A", "B")
+
+        assertEquals(ImportReport(changed = 0, skipped = 0, waiting = 1), b.import())
+        assertTrue(b.rows().isEmpty())
+        assertTrue(b.clock.last < stamp.hlc, "a line set aside must not move this device's clock")
+
+        b.skew = 0
+        assertEquals(ImportReport(changed = 1, skipped = 0, waiting = 0), b.import())
+        assertEquals("lamp", b.itemName(id))
+    }
+
+    @Test
+    fun aPlausibleLineAfterAHeldOneAppliesOnTheSameImport() {
+        val w = world()
+        val a = w.Device("A")
+        val plausible = a.create("lamp")
+        w.syncthing.now = 3 * day
+        val ahead = a.create("kettle")
+        a.export()
+        val lines = w.plainLines("A", FolderLayout.segment("A", 0))
+        val (p, q) = listOf(plausible, ahead).map { id -> lines.single { "\"id\":\"$id\"" in it } }
+        val b = w.Device("B")
+        b.skew = -2 * day
+        // The line stamped ahead comes first in the file.
+        w.syncthing.folder("B").replace(FolderLayout.segment("X", 0), (w.sealed(q) + w.sealed(p)).encodeToByteArray())
+
+        assertEquals(ImportReport(changed = 1, skipped = 0, waiting = 1), b.import())
+        assertEquals(setOf(plausible), b.rows().keys)
+
+        b.skew = 0
+        assertEquals(ImportReport(changed = 1, skipped = 0, waiting = 0), b.import())
+        assertEquals(setOf(plausible, ahead), b.rows().keys)
+    }
+
+    @Test
+    fun aHeldLineSurvivesTheWritersCompaction() {
+        // Small segments and early compaction, so A's next exports replace the segment B holds a position in.
+        val w = world(segmentBytes = 200, snapshotEvery = 2)
+        val a = w.Device("A")
+        val b = w.Device("B")
+        w.syncthing.now = 3 * day
+        b.skew = -2 * day
+        val id = a.create("lamp")
+        a.export()
+        w.syncthing.session("A", "B")
+        assertEquals(1, b.import().waiting)
+
+        repeat(3) { a.edit(id, NOTES, "brass$it"); a.export() }
+        val paths = w.syncthing.paths("A")
+        assertFalse(FolderLayout.segment("A", 0) in paths, "the segment B read was deleted: $paths")
+        assertTrue(paths.any { "/snapshot-" in it }, "no snapshot: $paths")
+        w.syncthing.session("A", "B")
+        b.import()
+        assertTrue(b.rows().isEmpty(), "still ahead of B's clock")
+
+        b.skew = 0
+        b.import()
+        assertEquals("lamp", b.itemName(id))
+        assertEquals("brass2", b.rows().getValue(id).groups.getValue(NOTES).values["notes"])
+    }
+
+    @Test
+    fun aConflictCopyHoldingAHeldLineIsKept() {
+        val w = world()
+        val a = w.Device("A")
+        w.syncthing.now = 3 * day
+        val id = a.create("lamp")
+        a.export()
+        val record = w.plainLines("A", FolderLayout.segment("A", 0)).single()
+        val b = w.Device("B")
+        b.skew = -2 * day
+        val copy = "${FolderLayout.dir("X")}/log-000000.sync-conflict-5-X.jsonl"
+        w.syncthing.folder("B").replace(copy, w.sealed(record).encodeToByteArray())
+
+        assertEquals(1, b.import().waiting)
+        assertTrue(copy in w.syncthing.paths("B"), "the copy holds a line set aside")
+
+        b.skew = 0
+        b.import()
+        assertEquals("lamp", b.itemName(id))
+        assertFalse(copy in w.syncthing.paths("B"), "applied, the copy goes")
     }
 
     private fun photoRow(id: String, itemId: String?, placeId: String?, hash: String) = Row(PHOTO, id, mapOf(
