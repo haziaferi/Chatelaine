@@ -147,6 +147,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | O-R116 | Price paid in the savings export | 10. Modules and the shopping list |
 | D-R121 | Showing the difference | 10. Modules and the shopping list |
 | D-R109 | Expiry dates | 10. Modules and the shopping list |
+| D-R153 | Expiration timeline | 10. Modules and the shopping list |
 | D-R110 | Usage rate | 10. Modules and the shopping list |
 | O-R98 | Savings app and the shopping list | 10. Modules and the shopping list |
 | D-R99 | Reminders | 10. Modules and the shopping list |
@@ -1236,11 +1237,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### Q-R84 · Homepage layout
 
-**Rule:** What does the homepage hold, and how is it laid out? The owner's sketch below is an input to the purpose map (R90), not a decided layout.
+**Rule:** What does the homepage hold, and how is it laid out? It is designed last, after every module is designed (R97, stage 10); the owner's sketch below is an input, not a decided layout.
 
-**Default:** The owner's sketch, as the rows below give it, with reach and density following R95.
+**Default:** The owner's sketch, as the rows below give it, with reach and density following R95, plus a shortcut to each module's main screen.
 
-**Why:** The sketch is not decided; the purpose map (R90) and its scoring (R91) decide the screens.
+**Why:** The homepage gathers shortcuts to the other screens (R92), so it can be laid out only once every module's screens are known.
 
 **Values:**
 
@@ -1251,7 +1252,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Below the search bar | Tags card | a grid of top-level (parent) tags |
 | Below the cards | object of the day | — |
 
-**Since:** 2026-10-28 · owner · migrated
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R85 · Tag card
 
@@ -1320,9 +1321,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Why:** Layout and navigation are decided once instead of corrected later.
 
-**Acceptance:** The owner approves the spec and the purpose map, as stage 0's gate requires (R100).
+**Evidence:** The owner approved the Inventory screens on 2026-11-25 (`docs/purpose-map.md`); the Wardrobe, Pantry and Shopping screens there are provisional.
 
-**Since:** 2026-11-22 · owner · own words
+**Acceptance:** The owner approves the spec and the purpose map's Inventory screens, as stage 0's gate requires (R100); each other module's screens are confirmed when that module is designed (R97, stage 10).
+
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R91 · Scoring axes
 
@@ -1420,14 +1423,14 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 | Module | Fields | Views |
 |---|---|---|
-| Inventory | expiry date, opened on, months after opening | expiring soon |
+| Inventory | expiry date, opened on, months after opening | expiring soon, expiration timeline (R153) |
 | Wardrobe | size, colour, material, season, occasion, last worn, laundry | outfits, seasonal swap, not worn in a year, usage rate |
 | Pantry | counting unit (R147), minimum stock | usage rate |
 | Shopping | category, shown while the savings export is on (R125); may need a bag (R146); prices live in the price book (R112) | shopping list, store lists, wish list, "already have it" check, price comparison |
 
 **Acceptance:** Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 
-**Since:** 2026-11-24 · owner · agreed rewording
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R151 · Module tags
 
@@ -1978,6 +1981,14 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 **Since:** 2026-11-22 · owner · agreed rewording
 
+### D-R153 · Expiration timeline
+
+**Rule:** The expiration timeline lists every item with an expiry date, closest first, the past ones at the top. An item's date is its expiry date or, once it is opened, its opened-on date plus its months after opening (R109), whichever comes first; a date given as a month and year sorts as that month's last day.
+
+**Acceptance:** Items expiring on 3 March 2027, in April 2027 (no day given) and 10 April 2027 list as 3 March, 10 April 2027, then April 2027; an item opened on 1 January with "12M" and an expiry date in 2028 lists at 1 January of the next year; an item with no expiry date is not listed.
+
+**Since:** 2026-11-25 · owner · agreed rewording
+
 ### D-R110 · Usage rate
 
 **Rule:** Usage rate is worked out from what is already recorded, with nothing extra to log: in Pantry from quantity changes over time, in Wardrobe from "last worn" and laundry (R97).
@@ -2032,7 +2043,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 | Stage | Holds | Done when | Unlocks |
 |---|---|---|---|
-| 0 Foundations | the spec; purpose map scored on the axes of R91; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed against R65 on the target phones; Compose Multiplatform window running on Android and Windows (R102) | owner approves the spec and the purpose map; spike timings recorded (`docs/evidence/stage0-recognition.md`); KMP spike run recorded (`docs/evidence/stage0-kmp.md`) | — |
+| 0 Foundations | the spec; purpose map scored on the axes of R91; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed against R65 on the target phones; Compose Multiplatform window running on Android and Windows (R102) | owner approves the spec and the purpose map's Inventory screens (R90); spike timings recorded (`docs/evidence/stage0-recognition.md`); KMP spike run recorded (`docs/evidence/stage0-kmp.md`) | — |
 | 1 Data and safety | data model (items, places, tags with parents and kept-together, photos, states, custom fields, history); database; backup and export; change-file sync | round-trip tests: export → import, two-device sync with conflicts, a corrupted database is kept, not deleted | — |
 | 2 Logging and tags | quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove; search including sub-tags | owner-approved screens built; R05 passes | R05 |
 | 3 Places and photos | place tree; camera (phone only, R21); item and place photos; settled-area path; place contents view; in use / away; move and bulk move | R09 passes; the move part of R11 passes | R09 |
@@ -2047,7 +2058,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 **Acceptance:** Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
 
-**Since:** 2026-11-23 · owner · agreed rewording
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R101 · Order of stages 4 to 6
 
@@ -2186,7 +2197,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R86 · No push by default: A fresh install with default settings sends no notification during a week of use, and shows no prompt other than R128's offer, once.
 - R87 · Clear-box surfaces: The owner uses the widget and the labels for a week, as stage 7's gate requires (R100).
 - R88 · Labels: The owner uses the labels for a week, as stage 7's gate requires (R100).
-- R90 · Purpose map: The owner approves the spec and the purpose map, as stage 0's gate requires (R100).
+- R90 · Purpose map: The owner approves the spec and the purpose map's Inventory screens, as stage 0's gate requires (R100); each other module's screens are confirmed when that module is designed (R97, stage 10).
 - R91 · Scoring axes: Scored as controls, every reference app's total is below the chosen map's; while one is not, the axes are revised with the owner before the map is approved.
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
 - R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
@@ -2228,6 +2239,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
 - R121 · Showing the difference: Ticking an item as bought below or above its saved price shows no difference or saving at the tick step, and reading every Shopping screen's text finds none elsewhere.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
+- R153 · Expiration timeline: Items expiring on 3 March 2027, in April 2027 (no day given) and 10 April 2027 list as 3 March, 10 April 2027, then April 2027; an item opened on 1 January with "12M" and an expiry date in 2028 lists at 1 January of the next year; an item with no expiry date is not listed.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and with the savings export on (R125) each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 - R99 · Reminders: With any of its modules off, a notification can neither be turned on nor arrive. The Inventory module's notifications can be turned on at any time.

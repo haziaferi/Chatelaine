@@ -451,3 +451,8 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-25 · spec · changed · glossary: Function, Facet, Home; purpose map generated from its JSON · owner
 - 2026-11-25 · R91 · changed · screen count as functions per screen; steps against the fewest taps any map needs · owner
 - 2026-11-25 · R152 · added · deleting items, places and tags asks first; contents move up · owner
+- 2026-11-25 · R90 · changed · the owner approves the Inventory screens at stage 0; module screens when each module is designed · owner
+- 2026-11-25 · R100 · changed · stage 0 done-when: the purpose map's Inventory screens · owner
+- 2026-11-25 · R84 · changed · homepage designed last, after every module · owner
+- 2026-11-25 · R97 · changed · Inventory view: expiration timeline · owner
+- 2026-11-25 · R153 · added · expiration timeline, closest first · owner
