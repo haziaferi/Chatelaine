@@ -116,9 +116,8 @@ class ItemTagTest {
     }
 
     /**
-     * R152, R151. Field values arrive with the modules (Task 9), which extends this test to assert that the
-     * tag's field values stay in `field_value`, hidden. Until then it checks what exists: the tag is a module
-     * tag, and deleting it purges the tag and its links and nothing else, which leaves a value table untouched.
+     * R152, R151. Deleting a module's tag purges the tag and its links and nothing else: a value set through a
+     * field attached to that tag stays in `field_value`, and reads as hidden, since the item no longer reaches the field.
      */
     @Test
     fun deletingModuleTagHidesNotDeletesValues() = run {
@@ -128,10 +127,21 @@ class ItemTagTest {
         val item = inventory.addItem("rice")
         inventory.tag(listOf(item), pantry)
         inventory.tag(listOf(item), other)
+        val fields = Fields(db, LocalWrites(db, clock))
+        val shelf = fields.define("shelf life", FieldType.TEXT)
+        fields.attachToTag(shelf, pantry)
+        fields.set(item, shelf, FieldInput.Text("two years"))
+        assertEquals(listOf(shelf), fields.fieldsFor(item).map { it.id })
         val linkIds = db.itemTagDao().linksOfItem(item).map { it.id }.toSet()
         val before = db.syncDao().purges().map { it.id }.toSet()
 
         inventory.deleteTag(pantry)
+
+        val kept = db.fieldValueDao().allValues().single()
+        assertEquals(item, kept.ownerId)
+        assertEquals(shelf, kept.defId)
+        assertTrue(fields.fieldsFor(item).isEmpty(), "the field is hidden once its tag is gone")
+        assertEquals(FieldInput.Text("two years"), fields.get(item, shelf))
 
         val purged = db.syncDao().purges().map { it.id }.toSet() - before
         val remaining = db.itemTagDao().linksOfItem(item).single().id

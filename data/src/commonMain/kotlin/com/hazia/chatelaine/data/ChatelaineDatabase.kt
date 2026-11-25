@@ -27,6 +27,7 @@ import com.hazia.chatelaine.data.sync.WaitingEntity
         WaitingEntity::class, LostEntity::class,
         TagKindEntity::class, TagEntity::class, ItemEntity::class, ItemTagEntity::class,
         PlaceEntity::class, PlaceTagEntity::class, PhotoEntity::class, PhotoRegionEntity::class,
+        FieldDefEntity::class, FieldAttachEntity::class, FieldValueEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -42,6 +43,9 @@ abstract class ChatelaineDatabase : RoomDatabase() {
     internal abstract fun placeTagDao(): PlaceTagDao
     internal abstract fun photoDao(): PhotoDao
     internal abstract fun photoRegionDao(): PhotoRegionDao
+    internal abstract fun fieldDefDao(): FieldDefDao
+    internal abstract fun fieldAttachDao(): FieldAttachDao
+    internal abstract fun fieldValueDao(): FieldValueDao
 }
 
 /** In [SYNCED_TABLES]' order, parents before children, which is the order a snapshot is written in. */
@@ -55,6 +59,9 @@ internal fun ChatelaineDatabase.syncedTables(): Map<String, RowTable> =
         PLACE_TAG to placeTagTable(placeTagDao()),
         PHOTO to photoTable(photoDao()),
         PHOTO_REGION to photoRegionTable(photoRegionDao()),
+        FIELD_DEF to fieldDefTable(fieldDefDao()),
+        FIELD_ATTACH to fieldAttachTable(fieldAttachDao()),
+        FIELD_VALUE to fieldValueTable(fieldValueDao()),
     ).also { check(it.keys.toList() == SYNCED_TABLES) { "every synced table needs its export triggers" } }
 
 /**
@@ -69,7 +76,9 @@ internal val KEEP_LOSER_GROUPS: Set<String> = setOf(
     PARENT, KIND, KEPT_TOGETHER, HOME, MODULE, // tag
     LINK, SUGGESTED, ORDER, // item_tag, tag_kind
     SITE, SIZE, MAP_POSITION, // place (name, parent, notes and photoOutdated are shared with items and tags)
-    OWNER, BLOB, TAKEN, AREA, TARGET, // photo, photo_region
+    OWNER, BLOB, TAKEN, AREA, TARGET, // photo, photo_region, field_attach (target)
+    TYPE, UNIT, MULTI, OPTIONS, PRESET, HIDDEN, // field_def (its name is shared)
+    VALUE, // field_value
 )
 
 // Room's KSP processor generates the actual for each target.
