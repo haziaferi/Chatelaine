@@ -6,7 +6,17 @@ import com.hazia.chatelaine.core.sync.HybridClock
 import com.hazia.chatelaine.core.sync.Merger
 import com.hazia.chatelaine.core.sync.Stamp
 import com.hazia.chatelaine.data.ChatelaineDatabase
+import com.hazia.chatelaine.data.LocalWrites
 import com.hazia.chatelaine.data.isConstraintViolation
+import kotlinx.coroutines.sync.Mutex
+
+/**
+ * Serialises what changes the database from outside a local edit: a sync import or export ([FolderSync]) and a backup
+ * restore, write or roll back (`Backup`). One per database, passed to both, so none runs while another does.
+ */
+class ImportLock {
+    internal val mutex = Mutex()
+}
 
 /**
  * The one way record lines enter the database, whether they were read from a peer's file ([FolderSync]) or from a
@@ -170,7 +180,7 @@ internal class RecordImport(
     }
 
     /** A record this version can apply, in its groups ([RowTable.upgrade]), or null: unreadable, not a row of any table it has, or a row its table's rules refuse. */
-    private fun readable(line: String): Record? {
+    fun readable(line: String): Record? {
         val record = try {
             RecordCodec.decode(line)
         } catch (_: IllegalArgumentException) {
@@ -182,7 +192,7 @@ internal class RecordImport(
     }
 
     /** The rules that follow every import: field values and attachments of purged owners go, and parent cycles end. */
-    suspend fun finish(writes: com.hazia.chatelaine.data.LocalWrites) {
+    suspend fun finish(writes: LocalWrites) {
         sweepPurgedOwners(db)
         repairParentCycles(tables, writes)
     }

@@ -12,7 +12,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 /**
@@ -61,12 +60,13 @@ internal class FolderSync(
      * back from the folder even with no peer.
      */
     recovered: Boolean = false,
+    /** Shared with the database's `Backup`, so an import and a restore never overlap. */
+    private val importLock: ImportLock = ImportLock(),
 ) {
     private var readOwn = recovered
     private val dao = db.syncDao()
     private val writes = LocalWrites(db, clock)
     private val importer = RecordImport(db, tables, clock, Merger(clock, ASK_GROUPS, KEEP_LOSER_GROUPS), seal, wallMillis)
-    private val lock = Mutex()
 
     /**
      * Reads what peers wrote since the last import. When it takes back a purge (a row edited after
@@ -74,7 +74,7 @@ internal class FolderSync(
      * in files already read: every file, this device's own too, is read again from its start, which
      * the merge takes without change for what it already holds.
      */
-    suspend fun import(): ImportReport = lock.withLock {
+    suspend fun import(): ImportReport = importLock.mutex.withLock {
         importer.undidPurge = false
         var report = readFiles()
         if (importer.undidPurge) {
@@ -145,7 +145,7 @@ internal class FolderSync(
     }
 
     /** Appends every row and purge in the outbox to this device's log, then compacts it if due. */
-    suspend fun export(): Unit = lock.withLock {
+    suspend fun export(): Unit = importLock.mutex.withLock {
         val pending = dao.outbox()
         if (pending.isEmpty()) return
         val dir = FolderLayout.dir(device)

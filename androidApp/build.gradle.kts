@@ -28,5 +28,4 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
 }
