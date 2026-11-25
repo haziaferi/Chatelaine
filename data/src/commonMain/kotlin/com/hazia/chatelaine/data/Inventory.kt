@@ -20,6 +20,8 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     private val links get() = db.itemTagDao()
     private val places get() = db.placeDao()
     private val placeLinks get() = db.placeTagDao()
+    private val photos get() = db.photoDao()
+    private val regions get() = db.photoRegionDao()
 
     // ---- items ----
 
@@ -88,14 +90,21 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
 
     suspend fun setAway(itemId: String, away: Boolean) = writes.edit(ITEM, itemId, AWAY) { mapOf("away" to away) }
 
-    /** Removes the item and its tag links for good (R152). */
+    /** Removes the item, its tag links, its photos with their regions, and the regions that point to it, for good (R152). */
     suspend fun deleteItem(itemId: String) {
         val linkIds = mutableListOf<String>()
+        val photoIds = mutableListOf<String>()
+        val regionIds = mutableSetOf<String>()
         writes.write({
             requireNotNull(items.item(itemId)) { "no item $itemId" }
             linkIds += links.linksOfItem(itemId).map { it.id }
-            mapOf(ITEM to listOf(itemId), ITEM_TAG to linkIds.toList())
+            photoIds += photos.photosOfItem(itemId).map { it.id }
+            photoIds.forEach { p -> regionIds += regions.regionsOfPhoto(p).map { it.id } }
+            regionIds += regions.regionsOfItem(itemId).map { it.id }
+            mapOf(ITEM to listOf(itemId), ITEM_TAG to linkIds.toList(), PHOTO to photoIds.toList(), PHOTO_REGION to regionIds.toList())
         }) { store, _ ->
+            regionIds.forEach { writes.merger.purge(store, it) }
+            photoIds.forEach { writes.merger.purge(store, it) }
             linkIds.forEach { writes.merger.purge(store, it) }
             writes.merger.purge(store, itemId)
         }
@@ -350,24 +359,30 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
 
     /**
      * Puts every item in [itemIds] in [placeId] at once, or takes them out of their places for null. An item
-     * moved into or out of a place raises its "photo outdated" flag, and so does each place it left or entered (R31).
-     * Whether a place has a photo is not asked yet: photos arrive with Task 8.
+     * moved into or out of a place raises its "photo outdated" flag, and so does each place it left or entered (R31);
+     * an item or place with no photo has nothing to be out of date and keeps its flag down.
      */
     suspend fun moveItems(itemIds: List<String>, placeId: String?) {
         val ids = itemIds.distinct()
         val moving = mutableListOf<String>()
+        val photographed = mutableSetOf<String>() // the moving items that have a photo
         writes.write({
             if (placeId != null) requireNotNull(places.place(placeId)) { "no place $placeId" }
             val found = readChunked(ids) { items.items(it) }
             require(found.size == ids.size) { "no item ${ids.first { id -> found.none { it.id == id } }}" }
             val shifting = found.filter { it.placeId != placeId }
             moving += shifting.map { it.id }
+            photographed += readChunked(moving.toList()) { photos.itemIdsWithPhotos(it) }
             val touched = shifting.mapNotNull { it.placeId }.toMutableSet()
             if (placeId != null && shifting.isNotEmpty()) touched += placeId
-            mapOf(ITEM to moving.toList(), PLACE_TABLE to readChunked(touched.toList()) { places.places(it) }.map { it.id })
+            val touchedPlaces = readChunked(touched.toList()) { places.places(it) }.map { it.id }
+            mapOf(ITEM to moving.toList(), PLACE_TABLE to readChunked(touchedPlaces) { photos.placeIdsWithPhotos(it) })
         }) { store, targets ->
             val s = writes.clock.tick()
-            for (id in moving) store.put(requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to placeId)).raised(s))
+            for (id in moving) {
+                val moved = requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to placeId))
+                store.put(if (id in photographed) moved.raised(s) else moved)
+            }
             for (id in targets.getValue(PLACE_TABLE)) store.put(requireNotNull(store.row(id)).raised(s))
         }
     }
@@ -391,7 +406,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     }
 
     /**
-     * Deletes the place and its tag links (R152). Its items and places move to its parent (a site in it goes to the top); tags that had it as home lose the home; for a site, or a place
+     * Deletes the place, its tag links, and its photos with their regions (R152). Its items and places move to its parent (a site in it goes to the top); tags that had it as home lose the home; for a site, or a place
      * with no parent, the items become unplaced and the places lose their parent. This is one write, however many
      * items it holds. The places and items moved count as changed, as moving them would (R31).
      */
@@ -401,6 +416,9 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         val linkIds = mutableListOf<String>()
         val siteIds = mutableSetOf<String>()
         val homeTagIds = mutableListOf<String>()
+        val photoIds = mutableListOf<String>()
+        val regionIds = mutableListOf<String>()
+        val photographed = mutableSetOf<String>() // the items and the parent place that have a photo
         var up: String? = null
         writes.write({
             val place = requireNotNull(places.place(placeId)) { "no place $placeId" }
@@ -409,20 +427,31 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             homeTagIds += tags.tagsWithHome(placeId).map { it.id }
             itemIds += places.itemsIn(placeId).map { it.id }
             linkIds += placeLinks.linksOfPlace(placeId).map { it.id }
+            photoIds += photos.photosOfPlace(placeId).map { it.id }
+            photoIds.forEach { p -> regionIds += regions.regionsOfPhoto(p).map { it.id } }
+            photographed += readChunked(itemIds.toList()) { photos.itemIdsWithPhotos(it) }
+            photographed += readChunked(listOfNotNull(up)) { photos.placeIdsWithPhotos(it) }
             mapOf(
                 PLACE_TABLE to (listOf(placeId) + listOfNotNull(up) + childIds).distinct(),
                 ITEM to itemIds.toList(),
                 TAG to homeTagIds.toList(),
                 PLACE_TAG to linkIds.toList(),
+                PHOTO to photoIds.toList(),
+                PHOTO_REGION to regionIds.toList(),
             )
         }) { store, _ ->
             val s = writes.clock.tick()
             val parent = up
-            for (id in itemIds) store.put(requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to parent)).raised(s))
+            regionIds.forEach { writes.merger.purge(store, it) }
+            photoIds.forEach { writes.merger.purge(store, it) }
+            for (id in itemIds) {
+                val moved = requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to parent))
+                store.put(if (id in photographed) moved.raised(s) else moved)
+            }
             for (id in childIds) {
                 store.put(requireNotNull(store.row(id)).edit(PARENT, s, mapOf("parentId" to parent.takeIf { it != id && id !in siteIds })))
             }
-            if (parent != null && (itemIds.isNotEmpty() || childIds.isNotEmpty())) {
+            if (parent != null && parent in photographed && (itemIds.isNotEmpty() || childIds.isNotEmpty())) {
                 store.put(requireNotNull(store.row(parent)).raised(s))
             }
             for (id in homeTagIds) store.put(requireNotNull(store.row(id)).edit(HOME, s, mapOf("homePlaceId" to null)))
@@ -514,7 +543,76 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             .sorted()
     }
 
+    // ---- photos ----
+
+    /**
+     * Saves a photo on an item or on a place, exactly one of them (R41), naming its picture by [hash], 64 lower-case
+     * hex digits (R56). The owner's "photo outdated" flag is cleared (R31).
+     */
+    suspend fun addPhoto(ownerItemId: String?, ownerPlaceId: String?, hash: String): String {
+        require((ownerItemId == null) != (ownerPlaceId == null)) { "a photo is on an item or on a place, not both and not neither" }
+        require(HASH.matches(hash)) { "a photo hash is 64 lower-case hex digits" }
+        val id = Ids.new()
+        val table = if (ownerItemId != null) ITEM else PLACE_TABLE
+        val ownerId = ownerItemId ?: requireNotNull(ownerPlaceId)
+        writes.write({
+            if (ownerItemId != null) requireNotNull(items.item(ownerId)) { "no item $ownerId" }
+            else requireNotNull(places.place(ownerId)) { "no place $ownerId" }
+            mapOf(table to listOf(ownerId), PHOTO to listOf(id))
+        }) { store, _ ->
+            val s = writes.clock.tick()
+            writes.merger.created(store, Row(PHOTO, id, mapOf(
+                OWNER to Group(s, mapOf("itemId" to ownerItemId, "placeId" to ownerPlaceId)),
+                BLOB to Group(s, mapOf("hash" to hash)),
+                TAKEN to Group(s, mapOf("takenAt" to s.hlc)),
+            )))
+            val owner = requireNotNull(store.row(ownerId))
+            if (owner.groups.getValue(PHOTO_OUTDATED).values["outdated"] == true) {
+                store.put(owner.edit(PHOTO_OUTDATED, s, mapOf("outdated" to false)))
+            }
+        }
+        return id
+    }
+
+    /**
+     * Marks an area of [photoId] that points to [itemId] (R41). [x] and [y] are the area's left and top edge, [w] and
+     * [h] its size, all as fractions of the photo, so the area lies inside it and has a size.
+     */
+    suspend fun addRegion(photoId: String, x: Double, y: Double, w: Double, h: Double, itemId: String): String {
+        require(x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= 1 + EDGE && y + h <= 1 + EDGE) {
+            "a region lies inside the photo: x=$x y=$y w=$w h=$h"
+        }
+        val id = Ids.new()
+        writes.write({
+            requireNotNull(photos.photo(photoId)) { "no photo $photoId" }
+            requireNotNull(items.item(itemId)) { "no item $itemId" }
+            mapOf(PHOTO_REGION to listOf(id))
+        }) { store, _ ->
+            val s = writes.clock.tick()
+            writes.merger.created(store, Row(PHOTO_REGION, id, mapOf(
+                AREA to Group(s, mapOf("photoId" to photoId, "x" to x, "y" to y, "w" to w, "h" to h)),
+                TARGET to Group(s, mapOf("itemId" to itemId)),
+            )))
+        }
+        return id
+    }
+
+    /** The item of the smallest region of [photoId] that holds the point, or null (regions may overlap, R41). */
+    suspend fun itemAt(photoId: String, x: Double, y: Double): String? =
+        regions.regionsOfPhoto(photoId)
+            .filter { x >= it.x && x <= it.x + it.w && y >= it.y && y <= it.y + it.h }
+            .minWithOrNull(compareBy({ it.w * it.h }, { it.id }))
+            ?.itemId
+            ?.takeIf { items.item(it) != null }
+
     // ---- helpers ----
+
+    private companion object {
+        val HASH = Regex("[0-9a-f]{64}")
+
+        /** Room for the rounding of an edge that sums to one. */
+        const val EDGE = 1e-9
+    }
 
     private class LinkCopy(val item: String, val tag: String, val suggested: Boolean)
 

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "52d822fae2eb0457f5fd5d4c6cd31421",
+    "identityHash": "e605817f4ed24f1bdb2fe79a14a389cc",
     "entities": [
       {
         "tableName": "purge_registry",
@@ -963,11 +963,253 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "photo",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `item_id` TEXT, `place_id` TEXT, `owner_hlc` INTEGER NOT NULL, `owner_device` TEXT NOT NULL, `hash` TEXT NOT NULL, `blob_hlc` INTEGER NOT NULL, `blob_device` TEXT NOT NULL, `taken_at` INTEGER NOT NULL, `taken_hlc` INTEGER NOT NULL, `taken_device` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`item_id`) REFERENCES `item`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY(`place_id`) REFERENCES `place`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemId",
+            "columnName": "item_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "placeId",
+            "columnName": "place_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ownerHlc",
+            "columnName": "owner_hlc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerDevice",
+            "columnName": "owner_device",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hash",
+            "columnName": "hash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "blobHlc",
+            "columnName": "blob_hlc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "blobDevice",
+            "columnName": "blob_device",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "takenAt",
+            "columnName": "taken_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "takenHlc",
+            "columnName": "taken_hlc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "takenDevice",
+            "columnName": "taken_device",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_photo_item_id",
+            "unique": false,
+            "columnNames": [
+              "item_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_photo_item_id` ON `${TABLE_NAME}` (`item_id`)"
+          },
+          {
+            "name": "index_photo_place_id",
+            "unique": false,
+            "columnNames": [
+              "place_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_photo_place_id` ON `${TABLE_NAME}` (`place_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "item",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "item_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "place",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "place_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "photo_region",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `photo_id` TEXT NOT NULL, `x` REAL NOT NULL, `y` REAL NOT NULL, `w` REAL NOT NULL, `h` REAL NOT NULL, `area_hlc` INTEGER NOT NULL, `area_device` TEXT NOT NULL, `item_id` TEXT NOT NULL, `target_hlc` INTEGER NOT NULL, `target_device` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`photo_id`) REFERENCES `photo`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY(`item_id`) REFERENCES `item`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoId",
+            "columnName": "photo_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "x",
+            "columnName": "x",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "y",
+            "columnName": "y",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "w",
+            "columnName": "w",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "h",
+            "columnName": "h",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "areaHlc",
+            "columnName": "area_hlc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "areaDevice",
+            "columnName": "area_device",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemId",
+            "columnName": "item_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetHlc",
+            "columnName": "target_hlc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetDevice",
+            "columnName": "target_device",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_photo_region_photo_id",
+            "unique": false,
+            "columnNames": [
+              "photo_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_photo_region_photo_id` ON `${TABLE_NAME}` (`photo_id`)"
+          },
+          {
+            "name": "index_photo_region_item_id",
+            "unique": false,
+            "columnNames": [
+              "item_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_photo_region_item_id` ON `${TABLE_NAME}` (`item_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "photo",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "photo_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "item",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "item_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '52d822fae2eb0457f5fd5d4c6cd31421')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e605817f4ed24f1bdb2fe79a14a389cc')"
     ]
   }
 }

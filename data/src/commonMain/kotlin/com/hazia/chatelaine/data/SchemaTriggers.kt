@@ -8,7 +8,7 @@ import androidx.sqlite.execSQL
  * The synced tables, by the name their folder records carry, parents before children;
  * [SchemaTriggers] queues writes to each for export.
  */
-internal val SYNCED_TABLES: List<String> = listOf(TAG_KIND, TAG, ITEM, ITEM_TAG, PLACE_TABLE, PLACE_TAG)
+internal val SYNCED_TABLES: List<String> = listOf(TAG_KIND, TAG, ITEM, ITEM_TAG, PLACE_TABLE, PLACE_TAG, PHOTO, PHOTO_REGION)
 
 /**
  * The triggers Room's annotations cannot declare, dropped and created again on every open so an

@@ -79,12 +79,16 @@ class PlaceTest {
         assertTrue(inventory.contents(box).items.isEmpty())
     }
 
-    /** R31: moving an item into or out of a place raises the flag on the item and on the place. Any place counts as having a photo until Task 8. */
+    /** R31: moving an item into or out of a place raises the flag on the item and on the place, when each has a photo. */
     @Test
     fun movingIntoOrOutOfPlaceRaisesOutdated() = run {
         val a = inventory.addPlace("box a")
         val b = inventory.addPlace("box b")
         val clip = inventory.addItem("paper clip")
+        val photo = "a".repeat(64)
+        inventory.addPhoto(clip, null, photo)
+        inventory.addPhoto(null, a, photo)
+        inventory.addPhoto(null, b, photo)
         assertFalse(inventory.getItem(clip)!!.photoOutdated)
         assertFalse(inventory.getPlace(a)!!.photoOutdated)
 
@@ -93,9 +97,11 @@ class PlaceTest {
         assertTrue(inventory.getPlace(a)!!.photoOutdated)
         assertFalse(inventory.getPlace(b)!!.photoOutdated)
 
-        // A new photo clears both (Task 8); here the flags are cleared by hand, then the item moves out of a and into b.
-        writes.edit(ITEM, clip, PHOTO_OUTDATED) { mapOf("outdated" to false) }
-        writes.edit(PLACE_TABLE, a, PHOTO_OUTDATED) { mapOf("outdated" to false) }
+        // A new photo clears the flags; then the item moves out of a and into b.
+        inventory.addPhoto(clip, null, photo)
+        inventory.addPhoto(null, a, photo)
+        assertFalse(inventory.getItem(clip)!!.photoOutdated)
+        assertFalse(inventory.getPlace(a)!!.photoOutdated)
         inventory.placeItem(clip, b)
         assertTrue(inventory.getPlace(a)!!.photoOutdated, "moving out raises the old place")
         assertTrue(inventory.getPlace(b)!!.photoOutdated, "moving in raises the new place")
@@ -169,8 +175,8 @@ class PlaceTest {
 
         assertEquals(1000, inventory.contents(chest).items.size)
         assertTrue(ids.all { inventory.getItem(it)?.placeId == chest })
-        // 1,000 items, the chest (its photo flag), the drawer's row and the drawer's purge: one batch.
-        assertEquals(1003, db.syncDao().outbox().size)
+        // 1,000 items, the drawer's row and the drawer's purge: one batch (nothing here has a photo, so no flag is raised).
+        assertEquals(1002, db.syncDao().outbox().size)
         assertTrue(drawer in db.syncDao().purges().map { it.id })
     }
 
