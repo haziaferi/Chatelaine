@@ -18,6 +18,8 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     private val tags get() = db.tagDao()
     private val kinds get() = db.tagKindDao()
     private val links get() = db.itemTagDao()
+    private val places get() = db.placeDao()
+    private val placeLinks get() = db.placeTagDao()
 
     // ---- items ----
 
@@ -303,9 +305,220 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     /** The kinds in order. */
     suspend fun kinds(): List<TagKind> = kinds.allKinds().map { it.toKind() }
 
+    // ---- places ----
+
+    /** A new place under [parentId], or at the top (R32); a site is a top-level place of its own. A place is never an item (R111). */
+    suspend fun addPlace(name: String, parentId: String? = null, isSite: Boolean = false): String {
+        val trimmed = name.trim()
+        require(trimmed.isNotEmpty()) { "a place needs a name" }
+        val id = Ids.new()
+        writes.write({
+            if (parentId != null) requireNotNull(places.place(parentId)) { "no place $parentId" }
+            mapOf(PLACE_TABLE to listOf(id))
+        }) { store, _ -> writes.merger.created(store, placeRow(id, writes.clock.tick(), trimmed, parentId, isSite)) }
+        return id
+    }
+
+    /** Moves [placeId] under [parentId], or to the top for null; never into itself or one of its places (R32). */
+    suspend fun movePlace(placeId: String, parentId: String?) {
+        writes.edit(PLACE_TABLE, placeId, PARENT, {
+            requireNotNull(places.place(placeId)) { "no place $placeId" }
+            if (parentId != null) {
+                requireNotNull(places.place(parentId)) { "no place $parentId" }
+                val seen = mutableSetOf<String>()
+                var up: String? = parentId
+                while (up != null && seen.add(up)) {
+                    require(up != placeId) { "place $placeId cannot sit inside its own place" }
+                    up = places.place(up)?.parentId
+                }
+            }
+        }) { mapOf("parentId" to parentId) }
+    }
+
+    /** Puts [itemId] in [placeId], or takes it out of any place for null (R30, R111). */
+    suspend fun placeItem(itemId: String, placeId: String?) = moveItems(listOf(itemId), placeId)
+
+    /**
+     * Puts every item in [itemIds] in [placeId] at once, or takes them out of their places for null. An item
+     * moved into or out of a place raises its "photo outdated" flag, and so does each place it left or entered (R31).
+     * Whether a place has a photo is not asked yet: photos arrive with Task 8.
+     */
+    suspend fun moveItems(itemIds: List<String>, placeId: String?) {
+        val ids = itemIds.distinct()
+        val moving = mutableListOf<String>()
+        writes.write({
+            if (placeId != null) requireNotNull(places.place(placeId)) { "no place $placeId" }
+            val found = readChunked(ids) { items.items(it) }
+            require(found.size == ids.size) { "no item ${ids.first { id -> found.none { it.id == id } }}" }
+            val shifting = found.filter { it.placeId != placeId }
+            moving += shifting.map { it.id }
+            val touched = shifting.mapNotNull { it.placeId }.toMutableSet()
+            if (placeId != null && shifting.isNotEmpty()) touched += placeId
+            mapOf(ITEM to moving.toList(), PLACE_TABLE to readChunked(touched.toList()) { places.places(it) }.map { it.id })
+        }) { store, targets ->
+            val s = writes.clock.tick()
+            for (id in moving) store.put(requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to placeId)).raised(s))
+            for (id in targets.getValue(PLACE_TABLE)) store.put(requireNotNull(store.row(id)).raised(s))
+        }
+    }
+
+    /** What [placeId] holds directly: its items and its places (R32, R111). */
+    suspend fun contents(placeId: String): PlaceContents {
+        requireNotNull(places.place(placeId)) { "no place $placeId" }
+        return PlaceContents(places.itemsIn(placeId).map { it.toItem() }, places.childrenOf(placeId).map { it.toPlace() })
+    }
+
+    /** The names from the top of the tree down to [placeId] (R32). The walk stops at a place it has met, so a cycle cannot loop it. */
+    suspend fun path(placeId: String): List<String> {
+        val names = ArrayDeque<String>()
+        val seen = mutableSetOf<String>()
+        var at: PlaceEntity? = requireNotNull(places.place(placeId)) { "no place $placeId" }
+        while (at != null && seen.add(at.id)) {
+            names.addFirst(at.name)
+            at = at.parentId?.let { places.place(it) }
+        }
+        return names.toList()
+    }
+
+    /**
+     * Deletes the place and its tag links (R152). Its items and places move to its parent; for a site, or a place
+     * with no parent, the items become unplaced and the places lose their parent. This is one write, however many
+     * items it holds. The places and items moved count as changed, as moving them would (R31).
+     */
+    suspend fun deletePlace(placeId: String) {
+        val childIds = mutableListOf<String>()
+        val itemIds = mutableListOf<String>()
+        val linkIds = mutableListOf<String>()
+        var up: String? = null
+        writes.write({
+            val place = requireNotNull(places.place(placeId)) { "no place $placeId" }
+            up = place.parentId?.takeIf { !place.isSite && it != placeId && places.place(it) != null }
+            childIds += places.childrenOf(placeId).map { it.id }
+            itemIds += places.itemsIn(placeId).map { it.id }
+            linkIds += placeLinks.linksOfPlace(placeId).map { it.id }
+            mapOf(
+                PLACE_TABLE to (listOf(placeId) + listOfNotNull(up) + childIds).distinct(),
+                ITEM to itemIds.toList(),
+                PLACE_TAG to linkIds.toList(),
+            )
+        }) { store, _ ->
+            val s = writes.clock.tick()
+            val parent = up
+            for (id in itemIds) store.put(requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to parent)).raised(s))
+            for (id in childIds) {
+                store.put(requireNotNull(store.row(id)).edit(PARENT, s, mapOf("parentId" to parent.takeIf { it != id })))
+            }
+            if (parent != null && (itemIds.isNotEmpty() || childIds.isNotEmpty())) {
+                store.put(requireNotNull(store.row(parent)).raised(s))
+            }
+            linkIds.forEach { writes.merger.purge(store, it) }
+            writes.merger.purge(store, placeId)
+        }
+    }
+
+    suspend fun getPlace(placeId: String): Place? = places.place(placeId)?.toPlace()
+
+    suspend fun places(): List<Place> = places.allPlaces().map { it.toPlace() }
+
+    /** Puts [tagId] on [placeId] (R33, R34); a place that carries it already is left alone. */
+    suspend fun tagPlace(placeId: String, tagId: String) {
+        val id = placeLinkId(placeId, tagId)
+        var fresh = false
+        writes.write({
+            requireNotNull(places.place(placeId)) { "no place $placeId" }
+            requireNotNull(tags.tag(tagId)) { "no tag $tagId" }
+            fresh = placeLinks.links(listOf(id)).isEmpty()
+            mapOf(PLACE_TAG to if (fresh) listOf(id) else emptyList())
+        }) { store, _ ->
+            if (fresh) {
+                // The pair may have been untagged before: its purge ends with the new link.
+                store.removePurge(id)
+                writes.merger.created(store, Row(PLACE_TAG, id, mapOf(
+                    LINK to Group(writes.clock.tick(), mapOf("placeId" to placeId, "tagId" to tagId)),
+                )))
+            }
+        }
+    }
+
+    /** The tags on a place, by name. */
+    suspend fun tagsOfPlace(placeId: String): List<Tag> {
+        val ids = placeLinks.linksOfPlace(placeId).map { it.tagId }
+        return readChunked(ids) { tags.tags(it) }.toTags().sortedWith(compareBy({ it.name }, { it.id }))
+    }
+
+    /**
+     * Marks [tagId] kept together or not, with its home place (R36). Only a kept-together tag has a home, and the
+     * home is a place. The two are groups of their own, so a peer's change to one never overwrites the other.
+     */
+    suspend fun setKeptTogether(tagId: String, kept: Boolean, homePlaceId: String?) {
+        require(kept || homePlaceId == null) { "only a kept-together tag has a home" }
+        var keptChanged = false
+        var homeChanged = false
+        writes.write({
+            val tag = requireNotNull(tags.tag(tagId)) { "no tag $tagId" }
+            if (homePlaceId != null) requireNotNull(places.place(homePlaceId)) { "no place $homePlaceId" }
+            keptChanged = tag.kept != kept
+            homeChanged = tag.homePlaceId != homePlaceId
+            mapOf(TAG to if (keptChanged || homeChanged) listOf(tagId) else emptyList())
+        }) { store, _ ->
+            if (keptChanged || homeChanged) {
+                val s = writes.clock.tick()
+                var row = requireNotNull(store.row(tagId))
+                if (keptChanged) row = row.edit(KEPT_TOGETHER, s, mapOf("kept" to kept))
+                if (homeChanged) row = row.edit(HOME, s, mapOf("homePlaceId" to homePlaceId))
+                store.put(row)
+            }
+        }
+    }
+
+    /**
+     * The ids of the items that carry [tagId] or one of its sub-tags and are not in its home place or inside one of
+     * the home's places (R36): items that are unplaced or taken out count as away. Empty when the tag is not kept
+     * together or its home is not here. The walks down the place and tag trees carry a seen-set.
+     */
+    suspend fun awayFromHome(tagId: String): List<String> {
+        val tag = requireNotNull(tags.tag(tagId)) { "no tag $tagId" }
+        val home = tag.homePlaceId
+        if (!tag.kept || home == null || places.place(home) == null) return emptyList()
+        val inHome = mutableSetOf<String>()
+        val placesToVisit = ArrayDeque(listOf(home))
+        while (placesToVisit.isNotEmpty()) {
+            val at = placesToVisit.removeFirst()
+            if (inHome.add(at)) places.childrenOf(at).forEach { placesToVisit.addLast(it.id) }
+        }
+        val tagIds = mutableSetOf<String>()
+        val tagsToVisit = ArrayDeque(listOf(tagId))
+        while (tagsToVisit.isNotEmpty()) {
+            val at = tagsToVisit.removeFirst()
+            if (tagIds.add(at)) tags.childrenOf(at).forEach { tagsToVisit.addLast(it.id) }
+        }
+        val itemIds = tagIds.flatMap { t -> links.linksOfTag(t).map { it.itemId } }.distinct()
+        return readChunked(itemIds) { items.items(it) }
+            .filter { item -> val at = item.placeId; item.away || at == null || at !in inHome }
+            .map { it.id }
+            .sorted()
+    }
+
     // ---- helpers ----
 
     private class LinkCopy(val item: String, val tag: String, val suggested: Boolean)
+
+    /** The link of a place and a tag: its id never equals an item-tag link's, whatever the ids. */
+    private fun placeLinkId(placeId: String, tagId: String) = linkId("place:$placeId", tagId)
+
+    /** This item or place with its "photo outdated" flag raised; as it was when already raised. */
+    private fun Row.raised(s: Stamp): Row =
+        if (groups.getValue(PHOTO_OUTDATED).values["outdated"] == true) this else edit(PHOTO_OUTDATED, s, mapOf("outdated" to true))
+
+    private fun placeRow(id: String, s: Stamp, name: String, parentId: String?, isSite: Boolean) = Row(PLACE_TABLE, id, mapOf(
+        NAME to Group(s, mapOf("name" to name)),
+        PARENT to Group(s, mapOf("parentId" to parentId)),
+        SITE to Group(s, mapOf("isSite" to isSite)),
+        NOTES to Group(s, mapOf("notes" to "")),
+        SIZE to Group(s, mapOf("size" to null)),
+        MAP_POSITION to Group(s, mapOf("x" to null, "y" to null)),
+        PHOTO_OUTDATED to Group(s, mapOf("outdated" to false)),
+    ))
 
     /** Tags as the app reads them: a parent or kind that is not here reads as none. */
     private suspend fun List<TagEntity>.toTags(): List<Tag> {
