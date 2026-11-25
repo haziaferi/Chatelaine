@@ -5,11 +5,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ZipBackupTest {
-    private val hash = "a".repeat(64)
+    private val photo = byteArrayOf(1, 2, 3)
+    private val hash = java.security.MessageDigest.getInstance("SHA-256").digest(photo).joinToString("") { "%02x".format(it) }
     private val good = mapOf(
         "records.jsonl" to "r".encodeToByteArray(),
         "purges.jsonl" to "p".encodeToByteArray(),
-        "blobs/$hash" to byteArrayOf(1, 2, 3),
+        "blobs/$hash" to photo,
     )
 
     @Test
@@ -21,7 +22,8 @@ class ZipBackupTest {
 
     @Test
     fun anEntryNameABackupNeverHoldsMeansNotABackup() {
-        for (bad in listOf("../evil", "blobs/../../evil", "/etc/passwd", "blobs/", "blobs/${hash}x", "notes.txt", "records.jsonl/")) {
+        val wrongHash = "b".repeat(64)
+        for (bad in listOf("../evil", "blobs/../../evil", "/etc/passwd", "blobs/", "blobs/${hash}x", "blobs/$wrongHash", "notes.txt", "records.jsonl/")) {
             assertEquals(emptyMap(), ZipBackup.unpack(ZipBackup.pack(good + (bad to byteArrayOf(9)))), bad)
         }
     }

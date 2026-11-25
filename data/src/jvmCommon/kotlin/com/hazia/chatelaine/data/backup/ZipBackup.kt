@@ -1,5 +1,6 @@
 package com.hazia.chatelaine.data.backup
 
+import com.hazia.chatelaine.data.blob.sha256Hex
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -35,13 +36,15 @@ object ZipBackup : BackupArchive {
         return out.toByteArray()
     }
 
-    /** The only entry names a backup holds; anything else (a path with `..`, a folder, another file) is not a backup. */
-    private val ENTRY_NAME = Regex("^(records\\.jsonl|purges\\.jsonl|blobs/[0-9a-f]{64})$")
+    private const val RECORDS = "records.jsonl"
+    private const val PURGES = "purges.jsonl"
 
     /**
      * The entries of [zip]; empty when it is damaged or cut short: any [IOException] while reading, or no end-of-
      * directory record at its end (a zip cut between two entries still reads, entry by entry, but is not whole).
-     * Also empty when any entry name is not one a backup holds, so no name from the archive ever reaches a path.
+     * Also empty when any entry is not one a backup holds. No name from the archive is ever used as a key: the two
+     * record files get their own constant names, and a blob's key is the SHA-256 of its bytes, which must equal the
+     * name it was stored under. So a name with `..`, a folder or any other file means "not a backup".
      */
     override fun unpack(zip: ByteArray): Map<String, ByteArray> {
         if (!hasEndRecord(zip)) return emptyMap()
@@ -51,8 +54,15 @@ object ZipBackup : BackupArchive {
                 while (true) {
                     val entry = input.nextEntry ?: break
                     val name = entry.name
-                    if (!ENTRY_NAME.matches(name)) return emptyMap()
-                    entries[name] = input.readBytes()
+                    if (name.contains("..")) return emptyMap()
+                    val bytes = input.readBytes()
+                    val key = when (name) {
+                        RECORDS -> RECORDS
+                        PURGES -> PURGES
+                        else -> BLOBS + sha256Hex(bytes)
+                    }
+                    if (key != name) return emptyMap()
+                    entries[key] = bytes
                 }
             }
         } catch (_: IOException) {
