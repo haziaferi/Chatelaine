@@ -3,6 +3,7 @@ package com.hazia.chatelaine.data
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
@@ -17,17 +18,17 @@ const val TAG = "tag"
 internal const val PARENT = "parent"
 internal const val KIND = "kind"
 internal const val KEPT_TOGETHER = "keptTogether"
+internal const val HOME = "home"
 
 /** A module's tag carries its key here (R151). */
 internal const val MODULE = "module"
-internal const val SUGGESTED = "suggested"
 
 /**
  * A tag (R34): at most one parent (R35), at most one kind (R37). The parent, kind and home place are
  * ids that are not foreign keys: a peer's row may arrive before the row it names, and a tag outlives
  * its parent's deletion by moving up.
  */
-@Entity(tableName = TAG)
+@Entity(tableName = TAG, indices = [Index("parent_id"), Index("kind")])
 internal data class TagEntity(
     @PrimaryKey val id: String,
     val name: String,
@@ -40,15 +41,14 @@ internal data class TagEntity(
     @ColumnInfo(name = "kind_hlc") val kindHlc: Long,
     @ColumnInfo(name = "kind_device") val kindDevice: String,
     val kept: Boolean,
-    @ColumnInfo(name = "home_place_id") val homePlaceId: String?,
     @ColumnInfo(name = "kept_together_hlc") val keptTogetherHlc: Long,
     @ColumnInfo(name = "kept_together_device") val keptTogetherDevice: String,
+    @ColumnInfo(name = "home_place_id") val homePlaceId: String?,
+    @ColumnInfo(name = "home_hlc") val homeHlc: Long,
+    @ColumnInfo(name = "home_device") val homeDevice: String,
     @ColumnInfo(name = "module_key") val moduleKey: String?,
     @ColumnInfo(name = "module_hlc") val moduleHlc: Long,
     @ColumnInfo(name = "module_device") val moduleDevice: String,
-    val suggested: Boolean,
-    @ColumnInfo(name = "suggested_hlc") val suggestedHlc: Long,
-    @ColumnInfo(name = "suggested_device") val suggestedDevice: String,
 )
 
 @Dao
@@ -85,9 +85,9 @@ internal fun TagEntity.toRow() = Row(TAG, id, mapOf(
     NAME to Group(Stamp(nameHlc, nameDevice), mapOf("name" to name)),
     PARENT to Group(Stamp(parentHlc, parentDevice), mapOf("parentId" to parentId)),
     KIND to Group(Stamp(kindHlc, kindDevice), mapOf("kind" to kind)),
-    KEPT_TOGETHER to Group(Stamp(keptTogetherHlc, keptTogetherDevice), mapOf("kept" to kept, "homePlaceId" to homePlaceId)),
+    KEPT_TOGETHER to Group(Stamp(keptTogetherHlc, keptTogetherDevice), mapOf("kept" to kept)),
+    HOME to Group(Stamp(homeHlc, homeDevice), mapOf("homePlaceId" to homePlaceId)),
     MODULE to Group(Stamp(moduleHlc, moduleDevice), mapOf("moduleKey" to moduleKey)),
-    SUGGESTED to Group(Stamp(suggestedHlc, suggestedDevice), mapOf("suggested" to suggested)),
 ))
 
 /** Throws when [this] is not a tag this version can read. */
@@ -97,7 +97,7 @@ internal fun Row.toTagEntity(): TagEntity {
     val kind = groups.getValue(KIND)
     val kept = groups.getValue(KEPT_TOGETHER)
     val module = groups.getValue(MODULE)
-    val suggested = groups.getValue(SUGGESTED)
+    val home = groups.getValue(HOME)
     return TagEntity(
         id = id,
         name = name.values["name"] as String,
@@ -110,15 +110,14 @@ internal fun Row.toTagEntity(): TagEntity {
         kindHlc = kind.stamp.hlc,
         kindDevice = kind.stamp.device,
         kept = kept.values["kept"] as Boolean,
-        homePlaceId = kept.values["homePlaceId"] as String?,
         keptTogetherHlc = kept.stamp.hlc,
         keptTogetherDevice = kept.stamp.device,
+        homePlaceId = home.values["homePlaceId"] as String?,
+        homeHlc = home.stamp.hlc,
+        homeDevice = home.stamp.device,
         moduleKey = module.values["moduleKey"] as String?,
         moduleHlc = module.stamp.hlc,
         moduleDevice = module.stamp.device,
-        suggested = suggested.values["suggested"] as Boolean,
-        suggestedHlc = suggested.stamp.hlc,
-        suggestedDevice = suggested.stamp.device,
     )
 }
 
@@ -131,7 +130,8 @@ data class Tag(
     val kept: Boolean,
     val homePlaceId: String?,
     val moduleKey: String?,
-    val suggested: Boolean,
 )
 
-internal fun TagEntity.toTag() = Tag(id, name, parentId, kind, kept, homePlaceId, moduleKey, suggested)
+/** [parent] and [kind] are what exist: an id that names a row not here (yet, or any more) reads as none. */
+internal fun TagEntity.toTag(parent: Boolean = true, kindExists: Boolean = true) =
+    Tag(id, name, parentId.takeIf { parent }, kind.takeIf { kindExists }, kept, homePlaceId, moduleKey)

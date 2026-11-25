@@ -31,7 +31,7 @@ internal interface RowTable {
 }
 
 /**
- * A synced table seen as [Row]s: [toRow] and [fromRow] map its entity [E] to the sync rules's groups and
+ * A synced table seen as [Row]s: [toRow] and [fromRow] map its entity [E] to the groups the sync rules stamp and
  * back.
  */
 internal class EntityTable<E>(

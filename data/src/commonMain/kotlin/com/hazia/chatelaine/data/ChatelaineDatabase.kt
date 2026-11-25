@@ -57,8 +57,8 @@ internal val ASK_GROUPS = emptySet<String>()
 /** Every user-visible group keeps the version it loses (R54, R55). */
 internal val KEEP_LOSER_GROUPS: Set<String> = setOf(
     NAME, NOTES, QUANTITY, PLACE, AWAY, PHOTO_OUTDATED, // item
-    PARENT, KIND, KEPT_TOGETHER, MODULE, SUGGESTED, // tag
-    LINK, ORDER, // item_tag, tag_kind
+    PARENT, KIND, KEPT_TOGETHER, HOME, MODULE, // tag
+    LINK, SUGGESTED, ORDER, // item_tag, tag_kind
 )
 
 // Room's KSP processor generates the actual for each target.

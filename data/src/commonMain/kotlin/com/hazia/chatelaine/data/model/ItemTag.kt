@@ -17,9 +17,10 @@ import com.hazia.chatelaine.data.sync.EntityTable
 const val ITEM_TAG = "item_tag"
 
 internal const val LINK = "link"
+internal const val SUGGESTED = "suggested"
 
 /**
- * One tag on one item: a row of its own, so that tagging on one device and untagging on another
+ * One tag on one item: a row of its own, whose id comes from the pair ([linkId]), so that tagging on one device and untagging on another
  * are two writes the merge keeps apart. Untagging purges the row; tagging again makes a new one.
  * The keys are deferred so an import may write a link and its item or tag in either order inside
  * one transaction; deleting an item or tag takes its links with it.
@@ -38,6 +39,10 @@ internal data class ItemTagEntity(
     @ColumnInfo(name = "tag_id") val tagId: String,
     @ColumnInfo(name = "link_hlc") val linkHlc: Long,
     @ColumnInfo(name = "link_device") val linkDevice: String,
+    /** The tag was offered for this item and not yet accepted (R39). */
+    val suggested: Boolean,
+    @ColumnInfo(name = "suggested_hlc") val suggestedHlc: Long,
+    @ColumnInfo(name = "suggested_device") val suggestedDevice: String,
 )
 
 @Dao
@@ -68,16 +73,21 @@ internal fun itemTagTable(dao: ItemTagDao) =
 
 internal fun ItemTagEntity.toRow() = Row(ITEM_TAG, id, mapOf(
     LINK to Group(Stamp(linkHlc, linkDevice), mapOf("itemId" to itemId, "tagId" to tagId)),
+    SUGGESTED to Group(Stamp(suggestedHlc, suggestedDevice), mapOf("suggested" to suggested)),
 ))
 
 /** Throws when [this] is not a link this version can read. */
 internal fun Row.toItemTagEntity(): ItemTagEntity {
     val link = groups.getValue(LINK)
+    val suggested = groups.getValue(SUGGESTED)
     return ItemTagEntity(
         id = id,
         itemId = link.values["itemId"] as String,
         tagId = link.values["tagId"] as String,
         linkHlc = link.stamp.hlc,
         linkDevice = link.stamp.device,
+        suggested = suggested.values["suggested"] as Boolean,
+        suggestedHlc = suggested.stamp.hlc,
+        suggestedDevice = suggested.stamp.device,
     )
 }

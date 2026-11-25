@@ -39,7 +39,8 @@ internal class SchemaTriggers(private val tables: List<String> = SYNCED_TABLES) 
 
     /**
      * A new database holds the five default tag kinds (R38). They are written before the triggers exist, so
-     * they are not queued: every device makes the same rows (fixed ids, [NEVER_WRITTEN] stamps).
+     * they are not queued: every device makes the same rows (fixed ids, [NEVER_WRITTEN] stamps). Each group
+     * also starts with that stamp as its base, so a peer's first edit is not taken for a clash.
      */
     override fun onCreate(connection: SQLiteConnection) {
         DEFAULT_KINDS.forEachIndexed { position, (id, name) ->
@@ -47,6 +48,11 @@ internal class SchemaTriggers(private val tables: List<String> = SYNCED_TABLES) 
                 "INSERT INTO tag_kind(id, name, name_hlc, name_device, position, order_hlc, order_device) " +
                     "VALUES ('$id', '$name', ${NEVER_WRITTEN.hlc}, '${NEVER_WRITTEN.device}', $position, ${NEVER_WRITTEN.hlc}, '${NEVER_WRITTEN.device}')",
             )
+            for (group in listOf(NAME, ORDER)) {
+                connection.execSQL(
+                    "INSERT INTO sync_base(id, grp, hlc, device) VALUES ('$id', '$group', ${NEVER_WRITTEN.hlc}, '${NEVER_WRITTEN.device}')",
+                )
+            }
         }
     }
 

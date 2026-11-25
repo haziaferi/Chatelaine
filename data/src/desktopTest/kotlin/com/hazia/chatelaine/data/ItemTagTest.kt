@@ -1,6 +1,9 @@
 package com.hazia.chatelaine.data
 
+import com.hazia.chatelaine.core.sync.Group
 import com.hazia.chatelaine.core.sync.HybridClock
+import com.hazia.chatelaine.core.sync.Row
+import com.hazia.chatelaine.core.sync.Stamp
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.nio.file.Files
@@ -81,9 +84,11 @@ class ItemTagTest {
         inventory.tag(ids, redSkirt)
         inventory.tag(ids, redSkirt) // again: still one link each
         for (id in ids) assertEquals(listOf(redSkirt), inventory.tagsOf(id).map { it.id })
+        assertEquals(3, db.itemTagDao().allLinks().size)
 
         inventory.untag(ids, redSkirt)
         for (id in ids) assertTrue(inventory.tagsOf(id).isEmpty())
+        assertEquals(0, db.itemTagDao().allLinks().size)
     }
 
     /** R152: sub-tags move to the parent; items lose only that tag. */
@@ -111,12 +116,14 @@ class ItemTagTest {
     }
 
     /**
-     * R152, R151. Field values arrive with the modules (Task 9), so this checks what exists: deleting a module's
-     * tag purges the tag and its links and nothing else, which leaves a value table untouched.
+     * R152, R151. Field values arrive with the modules (Task 9), which extends this test to assert that the
+     * tag's field values stay in `field_value`, hidden. Until then it checks what exists: the tag is a module
+     * tag, and deleting it purges the tag and its links and nothing else, which leaves a value table untouched.
      */
     @Test
     fun deletingModuleTagHidesNotDeletesValues() = run {
-        val pantry = inventory.addTag("pantry", moduleKey = "pantry")
+        val pantry = inventory.addModuleTag("pantry", "pantry")
+        assertEquals("pantry", inventory.getTag(pantry)?.moduleKey)
         val other = inventory.addTag("kitchen")
         val item = inventory.addItem("rice")
         inventory.tag(listOf(item), pantry)
@@ -170,20 +177,125 @@ class ItemTagTest {
         assertTrue(inventory.kinds().none { it.id == extra })
     }
 
-    /** R39. */
+    /** R39, R06: a suggestion belongs to one item's link; accepting it makes the link like one the person added. */
     @Test
     fun acceptedSuggestionLooksLikeAUserTag() = run {
         val item = inventory.addItem("laptop")
         val suggested = inventory.suggestTag(item, "PC")
-        assertTrue(assertNotNull(inventory.getTag(suggested)).suggested)
+        assertTrue(inventory.isSuggested(item, suggested))
         assertEquals(listOf(suggested), inventory.tagsOf(item).map { it.id })
 
         inventory.acceptSuggestion(item, suggested)
 
-        val own = inventory.addTag("PC")
-        val accepted = assertNotNull(inventory.getTag(suggested))
-        assertFalse(accepted.suggested)
-        assertEquals(inventory.getTag(own)?.copy(id = accepted.id), accepted)
-        assertContentEquals(listOf(suggested), inventory.tagsOf(item).map { it.id })
+        val other = inventory.addItem("desktop")
+        val own = inventory.addTag("own")
+        inventory.tag(listOf(other), own)
+        assertFalse(inventory.isSuggested(item, suggested))
+        assertFalse(inventory.isSuggested(other, own))
+        assertEquals(listOf(suggested), inventory.tagsOf(item).map { it.id })
+    }
+
+    @Test
+    fun suggestingAnExistingTagNameRecordsASuggestionAndAcceptingStaysPerItem() = run {
+        val pc = inventory.addTag("PC")
+        val a = inventory.addItem("laptop")
+        val b = inventory.addItem("tower")
+
+        assertEquals(pc, inventory.suggestTag(a, "pc"))
+        assertEquals(pc, inventory.suggestTag(b, "PC"))
+        assertTrue(inventory.isSuggested(a, pc))
+        assertTrue(inventory.isSuggested(b, pc))
+        assertEquals(1, inventory.tags().size)
+
+        inventory.acceptSuggestion(a, pc)
+
+        assertFalse(inventory.isSuggested(a, pc))
+        assertTrue(inventory.isSuggested(b, pc))
+    }
+
+    @Test
+    fun untaggingASuggestedLinkLeavesNothingBehind() = run {
+        val item = inventory.addItem("laptop")
+        val pc = inventory.suggestTag(item, "PC")
+        inventory.untag(listOf(item), pc)
+        assertTrue(inventory.tagsOf(item).isEmpty())
+        assertFalse(inventory.isSuggested(item, pc))
+        assertEquals(0, db.itemTagDao().allLinks().size)
+    }
+
+    /** One row per pair, on every device and after an untag: the link's id comes from the pair. */
+    @Test
+    fun oneLinkRowPerPairEvenAfterUntagAndTagAgain() = run {
+        val item = inventory.addItem("kettle")
+        val tag = inventory.addTag("kitchen")
+        inventory.tag(listOf(item), tag)
+        val id = db.itemTagDao().linksOfItem(item).single().id
+        assertEquals(id, linkId(item, tag)) // what another device computes for the same pair
+
+        inventory.untag(listOf(item), tag)
+        assertTrue(id in db.syncDao().purges().map { it.id })
+        inventory.tag(listOf(item), tag)
+        inventory.tag(listOf(item), tag)
+
+        assertEquals(listOf(id), db.itemTagDao().allLinks().map { it.id })
+        assertFalse(id in db.syncDao().purges().map { it.id }, "the purge of the earlier link must go")
+    }
+
+    @Test
+    fun nameBasedIdMatchesTheKnownVersion5Value() {
+        // RFC 4122 namespace DNS, name "python.org".
+        assertEquals("886313e1-3b8a-5372-9b90-0c9aee199e5d", uuidV5("6ba7b810-9dad-11d1-80b4-00c04fd430c8", "python.org"))
+    }
+
+    /** A peer's first edit of a default kind is no clash: nothing is kept as lost. */
+    @Test
+    fun peerRenameOfADefaultKindMergesWithoutALostVersion() = run {
+        val theirs = Row(TAG_KIND, "kind-function", mapOf(
+            NAME to Group(Stamp(5_000, "device-b"), mapOf("name" to "purpose")),
+            ORDER to Group(NEVER_WRITTEN, mapOf("position" to 0L)),
+        ))
+        val writes = LocalWrites(db, clock)
+        writes.write(mapOf(TAG_KIND to listOf("kind-function"))) { store ->
+            writes.merger.import(store, listOf(theirs), emptyMap())
+        }
+        assertEquals("purpose", inventory.kinds().first().name)
+        assertTrue(db.syncDao().lost().isEmpty())
+    }
+
+    @Test
+    fun readsMapAMissingParentOrKindToNull() = run {
+        val tag = inventory.addTag("blue")
+        val writes = LocalWrites(db, clock)
+        writes.edit(TAG, tag, PARENT) { mapOf("parentId" to "no-such-tag") }
+        writes.edit(TAG, tag, KIND) { mapOf("kind" to "no-such-kind") }
+
+        assertNull(inventory.getTag(tag)?.parentId)
+        assertNull(inventory.getTag(tag)?.kind)
+        assertNull(inventory.tags().single().parentId)
+    }
+
+    @Test
+    fun keptTogetherAndHomeAreGroupsOfTheirOwn() = run {
+        val tag = inventory.addTag("tools")
+        val row = db.syncedTables().getValue(TAG).load(listOf(tag)).single()
+        assertEquals(setOf(NAME, PARENT, KIND, KEPT_TOGETHER, HOME, MODULE), row.groups.keys)
+        assertEquals(setOf("kept"), row.groups.getValue(KEPT_TOGETHER).values.keys)
+        assertEquals(setOf("homePlaceId"), row.groups.getValue(HOME).values.keys)
+        assertTrue(HOME in KEEP_LOSER_GROUPS && KEPT_TOGETHER in KEEP_LOSER_GROUPS)
+    }
+
+    @Test
+    fun tagNamesAreTrimmed() = run {
+        val tag = inventory.addTag("  sewing  ")
+        assertEquals("sewing", inventory.getTag(tag)?.name)
+    }
+
+    @Test
+    fun approximateQuantityNeedsACount() = run {
+        val id = inventory.addItem("screws")
+        assertFailsWith<IllegalArgumentException> { inventory.setQuantity(id, null, approx = true) }
+        inventory.setQuantity(id, 50, approx = true)
+        assertEquals(50L, inventory.getItem(id)?.count)
+        assertTrue(inventory.getItem(id)?.approx == true)
     }
 }

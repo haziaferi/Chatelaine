@@ -39,6 +39,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     /** How many; [approx] makes it "about N" (R26). A null [count] is not counted. */
     suspend fun setQuantity(itemId: String, count: Long?, approx: Boolean) {
         require(count == null || count >= 0) { "a quantity is not negative" }
+        require(count != null || !approx) { "\"about\" needs a number" }
         writes.edit(ITEM, itemId, QUANTITY) { mapOf("count" to count, "approx" to approx) }
     }
 
@@ -50,16 +51,16 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     suspend fun splitItem(itemId: String, parts: Int): List<String> {
         require(parts >= 2) { "splitting makes at least two items" }
         val copies = mutableListOf<String>()
-        val linkCopies = mutableListOf<Triple<String, String, String>>() // copy, new link id, tag id
+        val linkCopies = mutableListOf<LinkCopy>()
         writes.write({
             val item = requireNotNull(items.item(itemId)) { "no item $itemId" }
             require(item.quantityCount == null || item.quantityCount == parts.toLong()) {
                 "the quantity ${item.quantityCount} does not split into $parts"
             }
             repeat(parts - 1) { copies += Ids.new() }
-            val tagIds = links.linksOfItem(itemId).map { it.tagId }
-            copies.forEach { copy -> tagIds.forEach { linkCopies += Triple(copy, Ids.new(), it) } }
-            mapOf(ITEM to listOf(itemId) + copies, ITEM_TAG to linkCopies.map { it.second })
+            val own = links.linksOfItem(itemId)
+            copies.forEach { copy -> own.forEach { linkCopies += LinkCopy(copy, it.tagId, it.suggested) } }
+            mapOf(ITEM to listOf(itemId) + copies, ITEM_TAG to linkCopies.map { linkId(it.item, it.tag) })
         }) { store, _ ->
             val s = writes.clock.tick()
             val original = requireNotNull(store.row(itemId))
@@ -69,7 +70,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
                 val groups = original.groups.mapValues { (_, g) -> Group(s, g.values) } + (QUANTITY to one)
                 writes.merger.created(store, Row(ITEM, copy, groups))
             }
-            for ((copy, link, tag) in linkCopies) writes.merger.created(store, linkRow(link, s, copy, tag))
+            for (c in linkCopies) writes.merger.created(store, linkRow(s, c.item, c.tag, c.suggested))
         }
         return listOf(itemId) + copies
     }
@@ -104,14 +105,21 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
 
     // ---- tags ----
 
-    /** A new tag, top-level or under [parentId] (R34, R35); [moduleKey] marks a module's tag (R151). */
-    suspend fun addTag(name: String, parentId: String? = null, moduleKey: String? = null): String {
-        require(name.isNotBlank()) { "a tag needs a name" }
+    /** A new tag, top-level or under [parentId] (R34, R35). */
+    suspend fun addTag(name: String, parentId: String? = null): String = createTag(name, parentId, null)
+
+    /** A module's tag (R151), carrying the module's [moduleKey]. */
+    internal suspend fun addModuleTag(name: String, moduleKey: String, parentId: String? = null): String =
+        createTag(name, parentId, moduleKey)
+
+    private suspend fun createTag(name: String, parentId: String?, moduleKey: String?): String {
+        val trimmed = name.trim()
+        require(trimmed.isNotEmpty()) { "a tag needs a name" }
         val id = Ids.new()
         writes.write({
             if (parentId != null) requireNotNull(tags.tag(parentId)) { "no tag $parentId" }
             mapOf(TAG to listOf(id))
-        }) { store, _ -> writes.merger.created(store, tagRow(id, writes.clock.tick(), name, parentId, moduleKey = moduleKey)) }
+        }) { store, _ -> writes.merger.created(store, tagRow(id, writes.clock.tick(), trimmed, parentId, moduleKey)) }
         return id
     }
 
@@ -137,20 +145,30 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         }) { mapOf("kind" to kindId) }
     }
 
-    /** Puts [tagId] on every item in [itemIds] at once; an item that has it already is left alone (R05). */
+    /**
+     * Puts [tagId] on every item in [itemIds] at once (R05). An item that has it already is left alone, except
+     * that a suggestion of it is accepted: the person tagged it.
+     */
     suspend fun tag(itemIds: List<String>, tagId: String) {
-        val wanted = mutableListOf<Pair<String, String>>() // link id, item id
+        val fresh = mutableListOf<String>() // item ids with no link yet
+        val accepted = mutableListOf<String>() // link ids of suggestions the person has now made their own
         writes.write({
             requireNotNull(tags.tag(tagId)) { "no tag $tagId" }
             val ids = itemIds.distinct()
             val found = readChunked(ids) { items.items(it) }.map { it.id }.toSet()
             require(found.size == ids.size) { "no item ${ids.first { it !in found }}" }
-            val have = links.linksOfTag(tagId).map { it.itemId }.toSet()
-            ids.filter { it !in have }.forEach { wanted += Ids.new() to it }
-            mapOf(ITEM_TAG to wanted.map { it.first })
+            val have = links.linksOfTag(tagId).associateBy { it.itemId }
+            ids.filter { it !in have }.forEach { fresh += it }
+            ids.mapNotNull { have[it] }.filter { it.suggested }.forEach { accepted += it.id }
+            mapOf(ITEM_TAG to fresh.map { linkId(it, tagId) } + accepted)
         }) { store, _ ->
             val s = writes.clock.tick()
-            for ((link, item) in wanted) writes.merger.created(store, linkRow(link, s, item, tagId))
+            for (item in fresh) {
+                // The pair may have been untagged before: its purge ends with the new link.
+                store.removePurge(linkId(item, tagId))
+                writes.merger.created(store, linkRow(s, item, tagId))
+            }
+            for (id in accepted) store.put(requireNotNull(store.row(id)).edit(SUGGESTED, s, mapOf("suggested" to false)))
         }
     }
 
@@ -165,37 +183,43 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     }
 
     /**
-     * Offers a tag named [name] for [itemId] (R39): the tag is marked suggested and the item carries it until the
-     * person accepts it. A tag of that name that exists already is used as it is.
+     * Offers a tag named [name] for [itemId] (R39): the tag is made if no tag has that name, and this item's link
+     * to it is marked suggested until the person accepts it. An item that carries the tag already is left as it is.
      */
     suspend fun suggestTag(itemId: String, name: String): String {
-        require(name.isNotBlank()) { "a tag needs a name" }
+        val trimmed = name.trim()
+        require(trimmed.isNotEmpty()) { "a tag needs a name" }
         var tagId = ""
         var newTag = false
-        var newLink: String? = null
+        var newLink = false
         writes.write({
             requireNotNull(items.item(itemId)) { "no item $itemId" }
-            val known = tags.named(name.trim()).firstOrNull()
+            val known = tags.named(trimmed).firstOrNull()
             newTag = known == null
             tagId = known?.id ?: Ids.new()
-            val linked = known != null && links.linksOfItem(itemId).any { it.tagId == tagId }
-            newLink = if (linked) null else Ids.new()
-            mapOf(TAG to if (newTag) listOf(tagId) else emptyList(), ITEM_TAG to listOfNotNull(newLink))
+            newLink = known == null || links.linksOfItem(itemId).none { it.tagId == tagId }
+            mapOf(TAG to if (newTag) listOf(tagId) else emptyList(), ITEM_TAG to if (newLink) listOf(linkId(itemId, tagId)) else emptyList())
         }) { store, _ ->
             val s = writes.clock.tick()
-            if (newTag) writes.merger.created(store, tagRow(tagId, s, name.trim(), suggested = true))
-            newLink?.let { writes.merger.created(store, linkRow(it, s, itemId, tagId)) }
+            if (newTag) writes.merger.created(store, tagRow(tagId, s, trimmed))
+            if (newLink) {
+                store.removePurge(linkId(itemId, tagId))
+                writes.merger.created(store, linkRow(s, itemId, tagId, suggested = true))
+            }
         }
         return tagId
     }
 
-    /** The person keeps the suggested tag: it stops being a suggestion and is a tag like any other (R39). */
+    /** The person keeps the suggestion for [itemId]: its link stops being a suggestion, here only (R39). */
     suspend fun acceptSuggestion(itemId: String, tagId: String) {
-        writes.edit(TAG, tagId, SUGGESTED, {
-            requireNotNull(tags.tag(tagId)) { "no tag $tagId" }
+        writes.edit(ITEM_TAG, linkId(itemId, tagId), SUGGESTED, {
             require(links.linksOfItem(itemId).any { it.tagId == tagId }) { "item $itemId does not carry tag $tagId" }
         }) { mapOf("suggested" to false) }
     }
+
+    /** Whether [tagId] is on [itemId] only as a suggestion. */
+    suspend fun isSuggested(itemId: String, tagId: String): Boolean =
+        links.linksOfItem(itemId).firstOrNull { it.tagId == tagId }?.suggested ?: false
 
     /**
      * Deletes the tag and its links (R152). Its sub-tags move to its parent, or become top-level; its items
@@ -219,16 +243,16 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         }
     }
 
-    suspend fun getTag(tagId: String): Tag? = tags.tag(tagId)?.toTag()
+    suspend fun getTag(tagId: String): Tag? = tags.tag(tagId)?.let { listOf(it).toTags().single() }
 
-    suspend fun tags(): List<Tag> = tags.allTags().map { it.toTag() }
+    suspend fun tags(): List<Tag> = tags.allTags().toTags()
 
-    suspend fun childrenOf(tagId: String): List<Tag> = tags.childrenOf(tagId).map { it.toTag() }
+    suspend fun childrenOf(tagId: String): List<Tag> = tags.childrenOf(tagId).toTags()
 
     /** The tags on an item, by name. */
     suspend fun tagsOf(itemId: String): List<Tag> {
         val ids = links.linksOfItem(itemId).map { it.tagId }
-        return readChunked(ids) { tags.tags(it) }.map { it.toTag() }.sortedWith(compareBy({ it.name }, { it.id }))
+        return readChunked(ids) { tags.tags(it) }.toTags().sortedWith(compareBy({ it.name }, { it.id }))
     }
 
     /** The items carrying a tag. */
@@ -281,6 +305,15 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
 
     // ---- helpers ----
 
+    private class LinkCopy(val item: String, val tag: String, val suggested: Boolean)
+
+    /** Tags as the app reads them: a parent or kind that is not here reads as none. */
+    private suspend fun List<TagEntity>.toTags(): List<Tag> {
+        val parents = readChunked(mapNotNull { it.parentId }.distinct()) { tags.tags(it) }.map { it.id }.toSet()
+        val kindIds = kinds.allKinds().map { it.id }.toSet()
+        return map { it.toTag(it.parentId in parents, it.kind in kindIds) }
+    }
+
     /** Writes rows made with one stamp; [make] gets that stamp. */
     private suspend fun create(target: Pair<String, List<String>>, make: (Stamp) -> List<Row>) =
         writes.write(mapOf(target)) { store: StagedStore ->
@@ -296,16 +329,19 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         PHOTO_OUTDATED to Group(s, mapOf("outdated" to false)),
     ))
 
-    private fun tagRow(id: String, s: Stamp, name: String, parentId: String? = null, moduleKey: String? = null, suggested: Boolean = false) =
+    private fun tagRow(id: String, s: Stamp, name: String, parentId: String? = null, moduleKey: String? = null) =
         Row(TAG, id, mapOf(
             NAME to Group(s, mapOf("name" to name)),
             PARENT to Group(s, mapOf("parentId" to parentId)),
             KIND to Group(s, mapOf("kind" to null)),
-            KEPT_TOGETHER to Group(s, mapOf("kept" to false, "homePlaceId" to null)),
+            KEPT_TOGETHER to Group(s, mapOf("kept" to false)),
+            HOME to Group(s, mapOf("homePlaceId" to null)),
             MODULE to Group(s, mapOf("moduleKey" to moduleKey)),
-            SUGGESTED to Group(s, mapOf("suggested" to suggested)),
         ))
 
-    private fun linkRow(id: String, s: Stamp, itemId: String, tagId: String) =
-        Row(ITEM_TAG, id, mapOf(LINK to Group(s, mapOf("itemId" to itemId, "tagId" to tagId))))
+    private fun linkRow(s: Stamp, itemId: String, tagId: String, suggested: Boolean = false) =
+        Row(ITEM_TAG, linkId(itemId, tagId), mapOf(
+            LINK to Group(s, mapOf("itemId" to itemId, "tagId" to tagId)),
+            SUGGESTED to Group(s, mapOf("suggested" to suggested)),
+        ))
 }
