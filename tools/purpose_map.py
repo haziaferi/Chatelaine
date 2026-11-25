@@ -274,6 +274,9 @@ def render(src=os.path.join(ROOT, "docs", "purpose-map.json"), dst=os.path.join(
     for w in d["where"]:
         rep = "; ".join(f"{names.get(x[0], x[0])} ({x[1]})" for x in w.get("repeats", [])) or "none"
         out.append(f"| {w['thing']} | {names.get(w['home'], w['home'])} | {rep} |")
+    if d.get("overlaps"):
+        out += ["", "## Overlap candidates", "", "| Entries | How the map settles it |", "|---|---|"]
+        out += [f"| {o['entries']} | {o['settled']} |" for o in d["overlaps"]]
     if d.get("scores"):
         out += ["", "## Scores (R91)", "", d["scores"]]
     if d.get("owner_answers"):

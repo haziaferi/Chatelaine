@@ -1,6 +1,6 @@
 # Purpose map
 
-Which purpose each screen serves, decided before any screen is built (R90) and scored on R91's axes against the seven walked reference apps. The Inventory screens, under purpose set S5, approved by the owner on 2026-11-25; the Wardrobe, Pantry and Shopping screens are provisional until each module is designed (R97, stage 10), and the homepage is designed last (R84).
+Which purpose each screen serves, decided before any screen is built (R90) and scored on R91's axes against the seven walked reference apps. The Inventory screens, under purpose set S5, approved by the owner on 2026-11-25; the Wardrobe, Pantry and Shopping screens are provisional until each module is designed (R97, stage 10), and the homepage is designed last (R84). Replaces the unscored draft of 2026-10-28 (in git history); its purposes, scored as set SD, came last of five.
 
 Generated from `docs/purpose-map.json` by `tools/purpose_map.py --render`; edit the JSON, not this page.
 
@@ -79,6 +79,18 @@ Generated from `docs/purpose-map.json` by `tools/purpose_map.py --render`; edit 
 | notification switches | Settings | none |
 | backups | Backup and restore | none |
 
+## Overlap candidates
+
+| Entries | How the map settles it |
+|---|---|
+| search bar, tag grid, tag results | tag results are Search and results filtered by the tag; the Tags screen holds only the tag tree |
+| place map, Places entry, place filter | the Places card opens the map; the filter stays on Search and results; open: whether the map itself filters, at stage 3 |
+| place contents, photo browsing | two screens, Place page and Photos; open: one place screen showing its photo first, at stage 3 |
+| photo add, settled area | Capture and the Place page; open: one camera flow with two starting points, at stages 3 and 4 |
+| proposal review, bulk tag edit, tag suggestions | proposals on Capture, bulk edits on Search and results; open: one selection toolbar, at stage 2 |
+| object of the day, rediscover prompt | two: one passive on the homepage, one opt-in outside the app (R86) |
+| backup, sync | the sync folder in Settings, backups on their own screen; open: one settings entry for both |
+
 ## Scores (R91)
 
 ### Purpose sets
@@ -89,6 +101,7 @@ Generated from `docs/purpose-map.json` by `tools/purpose_map.py --render`; edit 
 | SM one purpose per module | 0.993 | 0.834 | 0.553 | 0.911 | 0.974 | 0.853 | 2 |
 | S6 six, by job | 0.993 | 0.463 | 0.918 | 0.864 | 0.974 | 0.842 | 3 |
 | S7 seven, by job | 0.993 | 0.460 | 0.922 | 0.855 | 0.974 | 0.841 | 4 |
+| SD the 2026-10-28 draft, its modules section as one purpose | 0.993 | 0.444 | 0.883 | 0.827 | 0.974 | 0.824 | 5 |
 
 ### Maps and controls
 

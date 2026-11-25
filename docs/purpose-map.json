@@ -1,5 +1,5 @@
 {
- "about": "Which purpose each screen serves, decided before any screen is built (R90) and scored on R91's axes against the seven walked reference apps. The Inventory screens, under purpose set S5, approved by the owner on 2026-11-25; the Wardrobe, Pantry and Shopping screens are provisional until each module is designed (R97, stage 10), and the homepage is designed last (R84).",
+ "about": "Which purpose each screen serves, decided before any screen is built (R90) and scored on R91's axes against the seven walked reference apps. The Inventory screens, under purpose set S5, approved by the owner on 2026-11-25; the Wardrobe, Pantry and Shopping screens are provisional until each module is designed (R97, stage 10), and the homepage is designed last (R84). Replaces the unscored draft of 2026-10-28 (in git history); its purposes, scored as set SD, came last of five.",
  "purposes": {
   "P1": {
    "name": "Log",
@@ -332,7 +332,37 @@
    "home": "backup"
   }
  ],
- "scores": "### Purpose sets\n\n| | coverage | exclusivity | balance | fit | potential | total | rank |\n|---|---|---|---|---|---|---|---|\n| S5 five, by what the user is doing | 0.993 | 0.558 | 0.919 | 0.874 | 0.974 | 0.864 | 1 |\n| SM one purpose per module | 0.993 | 0.834 | 0.553 | 0.911 | 0.974 | 0.853 | 2 |\n| S6 six, by job | 0.993 | 0.463 | 0.918 | 0.864 | 0.974 | 0.842 | 3 |\n| S7 seven, by job | 0.993 | 0.460 | 0.922 | 0.855 | 0.974 | 0.841 | 4 |\n\n### Maps and controls\n\n| | screen count | one home per thing | steps per scenario | recall load | total | rank |\n|---|---|---|---|---|---|---|\n| by purpose | 0.781 | 0.385 | 0.926 | 0.973 | 0.766 | 1 |\n| hybrid | 0.657 | 0.143 | 0.926 | 1.000 | 0.682 | 2 |\n| by module | 0.410 | 0.000 | 0.889 | 1.000 | 0.575 | 3 |\n| control: boxorg | 0.125 | 1.000 | 0.179 | 0.578 | 0.470 | 4 |\n| control: prepper | 0.000 | 1.000 | 0.068 | 0.800 | 0.467 | 5 |\n| control: hot-stuff | 0.000 | 1.000 | 0.048 | 0.707 | 0.439 | 6 |\n| control: flindex | 0.000 | 1.000 | 0.069 | 0.618 | 0.422 | 7 |\n| control: StuffList | 0.000 | 1.000 | 0.123 | 0.486 | 0.402 | 8 |\n| control: personal-stuff | 0.000 | 0.636 | 0.035 | 0.542 | 0.303 | 9 |\n| control: whohasmystuff | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 10 |\n\n| | screens | functions | per screen | repeats / things | taps mean | recall steps | undone | first in the plateau test |\n|---|---|---|---|---|---|---|---|---|\n| hybrid | 18 | 107 | 5.94 | 3 / 14 | 4.11 | 0 | 0 | 0% |\n| by module | 24 | 107 | 4.46 | 4 / 14 | 4.22 | 0 | 0 | 0% |\n| by purpose | 16 | 107 | 6.69 | 2 / 13 | 4.11 | 1 | 0 | 100% |\n| StuffList | 9 | 14 | 1.56 | 0 / 6 | 15.0 | 12 | 7 | 0% |\n| boxorg | 4 | 11 | 2.75 | 0 / 4 | 13.0 | 13 | 6 | 0% |\n| flindex | 7 | 13 | 1.86 | 0 / 4 | 13.5 | 6 | 7 | 0% |\n| hot-stuff | 10 | 19 | 1.9 | 0 / 4 | 17.0 | 5 | 7 | 0% |\n| personal-stuff | 17 | 26 | 1.53 | 1 / 11 | 16.0 | 3 | 8 | 0% |\n| prepper | 19 | 31 | 1.63 | 0 / 6 | 14.0 | 0 | 7 | 0% |\n| whohasmystuff | 4 | 8 | 2.0 | 2 / 2 | None | 0 | 9 | 0% |",
+ "overlaps": [
+  {
+   "entries": "search bar, tag grid, tag results",
+   "settled": "tag results are Search and results filtered by the tag; the Tags screen holds only the tag tree"
+  },
+  {
+   "entries": "place map, Places entry, place filter",
+   "settled": "the Places card opens the map; the filter stays on Search and results; open: whether the map itself filters, at stage 3"
+  },
+  {
+   "entries": "place contents, photo browsing",
+   "settled": "two screens, Place page and Photos; open: one place screen showing its photo first, at stage 3"
+  },
+  {
+   "entries": "photo add, settled area",
+   "settled": "Capture and the Place page; open: one camera flow with two starting points, at stages 3 and 4"
+  },
+  {
+   "entries": "proposal review, bulk tag edit, tag suggestions",
+   "settled": "proposals on Capture, bulk edits on Search and results; open: one selection toolbar, at stage 2"
+  },
+  {
+   "entries": "object of the day, rediscover prompt",
+   "settled": "two: one passive on the homepage, one opt-in outside the app (R86)"
+  },
+  {
+   "entries": "backup, sync",
+   "settled": "the sync folder in Settings, backups on their own screen; open: one settings entry for both"
+  }
+ ],
+ "scores": "### Purpose sets\n\n| | coverage | exclusivity | balance | fit | potential | total | rank |\n|---|---|---|---|---|---|---|---|\n| S5 five, by what the user is doing | 0.993 | 0.558 | 0.919 | 0.874 | 0.974 | 0.864 | 1 |\n| SM one purpose per module | 0.993 | 0.834 | 0.553 | 0.911 | 0.974 | 0.853 | 2 |\n| S6 six, by job | 0.993 | 0.463 | 0.918 | 0.864 | 0.974 | 0.842 | 3 |\n| S7 seven, by job | 0.993 | 0.460 | 0.922 | 0.855 | 0.974 | 0.841 | 4 |\n| SD the 2026-10-28 draft, its modules section as one purpose | 0.993 | 0.444 | 0.883 | 0.827 | 0.974 | 0.824 | 5 |\n\n### Maps and controls\n\n| | screen count | one home per thing | steps per scenario | recall load | total | rank |\n|---|---|---|---|---|---|---|\n| by purpose | 0.781 | 0.385 | 0.926 | 0.973 | 0.766 | 1 |\n| hybrid | 0.657 | 0.143 | 0.926 | 1.000 | 0.682 | 2 |\n| by module | 0.410 | 0.000 | 0.889 | 1.000 | 0.575 | 3 |\n| control: boxorg | 0.125 | 1.000 | 0.179 | 0.578 | 0.470 | 4 |\n| control: prepper | 0.000 | 1.000 | 0.068 | 0.800 | 0.467 | 5 |\n| control: hot-stuff | 0.000 | 1.000 | 0.048 | 0.707 | 0.439 | 6 |\n| control: flindex | 0.000 | 1.000 | 0.069 | 0.618 | 0.422 | 7 |\n| control: StuffList | 0.000 | 1.000 | 0.123 | 0.486 | 0.402 | 8 |\n| control: personal-stuff | 0.000 | 0.636 | 0.035 | 0.542 | 0.303 | 9 |\n| control: whohasmystuff | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 10 |\n\n| | screens | functions | per screen | repeats / things | taps mean | recall steps | undone | first in the plateau test |\n|---|---|---|---|---|---|---|---|---|\n| hybrid | 18 | 107 | 5.94 | 3 / 14 | 4.11 | 0 | 0 | 0% |\n| by module | 24 | 107 | 4.46 | 4 / 14 | 4.22 | 0 | 0 | 0% |\n| by purpose | 16 | 107 | 6.69 | 2 / 13 | 4.11 | 1 | 0 | 100% |\n| StuffList | 9 | 14 | 1.56 | 0 / 6 | 15.0 | 12 | 7 | 0% |\n| boxorg | 4 | 11 | 2.75 | 0 / 4 | 13.0 | 13 | 6 | 0% |\n| flindex | 7 | 13 | 1.86 | 0 / 4 | 13.5 | 6 | 7 | 0% |\n| hot-stuff | 10 | 19 | 1.9 | 0 / 4 | 17.0 | 5 | 7 | 0% |\n| personal-stuff | 17 | 26 | 1.53 | 1 / 11 | 16.0 | 3 | 8 | 0% |\n| prepper | 19 | 31 | 1.63 | 0 / 6 | 14.0 | 0 | 7 | 0% |\n| whohasmystuff | 4 | 8 | 2.0 | 2 / 2 | None | 0 | 9 | 0% |",
  "owner_answers": [
   "2026-11-25: scoring defaults for R91 accepted; screen count as functions per screen and steps against the fewest taps, after the first scoring let five reference apps win.",
   "2026-11-25: screens by purpose confirmed for the Inventory module only; the other modules are not yet conceptually developed.",
