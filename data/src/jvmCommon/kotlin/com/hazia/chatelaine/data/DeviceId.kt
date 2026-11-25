@@ -8,6 +8,12 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 /**
+ * The directory, under the app's files, that holds the device id file (`identity/device-id`) and nothing else:
+ * Android's backup rules exclude this whole directory (R59), so a restored or transferred phone makes its own id.
+ */
+const val DEVICE_ID_DIR = "identity"
+
+/**
  * This device's sync identity, kept in its own [file]: not a setting and not in the database, so neither a
  * settings reset nor a recovered database gives the device a new one. A UUID, as every Chatelaine id is (R52).
  *
