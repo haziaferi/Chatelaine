@@ -74,6 +74,7 @@ internal fun fieldValueTable(dao: FieldValueDao) =
     EntityTable(
         dao::values, dao::allValues, dao::putValues, dao::deleteValues,
         FieldValueEntity::toRow, Row::toFieldValueEntity,
+        ownersOf = { listOf(it.ownerId) },
     ) {
         listOf(FIELD_DEF to it.defId)
     }

@@ -69,6 +69,7 @@ internal fun fieldAttachTable(dao: FieldAttachDao) =
     EntityTable(
         dao::attaches, dao::allAttaches, dao::putAttaches, dao::deleteAttaches,
         FieldAttachEntity::toRow, Row::toFieldAttachEntity,
+        ownersOf = { listOfNotNull(it.itemId) },
     ) {
         listOf(FIELD_DEF to it.defId)
     }

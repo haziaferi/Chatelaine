@@ -19,6 +19,13 @@ const val PHOTO_REGION = "photo_region"
 internal const val AREA = "area"
 internal const val TARGET = "target"
 
+/** Room for the rounding of an edge that sums to one. */
+private const val EDGE = 1e-9
+
+/** Whether an area lies inside its photo and has a size: fractions of the photo's width and height (R41). */
+internal fun regionFits(x: Double, y: Double, w: Double, h: Double): Boolean =
+    x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= 1 + EDGE && y + h <= 1 + EDGE
+
 /**
  * A marked area of a photo that points to the item it shows (R41): [x], [y], [w] and [h] are fractions of the
  * photo's width and height, the area's left and top edge and its size. The two groups are edited apart, so
@@ -83,13 +90,19 @@ internal fun PhotoRegionEntity.toRow() = Row(PHOTO_REGION, id, mapOf(
 internal fun Row.toPhotoRegionEntity(): PhotoRegionEntity {
     val area = groups.getValue(AREA)
     val target = groups.getValue(TARGET)
+    val x = (area.values["x"] as Number).toDouble()
+    val y = (area.values["y"] as Number).toDouble()
+    val w = (area.values["w"] as Number).toDouble()
+    val h = (area.values["h"] as Number).toDouble()
+    // A peer's row is checked here too: an area outside its photo is not a region this version can read.
+    require(regionFits(x, y, w, h)) { "a region lies inside the photo: x=$x y=$y w=$w h=$h" }
     return PhotoRegionEntity(
         id = id,
         photoId = area.values["photoId"] as String,
-        x = (area.values["x"] as Number).toDouble(),
-        y = (area.values["y"] as Number).toDouble(),
-        w = (area.values["w"] as Number).toDouble(),
-        h = (area.values["h"] as Number).toDouble(),
+        x = x,
+        y = y,
+        w = w,
+        h = h,
         areaHlc = area.stamp.hlc,
         areaDevice = area.stamp.device,
         itemId = target.values["itemId"] as String,

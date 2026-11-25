@@ -20,6 +20,9 @@ internal const val OWNER = "owner"
 internal const val BLOB = "blob"
 internal const val TAKEN = "taken"
 
+/** What a photo's hash looks like: a SHA-256, 64 lower-case hex digits (R56). */
+internal val PHOTO_HASH = Regex("[0-9a-f]{64}")
+
 /**
  * A photo (R41), on an item or on a place and never both: exactly one of [itemId] and [placeId] is set. The photo
  * names its picture by the hash of the content (R56); the files themselves are stored elsewhere. The keys are
@@ -95,6 +98,9 @@ internal fun Row.toPhotoEntity(): PhotoEntity {
     val owner = groups.getValue(OWNER)
     val blob = groups.getValue(BLOB)
     val taken = groups.getValue(TAKEN)
+    // A peer's row is checked here too: a row that breaks these is not a photo this version can read.
+    require((owner.values["itemId"] == null) != (owner.values["placeId"] == null)) { "a photo has exactly one owner" }
+    require(PHOTO_HASH.matches(blob.values["hash"] as String)) { "a photo hash is 64 lower-case hex digits" }
     return PhotoEntity(
         id = id,
         itemId = owner.values["itemId"] as String?,
