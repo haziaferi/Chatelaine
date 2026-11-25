@@ -6,9 +6,9 @@ import androidx.sqlite.execSQL
 
 /**
  * The synced tables, by the name their folder records carry, parents before children;
- * [SchemaTriggers] queues writes to each for export. Empty until the first data table is added.
+ * [SchemaTriggers] queues writes to each for export.
  */
-internal val SYNCED_TABLES: List<String> = emptyList()
+internal val SYNCED_TABLES: List<String> = listOf(TAG_KIND, TAG, ITEM, ITEM_TAG)
 
 /**
  * The triggers Room's annotations cannot declare, dropped and created again on every open so an
@@ -34,6 +34,19 @@ internal class SchemaTriggers(private val tables: List<String> = SYNCED_TABLES) 
             val name = "purge_outbox_${event.lowercase()}"
             add("DROP TRIGGER IF EXISTS $name")
             add("CREATE TRIGGER $name AFTER $event ON purge_registry BEGIN INSERT INTO sync_outbox(id, tbl) VALUES (NEW.id, NULL); END")
+        }
+    }
+
+    /**
+     * A new database holds the five default tag kinds (R38). They are written before the triggers exist, so
+     * they are not queued: every device makes the same rows (fixed ids, [NEVER_WRITTEN] stamps).
+     */
+    override fun onCreate(connection: SQLiteConnection) {
+        DEFAULT_KINDS.forEachIndexed { position, (id, name) ->
+            connection.execSQL(
+                "INSERT INTO tag_kind(id, name, name_hlc, name_device, position, order_hlc, order_device) " +
+                    "VALUES ('$id', '$name', ${NEVER_WRITTEN.hlc}, '${NEVER_WRITTEN.device}', $position, ${NEVER_WRITTEN.hlc}, '${NEVER_WRITTEN.device}')",
+            )
         }
     }
 
