@@ -93,6 +93,11 @@ Generated from `docs/purpose-map.json` by `tools/purpose_map.py --render`; edit 
 
 ## Scores (R91)
 
+- Coverage and exclusivity: means over the seven walked apps' 122 functions, each with the 23 scenario steps of R05 to R11, R114 and R115. Fit: over Chatelaine's 107 functions. Potential: the share of the 76 functions Chatelaine lacks or only partly has whose main facet lands in a purpose.
+- Screen count: functions per screen, 2 or fewer scores 0, 8 or more scores 1. Steps: per scenario, the fewest taps any map needs over this map's taps, 0 when it cannot be done. Recall: 1 minus the share of steps that need something the screen does not show.
+- Plateau test: how often a map comes first with every constant moved down and up by a third.
+- Reference apps are scored as controls on the screens-and-homes axes; every one must score below the chosen map.
+
 ### Purpose sets
 
 | | coverage | exclusivity | balance | fit | potential | total | rank |
@@ -130,6 +135,23 @@ Generated from `docs/purpose-map.json` by `tools/purpose_map.py --render`; edit 
 | personal-stuff | 17 | 26 | 1.53 | 1 / 11 | 16.0 | 3 | 8 | 0% |
 | prepper | 19 | 31 | 1.63 | 0 / 6 | 14.0 | 0 | 7 | 0% |
 | whohasmystuff | 4 | 8 | 2.0 | 2 / 2 | None | 0 | 9 | 0% |
+
+### Purposes of each set
+
+| Set | Purposes |
+|---|---|
+| S5 five, by what the user is doing | Log · Find · Arrange · Use up and buy · Look after the app |
+| S7 seven, by job | Log · Find · Places · Tags · Run out and wear · Shop · Look after the app |
+| SM one purpose per module | Inventory · Wardrobe · Pantry · Shopping · App |
+| S6 six, by job | Log · Find · Arrange · Run out and wear · Shop · Look after the app |
+| SD the 2026-10-28 draft, its modules section as one purpose | Find · Record · Organise · Know the storage · Keep in view · Look after it · Modules |
+
+### Screens of the other candidate maps
+
+| Map | Screens |
+|---|---|
+| hybrid | Homepage, Search and results, Expiration timeline, Item page, Quick add, Capture and proposals, Fields, Place page, Place map, Tags, Photos, Backup and restore, Pantry, Wardrobe, Shopping list, Store list, Prices, Settings |
+| by module | Homepage, Search and results, Expiration timeline, Item page, Quick add, Capture and proposals, Fields, Place page, Place map, Tags, Photos, Backup and restore, Wardrobe, Outfits, Seasonal swap, Pantry stock, Run-out, Shopping list, Wish list, Store list, Prices, Stores, Settings, Notifications |
 
 ## Owner's answers
 

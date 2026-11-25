@@ -278,7 +278,13 @@ def render(src=os.path.join(ROOT, "docs", "purpose-map.json"), dst=os.path.join(
         out += ["", "## Overlap candidates", "", "| Entries | How the map settles it |", "|---|---|"]
         out += [f"| {o['entries']} | {o['settled']} |" for o in d["overlaps"]]
     if d.get("scores"):
-        out += ["", "## Scores (R91)", "", d["scores"]]
+        out += ["", "## Scores (R91)", ""] + [f"- {n}" for n in d.get("score_notes", [])] + ["", d["scores"]]
+    if d.get("sets"):
+        out += ["", "### Purposes of each set", "", "| Set | Purposes |", "|---|---|"]
+        out += [f"| {k} {v['name']} | {' · '.join(v['purposes'])} |" for k, v in d["sets"].items()]
+    if d.get("candidates"):
+        out += ["", "### Screens of the other candidate maps", "", "| Map | Screens |", "|---|---|"]
+        out += [f"| {c['name']} | {', '.join(c['screens'])} |" for c in d["candidates"]]
     if d.get("owner_answers"):
         out += ["", "## Owner's answers", ""] + [f"- {a}" for a in d["owner_answers"]]
     with open(dst, "w", encoding="utf-8", newline="\n") as fh:

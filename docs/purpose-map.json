@@ -363,6 +363,123 @@
   }
  ],
  "scores": "### Purpose sets\n\n| | coverage | exclusivity | balance | fit | potential | total | rank |\n|---|---|---|---|---|---|---|---|\n| S5 five, by what the user is doing | 0.993 | 0.558 | 0.919 | 0.874 | 0.974 | 0.864 | 1 |\n| SM one purpose per module | 0.993 | 0.834 | 0.553 | 0.911 | 0.974 | 0.853 | 2 |\n| S6 six, by job | 0.993 | 0.463 | 0.918 | 0.864 | 0.974 | 0.842 | 3 |\n| S7 seven, by job | 0.993 | 0.460 | 0.922 | 0.855 | 0.974 | 0.841 | 4 |\n| SD the 2026-10-28 draft, its modules section as one purpose | 0.993 | 0.444 | 0.883 | 0.827 | 0.974 | 0.824 | 5 |\n\n### Maps and controls\n\n| | screen count | one home per thing | steps per scenario | recall load | total | rank |\n|---|---|---|---|---|---|---|\n| by purpose | 0.781 | 0.385 | 0.926 | 0.973 | 0.766 | 1 |\n| hybrid | 0.657 | 0.143 | 0.926 | 1.000 | 0.682 | 2 |\n| by module | 0.410 | 0.000 | 0.889 | 1.000 | 0.575 | 3 |\n| control: boxorg | 0.125 | 1.000 | 0.179 | 0.578 | 0.470 | 4 |\n| control: prepper | 0.000 | 1.000 | 0.068 | 0.800 | 0.467 | 5 |\n| control: hot-stuff | 0.000 | 1.000 | 0.048 | 0.707 | 0.439 | 6 |\n| control: flindex | 0.000 | 1.000 | 0.069 | 0.618 | 0.422 | 7 |\n| control: StuffList | 0.000 | 1.000 | 0.123 | 0.486 | 0.402 | 8 |\n| control: personal-stuff | 0.000 | 0.636 | 0.035 | 0.542 | 0.303 | 9 |\n| control: whohasmystuff | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 10 |\n\n| | screens | functions | per screen | repeats / things | taps mean | recall steps | undone | first in the plateau test |\n|---|---|---|---|---|---|---|---|---|\n| hybrid | 18 | 107 | 5.94 | 3 / 14 | 4.11 | 0 | 0 | 0% |\n| by module | 24 | 107 | 4.46 | 4 / 14 | 4.22 | 0 | 0 | 0% |\n| by purpose | 16 | 107 | 6.69 | 2 / 13 | 4.11 | 1 | 0 | 100% |\n| StuffList | 9 | 14 | 1.56 | 0 / 6 | 15.0 | 12 | 7 | 0% |\n| boxorg | 4 | 11 | 2.75 | 0 / 4 | 13.0 | 13 | 6 | 0% |\n| flindex | 7 | 13 | 1.86 | 0 / 4 | 13.5 | 6 | 7 | 0% |\n| hot-stuff | 10 | 19 | 1.9 | 0 / 4 | 17.0 | 5 | 7 | 0% |\n| personal-stuff | 17 | 26 | 1.53 | 1 / 11 | 16.0 | 3 | 8 | 0% |\n| prepper | 19 | 31 | 1.63 | 0 / 6 | 14.0 | 0 | 7 | 0% |\n| whohasmystuff | 4 | 8 | 2.0 | 2 / 2 | None | 0 | 9 | 0% |",
+ "score_notes": [
+  "Coverage and exclusivity: means over the seven walked apps' 122 functions, each with the 23 scenario steps of R05 to R11, R114 and R115. Fit: over Chatelaine's 107 functions. Potential: the share of the 76 functions Chatelaine lacks or only partly has whose main facet lands in a purpose.",
+  "Screen count: functions per screen, 2 or fewer scores 0, 8 or more scores 1. Steps: per scenario, the fewest taps any map needs over this map's taps, 0 when it cannot be done. Recall: 1 minus the share of steps that need something the screen does not show.",
+  "Plateau test: how often a map comes first with every constant moved down and up by a third.",
+  "Reference apps are scored as controls on the screens-and-homes axes; every one must score below the chosen map."
+ ],
+ "sets": {
+  "S5": {
+   "name": "five, by what the user is doing",
+   "purposes": [
+    "Log",
+    "Find",
+    "Arrange",
+    "Use up and buy",
+    "Look after the app"
+   ]
+  },
+  "S7": {
+   "name": "seven, by job",
+   "purposes": [
+    "Log",
+    "Find",
+    "Places",
+    "Tags",
+    "Run out and wear",
+    "Shop",
+    "Look after the app"
+   ]
+  },
+  "SM": {
+   "name": "one purpose per module",
+   "purposes": [
+    "Inventory",
+    "Wardrobe",
+    "Pantry",
+    "Shopping",
+    "App"
+   ]
+  },
+  "S6": {
+   "name": "six, by job",
+   "purposes": [
+    "Log",
+    "Find",
+    "Arrange",
+    "Run out and wear",
+    "Shop",
+    "Look after the app"
+   ]
+  },
+  "SD": {
+   "name": "the 2026-10-28 draft, its modules section as one purpose",
+   "purposes": [
+    "Find",
+    "Record",
+    "Organise",
+    "Know the storage",
+    "Keep in view",
+    "Look after it",
+    "Modules"
+   ]
+  }
+ },
+ "candidates": [
+  {
+   "name": "hybrid",
+   "screens": [
+    "Homepage",
+    "Search and results",
+    "Expiration timeline",
+    "Item page",
+    "Quick add",
+    "Capture and proposals",
+    "Fields",
+    "Place page",
+    "Place map",
+    "Tags",
+    "Photos",
+    "Backup and restore",
+    "Pantry",
+    "Wardrobe",
+    "Shopping list",
+    "Store list",
+    "Prices",
+    "Settings"
+   ]
+  },
+  {
+   "name": "by module",
+   "screens": [
+    "Homepage",
+    "Search and results",
+    "Expiration timeline",
+    "Item page",
+    "Quick add",
+    "Capture and proposals",
+    "Fields",
+    "Place page",
+    "Place map",
+    "Tags",
+    "Photos",
+    "Backup and restore",
+    "Wardrobe",
+    "Outfits",
+    "Seasonal swap",
+    "Pantry stock",
+    "Run-out",
+    "Shopping list",
+    "Wish list",
+    "Store list",
+    "Prices",
+    "Stores",
+    "Settings",
+    "Notifications"
+   ]
+  }
+ ],
  "owner_answers": [
   "2026-11-25: scoring defaults for R91 accepted; screen count as functions per screen and steps against the fewest taps, after the first scoring let five reference apps win.",
   "2026-11-25: screens by purpose confirmed for the Inventory module only; the other modules are not yet conceptually developed.",
