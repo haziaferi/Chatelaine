@@ -219,10 +219,10 @@ internal class FolderSync(
         // An owner has no foreign key, so a row that names a purged one is dropped, and one that names an id not here
         // (yet) is applied: the id reads as none until it arrives.
         val ownersOf = lines.associate { (text, r) -> text to (if (r is RowRecord) tables.getValue(r.row.table).owners(r.row) else emptyList()) }
-        // A purge in this same batch counts too: a snapshot holds a row and the purge of its owner side by side.
-        val purgedHere = lines.mapNotNull { (it.second as? PurgeRecord)?.id }.toSet()
+        // Only purges already in the database count: one in this same batch may still be taken back by a newer edit of its
+        // row. A child of an owner purged in this batch is applied, and the sweep after the import removes it.
         val purged = (missing + ownersOf.values.flatten()).distinct().chunked(StagedStore.CHUNK).flatMap { dao.purges(it) }
-            .map { it.id }.toSet() + purgedHere
+            .map { it.id }.toSet()
         val ready = mutableListOf<Pair<String, Record>>()
         val waiting = mutableListOf<String>()
         val dropped = mutableListOf<String>()

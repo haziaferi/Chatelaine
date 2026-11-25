@@ -695,10 +695,39 @@ class FolderSyncTest {
             (w.sealed(RecordCodec.encode(RowRecord(attach))) + w.sealed(RecordCodec.encode(purge))).encodeToByteArray(),
         )
 
-        val report = c.import()
+        c.import()
 
-        assertEquals(1, report.skipped)
+        // Applied with the batch, then removed by the sweep that follows the import.
         assertTrue(c.rows(FIELD_ATTACH).isEmpty())
+    }
+
+    /** A purge taken back by a newer edit within one segment: a value on the revived owner, written after, still arrives. */
+    @Test
+    fun aValueOnAnOwnerWhosePurgeIsTakenBackInTheSameSegmentArrives() {
+        val w = world()
+        val a = w.Device("A")
+        val item = a.create("lamp")
+        val def = runBlocking { a.fields.define("colour", FieldType.TEXT) }
+        a.export()
+        val c = w.Device("C")
+        w.syncthing.session("A", "C")
+        c.import()
+        val back = c.rows().getValue(item).edit(NAME, Stamp(6, "X"), mapOf("name" to "back"))
+        val value = Row(FIELD_VALUE, "x-value", mapOf(
+            com.hazia.chatelaine.data.VALUE to Group(Stamp(7, "X"), mapOf(
+                "ownerId" to item, "defId" to def, "json" to com.hazia.chatelaine.data.encodeInput(FieldInput.Text("brass")),
+            )),
+        ))
+        val lines = listOf(RecordCodec.encode(PurgeRecord(item, Stamp(5, "X"))), RecordCodec.encode(RowRecord(back)), RecordCodec.encode(RowRecord(value)))
+        val folder = w.syncthing.folder("C")
+        folder.replace(FolderLayout.segment("X", 0), lines.joinToString("") { w.sealed(it) }.encodeToByteArray())
+
+        c.import()
+
+        assertEquals(setOf(item), c.rows().keys)
+        assertEquals(setOf("x-value"), c.rows(FIELD_VALUE).keys, "the value on the revived owner is kept")
+        c.import()
+        assertEquals(setOf("x-value"), c.rows(FIELD_VALUE).keys)
     }
 
     /** An attachment to a tag that was deleted goes on every device, those made before and after the delete. */
