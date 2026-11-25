@@ -69,6 +69,10 @@ internal interface PhotoDao {
     @Query("SELECT * FROM photo WHERE place_id = :placeId ORDER BY id")
     suspend fun photosOfPlace(placeId: String): List<PhotoEntity>
 
+    /** The hash of every photo: the files a device keeps and carries (R56). */
+    @Query("SELECT DISTINCT hash FROM photo")
+    suspend fun photoHashes(): List<String>
+
     @Query("SELECT DISTINCT item_id FROM photo WHERE item_id IN (:ids)")
     suspend fun itemIdsWithPhotos(ids: List<String>): List<String>
 
