@@ -1,0 +1,206 @@
+{
+ "app": "flindex",
+ "features": [
+  {
+   "id": "flindex-01",
+   "name": "Open or create a box by code",
+   "where": "home",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R32",
+    "R88"
+   ],
+   "match_note": "Places are made in the tree and a label's QR opens one; no typed or user-chosen code.",
+   "facets": [
+    "codes",
+    "places"
+   ]
+  },
+  {
+   "id": "flindex-02",
+   "name": "Scan a QR code or barcode",
+   "where": "home, scan button",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R88"
+   ],
+   "match_note": "The QR on Chatelaine's own labels opens a place; existing barcodes are not read.",
+   "facets": [
+    "codes"
+   ]
+  },
+  {
+   "id": "flindex-03",
+   "name": "Open a box from an NFC tag",
+   "where": "not visible",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R88",
+    "R100"
+   ],
+   "match_note": "NFC tags are named for stage 11 only, pending their own decision.",
+   "facets": [
+    "codes",
+    "places"
+   ]
+  },
+  {
+   "id": "flindex-04",
+   "name": "Search items across all boxes",
+   "where": "search screen",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R81"
+   ],
+   "match_note": "Search finds items by name and tag; grouping results by place is left to screen design.",
+   "facets": [
+    "search"
+   ]
+  },
+  {
+   "id": "flindex-05",
+   "name": "See a list of all boxes",
+   "where": "inventory overview",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R32",
+    "R83",
+    "R84"
+   ],
+   "match_note": "Place tree, place map and the homepage places card.",
+   "facets": [
+    "browse",
+    "places"
+   ]
+  },
+  {
+   "id": "flindex-06",
+   "name": "See what is in a box",
+   "where": "inventory view",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R09",
+    "R100",
+    "R111"
+   ],
+   "match_note": "Place contents view.",
+   "facets": [
+    "inside"
+   ]
+  },
+  {
+   "id": "flindex-07",
+   "name": "Rename a box",
+   "where": "edit inventory",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R32",
+    "R33"
+   ],
+   "match_note": "A place carries the name of what it is.",
+   "facets": [
+    "places"
+   ]
+  },
+  {
+   "id": "flindex-08",
+   "name": "Add an item to a box",
+   "where": "edit inventory",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R29",
+    "R111"
+   ],
+   "match_note": "An item exists with a name only and can be noted in a place.",
+   "facets": [
+    "add",
+    "inside"
+   ]
+  },
+  {
+   "id": "flindex-09",
+   "name": "Remove an item from a box",
+   "where": "edit inventory",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R100",
+    "R143"
+   ],
+   "match_note": "Moving out of a place is defined; deleting an item is mentioned only in passing (R143).",
+   "facets": [
+    "edit",
+    "inside"
+   ]
+  },
+  {
+   "id": "flindex-10",
+   "name": "Delete a box and all its items",
+   "where": "edit inventory",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R32",
+    "R117"
+   ],
+   "match_note": "Deleting a place is implied (R117); what happens to its contents is not defined.",
+   "facets": [
+    "places",
+    "edit"
+   ]
+  },
+  {
+   "id": "flindex-11",
+   "name": "Choose a light or dark theme",
+   "where": "settings",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R94"
+   ],
+   "match_note": "No theme setting; the look is workshopped per screen.",
+   "facets": [
+    "settings"
+   ]
+  },
+  {
+   "id": "flindex-12",
+   "name": "Export data as JSON",
+   "where": "settings",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R60"
+   ],
+   "match_note": "Manual export of JSON and photos.",
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "flindex-13",
+   "name": "Import data from a file",
+   "where": "settings",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R60",
+    "R61"
+   ],
+   "match_note": "Import and restore, merged by sync stamps.",
+   "facets": [
+    "data"
+   ]
+  }
+ ]
+}

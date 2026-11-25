@@ -1,0 +1,66 @@
+{"name": "StuffList", "control": true, "purpose_set": null,
+ "screens": [
+  {"id": "intro", "name": "Intro tutorial", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "main", "name": "Main: list of trips", "purpose": null, "features": [], "surface": false, "homepage": true},
+  {"id": "newtrip", "name": "Name a new trip (dialog with a field)", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "trip", "name": "Trip: item photo grid", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "schedule", "name": "Schedule departures (dialog)", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "item", "name": "Add / edit item", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "viewer", "name": "Photo viewer", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "tripsort", "name": "Trip sort preference", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "itemsort", "name": "Item sort preference", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "notification", "name": "Items left for a trip (notification)", "purpose": null, "features": [], "surface": true, "homepage": false}
+ ],
+ "where": [
+  {"thing": "trip", "home": "main", "repeats": []},
+  {"thing": "item (name, note, taken, brought back)", "home": "item", "repeats": []},
+  {"thing": "item photo", "home": "item", "repeats": []},
+  {"thing": "departure schedule", "home": "schedule", "repeats": []},
+  {"thing": "trip sort order", "home": "tripsort", "repeats": []},
+  {"thing": "item sort order", "home": "itemsort", "repeats": []}
+ ],
+ "runs": {
+  "R05": null,
+  "R06": null,
+  "R07": null,
+  "R08": null,
+  "R09": [
+   {"screen": "main", "do": "tap the under-sink list", "recall": null}
+  ],
+  "R10": null,
+  "R11": [
+   {"screen": "main", "do": "tap the winter storage list", "recall": null},
+   {"screen": "trip", "do": "long-press winter item 1", "recall": "the long press: the grid draws no delete"},
+   {"screen": "trip", "do": "delete", "recall": null},
+   {"screen": "trip", "do": "long-press winter item 2", "recall": "the long press: the grid draws no delete"},
+   {"screen": "trip", "do": "delete", "recall": null},
+   {"screen": "trip", "do": "long-press winter item 3", "recall": "the long press: the grid draws no delete"},
+   {"screen": "trip", "do": "delete", "recall": null},
+   {"screen": "trip", "do": "add item", "recall": null},
+   {"screen": "item", "do": "type summer item 1's name", "recall": "the summer things' names: listed only in the closet list"},
+   {"screen": "item", "do": "Add more", "recall": null},
+   {"screen": "item", "do": "type summer item 2's name", "recall": "the summer things' names: listed only in the closet list"},
+   {"screen": "item", "do": "Add more", "recall": null},
+   {"screen": "item", "do": "type summer item 3's name", "recall": "the summer things' names: listed only in the closet list"},
+   {"screen": "item", "do": "Done adding", "recall": null},
+   {"screen": "trip", "do": "back to the lists", "recall": null},
+   {"screen": "main", "do": "tap the closet list", "recall": null},
+   {"screen": "trip", "do": "long-press summer item 1", "recall": "the long press: the grid draws no delete"},
+   {"screen": "trip", "do": "delete", "recall": null},
+   {"screen": "trip", "do": "long-press summer item 2", "recall": "the long press: the grid draws no delete"},
+   {"screen": "trip", "do": "delete", "recall": null},
+   {"screen": "trip", "do": "long-press summer item 3", "recall": "the long press: the grid draws no delete"},
+   {"screen": "trip", "do": "delete", "recall": null},
+   {"screen": "trip", "do": "add item", "recall": null},
+   {"screen": "item", "do": "type winter item 1's name", "recall": "the winter things' names: deleted from the storage list, no longer shown"},
+   {"screen": "item", "do": "Add more", "recall": null},
+   {"screen": "item", "do": "type winter item 2's name", "recall": "the winter things' names: deleted from the storage list, no longer shown"},
+   {"screen": "item", "do": "Add more", "recall": null},
+   {"screen": "item", "do": "type winter item 3's name", "recall": "the winter things' names: deleted from the storage list, no longer shown"},
+   {"screen": "item", "do": "Done adding", "recall": null}
+  ],
+  "R114": null,
+  "R115": null
+ },
+ "notes": "Read from code only. Nine screens plus the departure notification as a surface: the two dialogs that take input (new trip name, schedule) are counted; the long-press popup, the camera-or-gallery chooser, About, Review and Update log are not. Main is the launch screen (the intro shows on first run). Deleting from the long-press popup and creating are not counted as repeats, so every thing has one home. One step per tap, typing a field is one step; Add more and Done adding are taken as one tap each. The app has no places, but a list is the nearest container, as the walk notes say, so the fewest-tap reading counts R09 as opening a list named for the cabinet (1 tap) and R11 as moving between a storage list and a closet list; items cannot change list, so each move is a delete and a retype, and both the long press and the retyped names are recall. R05 is null (no tags, no search), R06-R08 null (one photo per item, no recognition), R10 null (no places, no map), R114 and R115 null (no prices)."
+}

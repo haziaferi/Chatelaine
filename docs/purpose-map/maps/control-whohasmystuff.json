@@ -1,0 +1,27 @@
+{"name": "whohasmystuff", "control": true, "purpose_set": null,
+ "screens": [
+  {"id": "main", "name": "Main list of lent items", "purpose": null, "features": [], "surface": false, "homepage": true},
+  {"id": "history", "name": "History: returned items", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "add", "name": "Add New Lent Item", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "edit", "name": "Edit Lent Item", "purpose": null, "features": [], "surface": false, "homepage": false}
+ ],
+ "where": [
+  {"thing": "loan (description, type, date, person)", "home": "edit", "repeats": [
+   ["main", "the long-press menu marks a loan as returned without opening it"],
+   ["history", "Lend again puts a returned loan back on the main list"]
+  ]},
+  {"thing": "backup and restore", "home": "main", "repeats": []}
+ ],
+ "runs": {
+  "R05": null,
+  "R06": null,
+  "R07": null,
+  "R08": null,
+  "R09": null,
+  "R10": null,
+  "R11": null,
+  "R114": null,
+  "R115": null
+ },
+ "notes": "Four screens from the walk: the overflow and long-press menus, the date picker, the system contacts picker and the system calendar are not counted; Backup and Restore were not run and are taken to open no screen of their own. The loan's home is Edit; the main list's long-press Mark as Returned and History's Lend again change the same loan elsewhere, so they are repeats (delete from a menu and Add New are not counted, as in the other controls). Every run is null: there are no tags or search (R05), no photos or recognition (R06-R08), no places, only the person who has each thing, and every record is a dated loan (R09, R11), no map (R10) and no prices (R114, R115)."
+}

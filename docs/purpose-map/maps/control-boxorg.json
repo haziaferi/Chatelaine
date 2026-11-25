@@ -1,0 +1,68 @@
+{"name": "boxorg", "control": true, "purpose_set": null,
+ "screens": [
+  {"id": "home", "name": "Home: logo, search bar with its results, camera button", "purpose": null, "features": [], "surface": false, "homepage": true},
+  {"id": "mark", "name": "Mark objects on the box photo (code)", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "object", "name": "Object: labels, box number, re-photo, delete (code)", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "boxlabels", "name": "Box labels drawer, ranked by use (code)", "purpose": null, "features": [], "surface": false, "homepage": false}
+ ],
+ "where": [
+  {"thing": "object (item)", "home": "object", "repeats": []},
+  {"thing": "object label", "home": "object", "repeats": []},
+  {"thing": "object photo", "home": "object", "repeats": []},
+  {"thing": "box (number and box labels)", "home": "boxlabels", "repeats": []}
+ ],
+ "runs": {
+  "R05": [
+   {"screen": "home", "do": "type sewing in the search bar", "recall": null},
+   {"screen": "home", "do": "open sewing object 1", "recall": null},
+   {"screen": "object", "do": "type the label red skirt", "recall": null},
+   {"screen": "object", "do": "back to the results", "recall": null},
+   {"screen": "home", "do": "open sewing object 2", "recall": null},
+   {"screen": "object", "do": "type the label red skirt", "recall": "the same label text, typed again: no label suggestions seen"},
+   {"screen": "object", "do": "back to the results", "recall": null},
+   {"screen": "home", "do": "open sewing object 3", "recall": null},
+   {"screen": "object", "do": "type the label red skirt", "recall": "the same label text, typed again: no label suggestions seen"},
+   {"screen": "home", "do": "later: type red skirt in the search bar", "recall": "the label red skirt: home shows no labels"}
+  ],
+  "R06": null,
+  "R07": null,
+  "R08": null,
+  "R09": [
+   {"screen": "home", "do": "type the cabinet's box number or box label in the search bar", "recall": "the box number or label: home lists no boxes"}
+  ],
+  "R10": null,
+  "R11": [
+   {"screen": "home", "do": "type winter in the search bar", "recall": null},
+   {"screen": "home", "do": "open winter object 1", "recall": null},
+   {"screen": "object", "do": "move to another box", "recall": null},
+   {"screen": "object", "do": "type the closet's box number", "recall": "the closet's box number: no box list"},
+   {"screen": "object", "do": "back to the results", "recall": null},
+   {"screen": "home", "do": "open winter object 2", "recall": null},
+   {"screen": "object", "do": "move to another box", "recall": null},
+   {"screen": "object", "do": "type the closet's box number", "recall": "the closet's box number: no box list"},
+   {"screen": "object", "do": "back to the results", "recall": null},
+   {"screen": "home", "do": "open winter object 3", "recall": null},
+   {"screen": "object", "do": "move to another box", "recall": null},
+   {"screen": "object", "do": "type the closet's box number", "recall": "the closet's box number: no box list"},
+   {"screen": "object", "do": "back to home", "recall": null},
+   {"screen": "home", "do": "type the closet's box number in the search bar", "recall": "the closet's box number: no box list"},
+   {"screen": "home", "do": "open summer object 1", "recall": null},
+   {"screen": "object", "do": "type the label summer", "recall": null},
+   {"screen": "object", "do": "move to another box", "recall": null},
+   {"screen": "object", "do": "type the storage box number", "recall": "the storage box number: no box list"},
+   {"screen": "object", "do": "back to the results", "recall": null},
+   {"screen": "home", "do": "open summer object 2", "recall": null},
+   {"screen": "object", "do": "type the label summer", "recall": "the same label text, typed again"},
+   {"screen": "object", "do": "move to another box", "recall": null},
+   {"screen": "object", "do": "type the storage box number", "recall": "the storage box number: no box list"},
+   {"screen": "object", "do": "back to the results", "recall": null},
+   {"screen": "home", "do": "open summer object 3", "recall": null},
+   {"screen": "object", "do": "type the label summer", "recall": "the same label text, typed again"},
+   {"screen": "object", "do": "move to another box", "recall": null},
+   {"screen": "object", "do": "type the storage box number", "recall": "the storage box number: no box list"}
+  ],
+  "R114": null,
+  "R115": null
+ },
+ "notes": "The walk was shallow (camera denied), so every screen past home is from the code notes: mark objects, the object (labels, box number, re-photo, delete) and the box-labels drawer; search results are counted as part of home, the system camera and the permission dialog are not counted, and backup is left out because no entry was found. Creation on the mark screen is not counted as a repeat; no screen edits a thing outside its home. One step per tap, and tapping a field and typing into it is one step. Move and label editing were never seen on screen, so the fewest-tap reading is used (open object, act, type, back; no separate save). R06-R08 are null: objects are marked by hand, nothing is recognised and there are no counts. R10 is null (one level of boxes, no map), R114 and R115 null (no prices). R11 uses a label for the season and a box number for closet and storage. Recall marks a box number typed from memory (no box list) and a label retyped with no suggestions."
+}

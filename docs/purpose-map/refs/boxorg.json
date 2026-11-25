@@ -1,0 +1,178 @@
+{
+ "app": "boxorg",
+ "features": [
+  {
+   "id": "boxorg-01",
+   "name": "Search objects and boxes by label",
+   "where": "home",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R25",
+    "R33",
+    "R81"
+   ],
+   "match_note": "Items are found by name and tag; search returning places by their own tags is not stated.",
+   "facets": [
+    "search",
+    "tags"
+   ]
+  },
+  {
+   "id": "boxorg-02",
+   "name": "Photograph a box's contents to log them",
+   "where": "home, camera button",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R29",
+    "R41",
+    "R42"
+   ],
+   "match_note": "Photo-first logging, with items proposed from the photo.",
+   "facets": [
+    "recog",
+    "photos"
+   ]
+  },
+  {
+   "id": "boxorg-03",
+   "name": "Mark each object on the box photo",
+   "where": "after the photo",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R41",
+    "R42"
+   ],
+   "match_note": "Regions on a place photo point to items, and a photo splits into items; no cut-out images.",
+   "facets": [
+    "recog",
+    "photos"
+   ]
+  },
+  {
+   "id": "boxorg-04",
+   "name": "Give objects free-text labels",
+   "where": "object",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R34"
+   ],
+   "match_note": "Any number of tags per item, with a tag tree on top.",
+   "facets": [
+    "tags"
+   ]
+  },
+  {
+   "id": "boxorg-05",
+   "name": "Rename a label",
+   "where": "object labels",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R34",
+    "R151"
+   ],
+   "match_note": "Renaming is implied for module tags only (R151); no rule defines renaming tags in general.",
+   "facets": [
+    "tags"
+   ]
+  },
+  {
+   "id": "boxorg-06",
+   "name": "Number and label boxes",
+   "where": "box",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R32",
+    "R33"
+   ],
+   "match_note": "Places carry a name and tags; a number is a naming choice.",
+   "facets": [
+    "places",
+    "tags"
+   ]
+  },
+  {
+   "id": "boxorg-07",
+   "name": "Move an object to another box",
+   "where": "object",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R11",
+    "R31",
+    "R100"
+   ],
+   "match_note": "Move and bulk move are in stage 3.",
+   "facets": [
+    "move"
+   ]
+  },
+  {
+   "id": "boxorg-08",
+   "name": "Re-photograph an object",
+   "where": "object",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R08",
+    "R31",
+    "R41"
+   ],
+   "match_note": "Items can be rephotographed; a new photo clears the outdated flag.",
+   "facets": [
+    "photos"
+   ]
+  },
+  {
+   "id": "boxorg-09",
+   "name": "Delete an object or a label",
+   "where": "object",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R34",
+    "R143"
+   ],
+   "match_note": "Deleting an item is mentioned only in passing (R143); deleting a tag is not defined.",
+   "facets": [
+    "edit",
+    "tags"
+   ]
+  },
+  {
+   "id": "boxorg-10",
+   "name": "See labels ranked by use",
+   "where": "label drawer",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R84",
+    "R85"
+   ],
+   "match_note": "The tag card shows top-level tags; no ranking by use.",
+   "facets": [
+    "tags",
+    "browse"
+   ]
+  },
+  {
+   "id": "boxorg-11",
+   "name": "Back up data",
+   "where": "not reached",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R60"
+   ],
+   "match_note": "Automatic backup to a chosen folder and manual export.",
+   "facets": [
+    "data"
+   ]
+  }
+ ]
+}

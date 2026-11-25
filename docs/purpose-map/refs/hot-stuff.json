@@ -1,0 +1,289 @@
+{
+ "app": "hot-stuff",
+ "features": [
+  {
+   "id": "hot-stuff-01",
+   "name": "Read intro pages on first run",
+   "where": "onboarding",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [],
+   "match_note": "No rule defines an intro or onboarding.",
+   "facets": [
+    "help"
+   ]
+  },
+  {
+   "id": "hot-stuff-02",
+   "name": "Set up the building on first run",
+   "where": "onboarding, Create Building",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R32"
+   ],
+   "match_note": "Sites sit at the top of the place tree; no first-run setup.",
+   "facets": [
+    "places",
+    "help"
+   ]
+  },
+  {
+   "id": "hot-stuff-03",
+   "name": "See totals and charts of belongings",
+   "where": "home",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R84",
+    "R103"
+   ],
+   "match_note": "No counts, value totals or charts; value tracking is out of scope (R103).",
+   "facets": [
+    "value",
+    "browse"
+   ]
+  },
+  {
+   "id": "hot-stuff-04",
+   "name": "Browse all items in a list",
+   "where": "items",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R25",
+    "R84",
+    "R85"
+   ],
+   "match_note": "Items are reached by search, tags and places; no rule defines a list of every item.",
+   "facets": [
+    "browse"
+   ]
+  },
+  {
+   "id": "hot-stuff-05",
+   "name": "Search by name, room, category or brand",
+   "where": "items toolbar",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R10",
+    "R25",
+    "R81"
+   ],
+   "match_note": "Name and tag search with a place filter; search on field values such as brand is not defined.",
+   "facets": [
+    "search"
+   ]
+  },
+  {
+   "id": "hot-stuff-06",
+   "name": "Export all items to a spreadsheet",
+   "where": "items toolbar",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R60"
+   ],
+   "match_note": "Export is JSON with photos, not CSV.",
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "hot-stuff-07",
+   "name": "See an item's details",
+   "where": "item details",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R30"
+   ],
+   "match_note": "Item screen with its fields and state.",
+   "facets": [
+    "edit"
+   ]
+  },
+  {
+   "id": "hot-stuff-08",
+   "name": "Edit an item",
+   "where": "edit item",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R29"
+   ],
+   "match_note": "Every item fact can be set in any order.",
+   "facets": [
+    "edit"
+   ]
+  },
+  {
+   "id": "hot-stuff-09",
+   "name": "Delete an item after confirming",
+   "where": "item details",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R143"
+   ],
+   "match_note": "Deleting an item is mentioned only in passing; no rule defines it.",
+   "facets": [
+    "edit"
+   ]
+  },
+  {
+   "id": "hot-stuff-10",
+   "name": "Add an item with category and room",
+   "where": "create",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R26",
+    "R32",
+    "R34"
+   ],
+   "match_note": "Only a name is required; quantity, tags and place are optional.",
+   "facets": [
+    "add",
+    "tags",
+    "places"
+   ]
+  },
+  {
+   "id": "hot-stuff-11",
+   "name": "Add a photo from camera or gallery",
+   "where": "create, edit item",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R41",
+    "R100"
+   ],
+   "match_note": "Camera photos on items and places; picking an existing photo is not stated.",
+   "facets": [
+    "photos",
+    "add"
+   ]
+  },
+  {
+   "id": "hot-stuff-12",
+   "name": "Record an item's value and brand",
+   "where": "create",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R45",
+    "R103"
+   ],
+   "match_note": "Brand is a ready-made field; value is out of scope for v1 (R103).",
+   "facets": [
+    "value",
+    "fields"
+   ]
+  },
+  {
+   "id": "hot-stuff-13",
+   "name": "Pick a room or category from suggestions",
+   "where": "create",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R24",
+    "R39",
+    "R82"
+   ],
+   "match_note": "Starter place names exist and R24 names a type-ahead picker; no rule defines picking from a typed list.",
+   "facets": [
+    "add",
+    "tags"
+   ]
+  },
+  {
+   "id": "hot-stuff-14",
+   "name": "Keep adding items from a cleared form",
+   "where": "create",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R25",
+    "R100"
+   ],
+   "match_note": "Quick add by name exists; no save-and-add-next.",
+   "facets": [
+    "add"
+   ]
+  },
+  {
+   "id": "hot-stuff-15",
+   "name": "Read help articles",
+   "where": "learn",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [],
+   "match_note": "No rule defines help content.",
+   "facets": [
+    "help"
+   ]
+  },
+  {
+   "id": "hot-stuff-16",
+   "name": "Choose a theme",
+   "where": "settings",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R94"
+   ],
+   "match_note": "No theme setting.",
+   "facets": [
+    "settings"
+   ]
+  },
+  {
+   "id": "hot-stuff-17",
+   "name": "Choose a currency",
+   "where": "settings",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R123"
+   ],
+   "match_note": "Prices are in euro only in v1.",
+   "facets": [
+    "settings",
+    "value"
+   ]
+  },
+  {
+   "id": "hot-stuff-18",
+   "name": "Edit the building's name, type and description",
+   "where": "settings",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R32",
+    "R33"
+   ],
+   "match_note": "A site is a place with a name, tags and notes.",
+   "facets": [
+    "places"
+   ]
+  },
+  {
+   "id": "hot-stuff-19",
+   "name": "Report a bug or send feedback",
+   "where": "settings",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [],
+   "match_note": "No rule defines a feedback channel.",
+   "facets": [
+    "help"
+   ]
+  }
+ ]
+}

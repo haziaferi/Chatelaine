@@ -1,0 +1,489 @@
+{
+ "about": "Which purpose each screen serves, decided before any screen is built (R90) and scored on R91's axes against the seven walked reference apps. The Inventory screens, under purpose set S5, approved by the owner on 2026-11-25; the Wardrobe, Pantry and Shopping screens are provisional until each module is designed (R97, stage 10), and the homepage is designed last (R84). The scored data is in `docs/purpose-map/`. Replaces the unscored draft of 2026-10-28 (in git history); its purposes, scored as set SD, came last of five.",
+ "purposes": {
+  "P1": {
+   "name": "Log",
+   "job": "get things into the app, by hand or from a photo, and fix what was logged"
+  },
+  "P2": {
+   "name": "Find",
+   "job": "find a thing and see where it is"
+  },
+  "P3": {
+   "name": "Arrange",
+   "job": "keep places and tags in order and things where they belong"
+  },
+  "P4": {
+   "name": "Use up and buy",
+   "job": "keep track of what runs out, wears or needs buying, and buy it"
+  },
+  "P5": {
+   "name": "Look after the app",
+   "job": "keep the data safe and the app set up"
+  }
+ },
+ "screens": [
+  {
+   "id": "home",
+   "name": "Homepage",
+   "purpose": "P2",
+   "status": "designed last, after every module (R84)",
+   "holds": "open places from the homepage; see an object of the day; choose the homepage cards",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "prepper"
+   ]
+  },
+  {
+   "id": "search",
+   "name": "Search and results",
+   "purpose": "P2",
+   "status": "approved 2026-11-25",
+   "holds": "search items by name or tag; filter search by house or floor; see items not yet placed; move several items at once; add or remove tags in bulk; bulk edit fields on several items; see things expiring soon",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList"
+   ]
+  },
+  {
+   "id": "timeline",
+   "name": "Expiration timeline",
+   "purpose": "P4",
+   "status": "approved 2026-11-25",
+   "holds": "see every expiry date, closest first",
+   "sources": [
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList"
+   ]
+  },
+  {
+   "id": "item",
+   "name": "Item page",
+   "purpose": "P1",
+   "status": "approved 2026-11-25",
+   "holds": "edit an item's name, notes and fields; record an item's quantity; split identical things into separate items; mark an item away and back; move an item to another place; tag items and places; add a brand, model or purchase date; set expiry and opening dates; record last worn and laundry state; restore an overwritten value from history",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList",
+    "whohasmystuff"
+   ]
+  },
+  {
+   "id": "add",
+   "name": "Quick add",
+   "purpose": "P1",
+   "status": "approved 2026-11-25",
+   "holds": "add an item by name only; dictate a list of things to log",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList"
+   ]
+  },
+  {
+   "id": "capture",
+   "name": "Capture and proposals",
+   "purpose": "P1",
+   "status": "approved 2026-11-25",
+   "holds": "log an item photo first, name later; take photos of items and places; log things from a photo as proposals; correct proposed lines in a few taps; split a photo into items with counts; accept or delete suggested tags; clear all suggested tags at once; get tag and place suggestions; group logged things by similarity; read expiry dates from label photos; recognise phone photos on the pc",
+   "sources": [
+    "boxorg",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList"
+   ]
+  },
+  {
+   "id": "fields",
+   "name": "Fields",
+   "purpose": "P1",
+   "status": "approved 2026-11-25",
+   "holds": "define custom fields; attach a field to tags or items; rename, hide or edit module preset fields",
+   "sources": [
+    "boxorg",
+    "prepper"
+   ]
+  },
+  {
+   "id": "place",
+   "name": "Place page",
+   "purpose": "P3",
+   "status": "approved 2026-11-25",
+   "holds": "build a place tree across several sites; give a place tags, notes, photo; see what is inside a place; see a place's path up the tree; move a place with its contents; mark items on a settled-area photo; print photo labels with a qr code; open a place from its label qr; open a place from an nfc tag",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList"
+   ]
+  },
+  {
+   "id": "map",
+   "name": "Place map",
+   "purpose": "P2",
+   "status": "approved 2026-11-25",
+   "holds": "browse a visual map of places; rearrange place blocks on the map; draw the place map freely",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "prepper"
+   ]
+  },
+  {
+   "id": "tags",
+   "name": "Tags",
+   "purpose": "P3",
+   "status": "approved 2026-11-25",
+   "holds": "nest tags under a parent tag; give a kept-together tag a home place; see a tag's items away from home; set a tag's kind and edit kinds; browse top-level tags",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList",
+    "whohasmystuff"
+   ]
+  },
+  {
+   "id": "photos",
+   "name": "Photos",
+   "purpose": "P2",
+   "status": "approved 2026-11-25",
+   "holds": "see which photos are outdated; browse places by their photos",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList"
+   ]
+  },
+  {
+   "id": "backup",
+   "name": "Backup and restore",
+   "purpose": "P5",
+   "status": "approved 2026-11-25",
+   "holds": "export and import data with photos; restore a backup by merging; roll back to a backup",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "whohasmystuff"
+   ]
+  },
+  {
+   "id": "running",
+   "name": "Running out and wear",
+   "purpose": "P4",
+   "status": "provisional: confirmed when its module is designed (R97, stage 10)",
+   "holds": "see an item's usage rate; count stock with − and +; set a minimum stock; see an estimated run-out day; put together outfits; swap clothes at the change of season; see clothes not worn in a year",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList"
+   ]
+  },
+  {
+   "id": "lists",
+   "name": "Lists and store lists",
+   "purpose": "P4",
+   "status": "provisional: confirmed when its module is designed (R97, stage 10)",
+   "holds": "send finished consumables to the shopping list; keep a shopping list; keep a wish list; add low-stock items to the list; see what is already owned and where; edit shopping lists on the pc; make a store list; pin a store list for repeated runs; tick items bought with price paid; tick products sold by weight; add a bag when ticking; mark a discount when ticking; untick before the receipt closes; close a receipt at the till; discount a whole receipt; get warned about other store lists; send receipts to the savings app",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList",
+    "whohasmystuff"
+   ]
+  },
+  {
+   "id": "prices",
+   "name": "Prices",
+   "purpose": "P4",
+   "status": "provisional: confirmed when its module is designed (R97, stage 10)",
+   "holds": "compare packs by price per unit; compare one product across stores; keep shop prices and promotions; add, rename and delete stores; mark products a store carries",
+   "sources": [
+    "boxorg",
+    "personal-stuff",
+    "prepper"
+   ]
+  },
+  {
+   "id": "settings",
+   "name": "Settings",
+   "purpose": "P5",
+   "status": "approved 2026-11-25",
+   "holds": "download larger optional models; use an ai-service key for recognition; choose approximate or exact counts; turn modules on or off; give items and wishes a savings category; turn on the savings export; sync phone and pc through a folder; back up automatically to a chosen folder; switch the app's language; get expiry notifications; get low-stock notifications; get add-to-list notifications; get usage-rate notifications; get run-out notifications for chosen items; get laundry notifications; get a seasonal swap notification",
+   "sources": [
+    "boxorg",
+    "flindex",
+    "hot-stuff",
+    "personal-stuff",
+    "prepper",
+    "StuffList",
+    "whohasmystuff"
+   ]
+  },
+  {
+   "id": "surface",
+   "name": "Widget, lock screen and prompts",
+   "purpose": "surface",
+   "status": "approved 2026-11-25",
+   "holds": "keep a place or tag in view; show stored things on the lock screen; get an opt-in rediscover prompt",
+   "sources": [
+    "personal-stuff",
+    "StuffList"
+   ]
+  }
+ ],
+ "where": [
+  {
+   "thing": "an item's details",
+   "home": "item"
+  },
+  {
+   "thing": "a place and what it holds",
+   "home": "place"
+  },
+  {
+   "thing": "the tag tree",
+   "home": "tags"
+  },
+  {
+   "thing": "custom fields",
+   "home": "fields"
+  },
+  {
+   "thing": "an item's quantity",
+   "home": "item",
+   "repeats": [
+    [
+     "running",
+     "stock counted with − and + in the running-out view"
+    ]
+   ]
+  },
+  {
+   "thing": "an item's expiry date",
+   "home": "item"
+  },
+  {
+   "thing": "last worn and laundry",
+   "home": "item",
+   "repeats": [
+    [
+     "running",
+     "laundry marked from the clothes in the running-out view"
+    ]
+   ]
+  },
+  {
+   "thing": "the shopping list",
+   "home": "lists"
+  },
+  {
+   "thing": "a store list",
+   "home": "lists"
+  },
+  {
+   "thing": "shop prices",
+   "home": "prices"
+  },
+  {
+   "thing": "settings",
+   "home": "settings"
+  },
+  {
+   "thing": "notification switches",
+   "home": "settings"
+  },
+  {
+   "thing": "backups",
+   "home": "backup"
+  }
+ ],
+ "overlaps": [
+  {
+   "entries": "search bar, tag grid, tag results",
+   "settled": "tag results are Search and results filtered by the tag; the Tags screen holds only the tag tree"
+  },
+  {
+   "entries": "place map, Places entry, place filter",
+   "settled": "the Places card opens the map; the filter stays on Search and results; open: whether the map itself filters, at stage 3"
+  },
+  {
+   "entries": "place contents, photo browsing",
+   "settled": "two screens, Place page and Photos; open: one place screen showing its photo first, at stage 3"
+  },
+  {
+   "entries": "photo add, settled area",
+   "settled": "Capture and the Place page; open: one camera flow with two starting points, at stages 3 and 4"
+  },
+  {
+   "entries": "proposal review, bulk tag edit, tag suggestions",
+   "settled": "proposals on Capture, bulk edits on Search and results; open: one selection toolbar, at stage 2"
+  },
+  {
+   "entries": "object of the day, rediscover prompt",
+   "settled": "two: one passive on the homepage, one opt-in outside the app (R86)"
+  },
+  {
+   "entries": "backup, sync",
+   "settled": "the sync folder in Settings, backups on their own screen; open: one settings entry for both"
+  }
+ ],
+ "scores": "### Purpose sets\n\n| | coverage | exclusivity | balance | fit | potential | total | rank |\n|---|---|---|---|---|---|---|---|\n| S5 five, by what the user is doing | 0.993 | 0.558 | 0.919 | 0.874 | 0.974 | 0.864 | 1 |\n| SM one purpose per module | 0.993 | 0.834 | 0.553 | 0.911 | 0.974 | 0.853 | 2 |\n| S6 six, by job | 0.993 | 0.463 | 0.918 | 0.864 | 0.974 | 0.842 | 3 |\n| S7 seven, by job | 0.993 | 0.460 | 0.922 | 0.855 | 0.974 | 0.841 | 4 |\n| SD the 2026-10-28 draft, its modules section as one purpose | 0.993 | 0.444 | 0.883 | 0.827 | 0.974 | 0.824 | 5 |\n\n### Maps and controls\n\n| | screen count | one home per thing | steps per scenario | recall load | total | rank |\n|---|---|---|---|---|---|---|\n| by purpose | 0.781 | 0.385 | 0.926 | 0.973 | 0.766 | 1 |\n| hybrid | 0.657 | 0.143 | 0.926 | 1.000 | 0.682 | 2 |\n| by module | 0.410 | 0.000 | 0.889 | 1.000 | 0.575 | 3 |\n| control: boxorg | 0.125 | 1.000 | 0.179 | 0.578 | 0.470 | 4 |\n| control: prepper | 0.000 | 1.000 | 0.068 | 0.800 | 0.467 | 5 |\n| control: hot-stuff | 0.000 | 1.000 | 0.048 | 0.707 | 0.439 | 6 |\n| control: flindex | 0.000 | 1.000 | 0.069 | 0.618 | 0.422 | 7 |\n| control: StuffList | 0.000 | 1.000 | 0.123 | 0.486 | 0.402 | 8 |\n| control: personal-stuff | 0.000 | 0.636 | 0.035 | 0.542 | 0.303 | 9 |\n| control: whohasmystuff | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 10 |\n\n| | screens | functions | per screen | repeats / things | taps mean | recall steps | undone | first in the plateau test |\n|---|---|---|---|---|---|---|---|---|\n| hybrid | 18 | 107 | 5.94 | 3 / 14 | 4.11 | 0 | 0 | 0% |\n| by module | 24 | 107 | 4.46 | 4 / 14 | 4.22 | 0 | 0 | 0% |\n| by purpose | 16 | 107 | 6.69 | 2 / 13 | 4.11 | 1 | 0 | 100% |\n| StuffList | 9 | 14 | 1.56 | 0 / 6 | 15.0 | 12 | 7 | 0% |\n| boxorg | 4 | 11 | 2.75 | 0 / 4 | 13.0 | 13 | 6 | 0% |\n| flindex | 7 | 13 | 1.86 | 0 / 4 | 13.5 | 6 | 7 | 0% |\n| hot-stuff | 10 | 19 | 1.9 | 0 / 4 | 17.0 | 5 | 7 | 0% |\n| personal-stuff | 17 | 26 | 1.53 | 1 / 11 | 16.0 | 3 | 8 | 0% |\n| prepper | 19 | 31 | 1.63 | 0 / 6 | 14.0 | 0 | 7 | 0% |\n| whohasmystuff | 4 | 8 | 2.0 | 2 / 2 | None | 0 | 9 | 0% |",
+ "score_notes": [
+  "Coverage and exclusivity: means over the seven walked apps' 122 functions, each with the 23 scenario steps of R05 to R11, R114 and R115. Fit: over Chatelaine's 107 functions. Potential: the share of the 76 functions Chatelaine lacks or only partly has whose main facet lands in a purpose.",
+  "Screen count: functions per screen, 2 or fewer scores 0, 8 or more scores 1. Steps: per scenario, the fewest taps any map needs over this map's taps, 0 when it cannot be done. Recall: 1 minus the share of steps that need something the screen does not show.",
+  "Plateau test: how often a map comes first with every constant moved down and up by a third.",
+  "Reference apps are scored as controls on the screens-and-homes axes; every one must score below the chosen map."
+ ],
+ "sets": {
+  "S5": {
+   "name": "five, by what the user is doing",
+   "purposes": [
+    "Log",
+    "Find",
+    "Arrange",
+    "Use up and buy",
+    "Look after the app"
+   ]
+  },
+  "S7": {
+   "name": "seven, by job",
+   "purposes": [
+    "Log",
+    "Find",
+    "Places",
+    "Tags",
+    "Run out and wear",
+    "Shop",
+    "Look after the app"
+   ]
+  },
+  "SM": {
+   "name": "one purpose per module",
+   "purposes": [
+    "Inventory",
+    "Wardrobe",
+    "Pantry",
+    "Shopping",
+    "App"
+   ]
+  },
+  "S6": {
+   "name": "six, by job",
+   "purposes": [
+    "Log",
+    "Find",
+    "Arrange",
+    "Run out and wear",
+    "Shop",
+    "Look after the app"
+   ]
+  },
+  "SD": {
+   "name": "the 2026-10-28 draft, its modules section as one purpose",
+   "purposes": [
+    "Find",
+    "Record",
+    "Organise",
+    "Know the storage",
+    "Keep in view",
+    "Look after it",
+    "Modules"
+   ]
+  }
+ },
+ "candidates": [
+  {
+   "name": "hybrid",
+   "screens": [
+    "Homepage",
+    "Search and results",
+    "Expiration timeline",
+    "Item page",
+    "Quick add",
+    "Capture and proposals",
+    "Fields",
+    "Place page",
+    "Place map",
+    "Tags",
+    "Photos",
+    "Backup and restore",
+    "Pantry",
+    "Wardrobe",
+    "Shopping list",
+    "Store list",
+    "Prices",
+    "Settings"
+   ]
+  },
+  {
+   "name": "by module",
+   "screens": [
+    "Homepage",
+    "Search and results",
+    "Expiration timeline",
+    "Item page",
+    "Quick add",
+    "Capture and proposals",
+    "Fields",
+    "Place page",
+    "Place map",
+    "Tags",
+    "Photos",
+    "Backup and restore",
+    "Wardrobe",
+    "Outfits",
+    "Seasonal swap",
+    "Pantry stock",
+    "Run-out",
+    "Shopping list",
+    "Wish list",
+    "Store list",
+    "Prices",
+    "Stores",
+    "Settings",
+    "Notifications"
+   ]
+  }
+ ],
+ "owner_answers": [
+  "2026-11-25: scoring defaults for R91 accepted; screen count as functions per screen and steps against the fewest taps, after the first scoring let five reference apps win.",
+  "2026-11-25: screens by purpose confirmed for the Inventory module only; the other modules are not yet conceptually developed.",
+  "2026-11-25: an expiration timeline lists every item with an expiry date, closest first (R153); expiring soon is a filter on Search and results.",
+  "2026-11-25: the homepage is designed last, after every module is complete (R84)."
+ ]
+}
