@@ -77,7 +77,8 @@ class DatabaseRecoveryTest {
         val real = driver.open(file.path)
         try {
             val triggers = real.names("SELECT name FROM sqlite_master WHERE type = 'trigger'").toSet()
-            assertEquals(setOf("purge_outbox_insert", "purge_outbox_update"), triggers)
+            val perTable = SYNCED_TABLES.flatMap { t -> listOf("insert", "update", "delete").map { "${t}_outbox_$it" } }
+            assertEquals((perTable + listOf("purge_outbox_insert", "purge_outbox_update")).toSet(), triggers)
         } finally {
             real.close()
         }
@@ -99,6 +100,97 @@ class DatabaseRecoveryTest {
         } finally {
             scratch.close()
         }
+    }
+
+    @Test
+    fun aSideFileKeptAloneDoesNotBlockTheSetAside() {
+        val dir = tempDir()
+        val file = File(dir, DATABASE_NAME)
+        val old = byteArrayOf(9)
+        File(dir, "chatelaine.db-wal$UNOPENABLE_SUFFIX").writeBytes(old)
+        val garbage = Random(3).nextBytes(4096)
+        file.writeBytes(garbage)
+
+        val open = openChatelaineDatabase(file, now = { 5 })
+        open.database.close()
+
+        assertTrue(open.recovered)
+        assertContentEquals(garbage, open.keptAs!!.readBytes())
+        assertContentEquals(old, File(dir, "chatelaine.db-wal$UNOPENABLE_SUFFIX").readBytes())
+        assertFalse(open.keptAs!!.name == "chatelaine.db$UNOPENABLE_SUFFIX", "the suffix was not free for every file")
+    }
+
+    @Test
+    fun aFailedRenameRollsTheMovedFilesBack() {
+        val dir = tempDir()
+        val base = File(dir, DATABASE_NAME)
+        val names = listOf("", "-journal", "-wal")
+        names.forEachIndexed { i, s -> File(base.path + s).writeBytes(byteArrayOf(i.toByte())) }
+
+        val failure = runCatching {
+            setAsideDatabaseFiles(base.path, 1, rename = { from, to -> from.name != DATABASE_NAME && from.renameTo(to) })
+        }.exceptionOrNull()
+
+        assertIs<IllegalStateException>(failure)
+        names.forEachIndexed { i, s -> assertContentEquals(byteArrayOf(i.toByte()), File(base.path + s).readBytes()) }
+        assertEquals(setOf(DATABASE_NAME, "$DATABASE_NAME-journal", "$DATABASE_NAME-wal"), dir.list()!!.toSet())
+    }
+
+    /** A file whose header and schema read fine but whose table pages are damaged: Room's own open fails. */
+    @Test
+    fun aDatabaseCorruptPastItsSchemaPageIsSetAsideToo() {
+        val dir = tempDir()
+        val file = File(dir, DATABASE_NAME)
+        openChatelaineDatabase(file).database.close()
+        val bytes = file.readBytes()
+        val pageSize = ((bytes[16].toInt() and 0xFF) shl 8) or (bytes[17].toInt() and 0xFF)
+        for (i in pageSize until bytes.size) bytes[i] = 0x5A
+        file.writeBytes(bytes)
+
+        val open = openChatelaineDatabase(file)
+        open.database.close()
+
+        assertTrue(open.recovered)
+        assertContentEquals(bytes, File(file.path + UNOPENABLE_SUFFIX).readBytes())
+    }
+
+    @Test
+    fun aLockedDatabaseIsRethrownAndLeftInPlace() {
+        val dir = tempDir()
+        val file = File(dir, DATABASE_NAME)
+        val holder = BundledSQLiteDriver().open(file.path)
+        holder.execSQL("CREATE TABLE t(x)")
+        holder.execSQL("BEGIN EXCLUSIVE")
+        holder.execSQL("INSERT INTO t VALUES (1)")
+
+        val failure = runCatching { openChatelaineDatabase(file).database.close() }.exceptionOrNull()
+        holder.execSQL("ROLLBACK")
+        holder.close()
+
+        val messages = generateSequence(failure) { it.cause }.mapNotNull { it.message }.toList()
+        assertTrue(messages.any { "database is locked" in it }, "expected the busy failure, got $failure")
+        assertFalse(dir.list()!!.any { UNOPENABLE_SUFFIX in it })
+    }
+
+    @Test
+    fun theJournalWalAndShmFilesMoveWithTheDatabase() {
+        val base = File(tempDir(), DATABASE_NAME)
+        val bytes = mapOf("" to 0, "-journal" to 1, "-wal" to 2, "-shm" to 3)
+        bytes.forEach { (suffix, b) -> File(base.path + suffix).writeBytes(byteArrayOf(b.toByte())) }
+
+        setAsideDatabaseFiles(base.path, stamp = 7)
+
+        bytes.forEach { (suffix, b) ->
+            assertContentEquals(byteArrayOf(b.toByte()), File(base.path + suffix + UNOPENABLE_SUFFIX).readBytes())
+            assertFalse(File(base.path + suffix).exists())
+        }
+    }
+
+    @Test
+    fun aFreshDatabaseThatFailsToOpenIsClosedBeforeTheFailureIsRethrown() {
+        val f = Fixture(failures = 2)
+        runCatching { f.open() }
+        assertEquals(listOf("build", "probe(1)", "close(1)", "setAside", "build", "probe(2)", "close(2)"), f.events)
     }
 
     /** A fake database whose probe fails for the first [failures] builds. */

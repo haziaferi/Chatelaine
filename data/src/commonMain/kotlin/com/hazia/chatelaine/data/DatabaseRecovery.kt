@@ -37,7 +37,10 @@ fun <T> openOrRecover(
     val kept = setAside()
 
     val second = build()
-    probe(second)
+    runCatching { probe(second) }.onFailure {
+        runCatching { close(second) }
+        throw it
+    }
     return DatabaseOpen(second, recovered = true, keptAs = kept)
 }
 
