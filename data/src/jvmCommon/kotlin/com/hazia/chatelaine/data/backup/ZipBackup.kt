@@ -35,9 +35,13 @@ object ZipBackup : BackupArchive {
         return out.toByteArray()
     }
 
+    /** The only entry names a backup holds; anything else (a path with `..`, a folder, another file) is not a backup. */
+    private val ENTRY_NAME = Regex("^(records\\.jsonl|purges\\.jsonl|blobs/[0-9a-f]{64})$")
+
     /**
      * The entries of [zip]; empty when it is damaged or cut short: any [IOException] while reading, or no end-of-
      * directory record at its end (a zip cut between two entries still reads, entry by entry, but is not whole).
+     * Also empty when any entry name is not one a backup holds, so no name from the archive ever reaches a path.
      */
     override fun unpack(zip: ByteArray): Map<String, ByteArray> {
         if (!hasEndRecord(zip)) return emptyMap()
@@ -46,7 +50,9 @@ object ZipBackup : BackupArchive {
             ZipInputStream(ByteArrayInputStream(zip)).use { input ->
                 while (true) {
                     val entry = input.nextEntry ?: break
-                    if (!entry.isDirectory) entries[entry.name] = input.readBytes()
+                    val name = entry.name
+                    if (!ENTRY_NAME.matches(name)) return emptyMap()
+                    entries[name] = input.readBytes()
                 }
             }
         } catch (_: IOException) {
