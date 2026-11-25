@@ -449,3 +449,5 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-25 · spec · changed · glossary: Pantry item, Wardrobe module, Wardrobe item · owner
 - 2026-11-25 · R91 · changed · measures for every axis, controls and three candidate maps, plateau test; acceptance can fail · owner
 - 2026-11-25 · spec · changed · glossary: Function, Facet, Home; purpose map generated from its JSON · owner
+- 2026-11-25 · R91 · changed · screen count as functions per screen; steps against the fewest taps any map needs · owner
+- 2026-11-25 · R152 · added · deleting items, places and tags asks first; contents move up · owner

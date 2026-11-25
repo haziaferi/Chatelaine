@@ -61,6 +61,7 @@ Kinds: O owner rule · D decided · I inherited · A assumed · Q open.
 | D-R45 | Field presets | 4. Items, places and tags |
 | D-R46 | Where a field attaches | 4. Items, places and tags |
 | D-R47 | User-editable lists | 4. Items, places and tags |
+| D-R152 | Deleting items, places and tags | 4. Items, places and tags |
 | D-R48 | Local database | 5. Storage, sync and backup |
 | D-R49 | Database library | 5. Storage, sync and backup |
 | D-R50 | A database that fails to open | 5. Storage, sync and backup |
@@ -822,6 +823,22 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Since:** 2026-11-22 · owner · agreed rewording
 
+### D-R152 · Deleting items, places and tags
+
+**Rule:** Items, places and tags can be deleted, and every delete asks first. What a deletion leaves behind goes as the table below says.
+
+**Values:**
+
+| Deleted | What happens to what it held |
+|---|---|
+| an item | its photos are deleted with it |
+| a place | the items and places inside move to its parent place; inside a site, to the site |
+| a tag | its sub-tags move to its parent tag, or become top-level; its items lose only that tag |
+
+**Acceptance:** Each delete asks before it acts. Deleting a drawer moves its items and partitions into the chest of drawers that held it; deleting the tag "sewing" leaves "red skirt" under the parent of "sewing", or top-level, and its items keep their other tags; deleting an item removes its photos.
+
+**Since:** 2026-11-25 · owner · agreed rewording
+
 ## 5. Storage, sync and backup
 
 ### D-R48 · Local database
@@ -1320,14 +1337,16 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Balance | the entropy of main-facet counts over the purposes, divided by its maximum (1 = an even spread) | the purpose set |
 | Fit | the mean of coverage and exclusivity over Chatelaine's own functions | the purpose set |
 | Potential | the share of reference functions Chatelaine lacks or only partly has whose main facet lands in a named purpose | the purpose set |
-| Screen count | the number of screens, absolute: 1 at 8 or fewer, 0 at 24 or more, linear between | screens and homes |
+| Screen count | functions served per screen: 0 at 2 or fewer, 1 at 8 or more, linear between | screens and homes |
 | One home per thing | r = repeats outside a thing's home, not counting homepage shortcuts (R92), over things placed; score = max(0, 1 − 4r) | screens and homes |
-| Steps per scenario | taps from the homepage through R05 to R11, R114 and R115: 0.5 · clip((5 − mean) / 4) + 0.5 · clip((6 − max) / 5) | screens and homes |
+| Steps per scenario | taps from the homepage through R05 to R11, R114 and R115: per scenario, the fewest taps any scored map needs over this map's taps, 0 when the map cannot do it; the mean over the scenarios | screens and homes |
 | Recall load | 1 − the share of scenario steps that need a rule or gesture the screen does not draw, or a value carried from an earlier screen | screens and homes |
+
+**Evidence:** First scoring, 2026-11-25: with screen count as the number of screens and steps on fixed ranges of 1 to 5 taps, five of the seven reference apps outscored every candidate, by having few screens and by being unable to do most scenarios; with the measures above, every candidate scores above every reference app.
 
 **Acceptance:** Scored as controls, every reference app's total is below the chosen map's; while one is not, the axes are revised with the owner before the map is approved.
 
-**Not:** Screen count relative to the map with the fewest screens: a control with almost no screens would set the baseline and win. Fit and potential as ratings: both can be counted from the functions.
+**Not:** Screen count as the number of screens, absolute or relative to the fewest: an app that does little has few screens and wins. Steps on fixed ranges of 1 to 5 taps: Chatelaine's scenarios take four to six taps, which then score almost the same as a scenario that cannot be done. Fit and potential as ratings: both can be counted from the functions.
 
 **Since:** 2026-11-25 · owner · agreed rewording
 
@@ -2133,6 +2152,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R45 · Field presets: With each module on, its presets appear on the items carrying the tag in their row or one of its sub-tags, on every item and wish, or can be added to single items and wishes, as the row says. The bag mark can be added to several wishes in one bulk edit and appears only on those. A renamed counting unit choice still counts stock as before, and the counting unit and laundry offer no choice to add or remove. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
 - R46 · Where a field attaches: A field attached to a tag appears on every item that carries the tag or one of its sub-tags, including items tagged later. A field added to one item appears only on that item. A preset for every item and wish appears on each while its module is on, and on none while it is off.
 - R47 · User-editable lists: The user can add, rename and remove tag kinds, homepage cards and widget content, and the change shows at once.
+- R152 · Deleting items, places and tags: Each delete asks before it acts. Deleting a drawer moves its items and partitions into the chest of drawers that held it; deleting the tag "sewing" leaves "red skirt" under the parent of "sewing", or top-level, and its items keep their other tags; deleting an item removes its photos.
 - R48 · Local database: Each device opens its own database with the network off.
 - R49 · Database library: The shared data module builds with Room KMP for Android and for the desktop JVM, and stage 1's round-trip tests pass on both (R100).
 - R50 · A database that fails to open: In stage 1's round-trip tests, a corrupted database is kept, not deleted (R100).
