@@ -1,0 +1,401 @@
+{
+ "app": "personal-stuff",
+ "features": [
+  {
+   "id": "personal-stuff-01",
+   "name": "See item count and total value",
+   "where": "home",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R84",
+    "R103"
+   ],
+   "match_note": "No counts or value totals; value tracking is out of scope (R103).",
+   "facets": [
+    "browse",
+    "value"
+   ]
+  },
+  {
+   "id": "personal-stuff-02",
+   "name": "Browse the item list",
+   "where": "items",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R25",
+    "R84"
+   ],
+   "match_note": "Items are reached by search, tags and places; no rule defines a list of every item.",
+   "facets": [
+    "browse"
+   ]
+  },
+  {
+   "id": "personal-stuff-03",
+   "name": "Search items by name or tag",
+   "where": "items",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R81"
+   ],
+   "match_note": "Search by name and tag, including sub-tags.",
+   "facets": [
+    "search",
+    "tags"
+   ]
+  },
+  {
+   "id": "personal-stuff-04",
+   "name": "Scan a barcode to find an item",
+   "where": "items, add form",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R88"
+   ],
+   "match_note": "No product barcodes; QR codes on Chatelaine's labels open places only.",
+   "facets": [
+    "codes",
+    "search"
+   ]
+  },
+  {
+   "id": "personal-stuff-05",
+   "name": "Sort items by expiry or date",
+   "where": "items toolbar",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R97"
+   ],
+   "match_note": "An expiring-soon view exists; no list sorting is defined.",
+   "facets": [
+    "browse",
+    "expiry"
+   ]
+  },
+  {
+   "id": "personal-stuff-06",
+   "name": "Switch to a compact list",
+   "where": "items toolbar",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R95"
+   ],
+   "match_note": "Density is set per screen; no user toggle.",
+   "facets": [
+    "browse",
+    "settings"
+   ]
+  },
+  {
+   "id": "personal-stuff-07",
+   "name": "Add an item with amount and tags",
+   "where": "add form",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R26",
+    "R34"
+   ],
+   "match_note": "Name, quantity, tags and notes.",
+   "facets": [
+    "add",
+    "qty",
+    "tags"
+   ]
+  },
+  {
+   "id": "personal-stuff-08",
+   "name": "Change an item's amount by one",
+   "where": "add form",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R26",
+    "R147"
+   ],
+   "match_note": "− and + only for Pantry items counted in pieces or packs.",
+   "facets": [
+    "qty",
+    "consume"
+   ]
+  },
+  {
+   "id": "personal-stuff-09",
+   "name": "Set an expiry date",
+   "where": "add form",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R45",
+    "R109"
+   ],
+   "match_note": "Expiry date preset, typed or read from a label.",
+   "facets": [
+    "expiry"
+   ]
+  },
+  {
+   "id": "personal-stuff-10",
+   "name": "Set a low-stock threshold",
+   "where": "add form",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R27",
+    "R45",
+    "R107"
+   ],
+   "match_note": "Minimum stock, for Pantry items only.",
+   "facets": [
+    "consume"
+   ]
+  },
+  {
+   "id": "personal-stuff-11",
+   "name": "Record a price on an item",
+   "where": "add form",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R103",
+    "R134"
+   ],
+   "match_note": "Shop prices live in Shopping's price book by store and date; no plain price field.",
+   "facets": [
+    "prices"
+   ]
+  },
+  {
+   "id": "personal-stuff-12",
+   "name": "Attach a barcode to an item",
+   "where": "add form",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R88"
+   ],
+   "match_note": "No barcode field or scan.",
+   "facets": [
+    "codes"
+   ]
+  },
+  {
+   "id": "personal-stuff-13",
+   "name": "Add photos from camera or gallery",
+   "where": "add form",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R41",
+    "R100"
+   ],
+   "match_note": "Camera photos on items; picking an existing photo is not stated.",
+   "facets": [
+    "photos",
+    "add"
+   ]
+  },
+  {
+   "id": "personal-stuff-14",
+   "name": "Delete an item after confirming",
+   "where": "item card",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R143"
+   ],
+   "match_note": "Deleting an item is mentioned only in passing; no rule defines it.",
+   "facets": [
+    "edit"
+   ]
+  },
+  {
+   "id": "personal-stuff-15",
+   "name": "Duplicate an item",
+   "where": "item menu",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R28"
+   ],
+   "match_note": "An item with a quantity can be split into separate items; no duplicate action.",
+   "facets": [
+    "add",
+    "edit"
+   ]
+  },
+  {
+   "id": "personal-stuff-16",
+   "name": "See an item's stock movements",
+   "where": "item menu",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R110",
+    "R117",
+    "R147"
+   ],
+   "match_note": "Stock changes feed the usage rate and ticks add purchases; no movement history view.",
+   "facets": [
+    "consume",
+    "qty"
+   ]
+  },
+  {
+   "id": "personal-stuff-17",
+   "name": "Log an item's usage",
+   "where": "home tile, item menu",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R110",
+    "R147"
+   ],
+   "match_note": "Pantry stock is lowered in its counting unit; no separate usage record.",
+   "facets": [
+    "consume"
+   ]
+  },
+  {
+   "id": "personal-stuff-18",
+   "name": "Log a purchase",
+   "where": "home tile, item menu",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R117",
+    "R124"
+   ],
+   "match_note": "Ticking as bought in Shopping raises the quantity and records a receipt.",
+   "facets": [
+    "buy",
+    "qty"
+   ]
+  },
+  {
+   "id": "personal-stuff-19",
+   "name": "Log maintenance",
+   "where": "home tile, item menu",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [],
+   "match_note": "No rule defines maintenance records.",
+   "facets": [
+    "edit",
+    "notify"
+   ]
+  },
+  {
+   "id": "personal-stuff-20",
+   "name": "Set a dated reminder on an item",
+   "where": "item menu, reminders",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R86",
+    "R99"
+   ],
+   "match_note": "Only the fixed notifications of R99; no free dated reminder.",
+   "facets": [
+    "notify"
+   ]
+  },
+  {
+   "id": "personal-stuff-21",
+   "name": "Make a checklist of items",
+   "where": "home tile, checklists",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R05",
+    "R37"
+   ],
+   "match_note": "A project tag gathers items for a purpose; no checklist with its own ticks.",
+   "facets": [
+    "lists"
+   ]
+  },
+  {
+   "id": "personal-stuff-22",
+   "name": "Export and import data",
+   "where": "home tiles",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R60"
+   ],
+   "match_note": "Manual export and import of JSON and photos.",
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "personal-stuff-23",
+   "name": "Choose a theme",
+   "where": "settings",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R94"
+   ],
+   "match_note": "No theme setting.",
+   "facets": [
+    "settings"
+   ]
+  },
+  {
+   "id": "personal-stuff-24",
+   "name": "Get expiry alerts within a set window",
+   "where": "settings, alerts",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R86",
+    "R99"
+   ],
+   "match_note": "Opt-in expiry notifications; no warning-window setting.",
+   "facets": [
+    "notify",
+    "expiry"
+   ]
+  },
+  {
+   "id": "personal-stuff-25",
+   "name": "Get low-stock alerts",
+   "where": "settings, alerts",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R27",
+    "R99"
+   ],
+   "match_note": "Opt-in, for Pantry items.",
+   "facets": [
+    "notify",
+    "consume"
+   ]
+  },
+  {
+   "id": "personal-stuff-26",
+   "name": "Back up automatically on an interval",
+   "where": "settings",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R60"
+   ],
+   "match_note": "Automatic backup to a chosen folder; the interval is not specified.",
+   "facets": [
+    "data"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,477 @@
+{
+ "app": "prepper",
+ "features": [
+  {
+   "id": "prepper-01",
+   "name": "See counts of places and supplies",
+   "where": "home",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R84"
+   ],
+   "match_note": "The homepage sketch has no counts.",
+   "facets": [
+    "browse",
+    "places"
+   ]
+  },
+  {
+   "id": "prepper-02",
+   "name": "See supplies expiring soon",
+   "where": "home",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R45",
+    "R97"
+   ],
+   "match_note": "The Inventory module's expiring-soon view.",
+   "facets": [
+    "expiry",
+    "browse"
+   ]
+  },
+  {
+   "id": "prepper-03",
+   "name": "See recent additions",
+   "where": "home",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R30",
+    "R100"
+   ],
+   "match_note": "The unplaced inbox shows unplaced items, not recent ones.",
+   "facets": [
+    "browse"
+   ]
+  },
+  {
+   "id": "prepper-04",
+   "name": "Scan any code to open it",
+   "where": "scan button",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R88"
+   ],
+   "match_note": "A label's QR opens its place; no registering from an unknown code.",
+   "facets": [
+    "codes"
+   ]
+  },
+  {
+   "id": "prepper-05",
+   "name": "Register a location with name and photo",
+   "where": "register location",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R32",
+    "R33"
+   ],
+   "match_note": "A place needs no barcode.",
+   "facets": [
+    "places",
+    "photos"
+   ]
+  },
+  {
+   "id": "prepper-06",
+   "name": "Browse locations with their counts",
+   "where": "locations",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R32",
+    "R83"
+   ],
+   "match_note": "Place tree and place map; counts per place are not specified.",
+   "facets": [
+    "browse",
+    "places"
+   ]
+  },
+  {
+   "id": "prepper-07",
+   "name": "See a place's containers and supplies",
+   "where": "location and container detail",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R09",
+    "R111"
+   ],
+   "match_note": "Place contents view.",
+   "facets": [
+    "inside"
+   ]
+  },
+  {
+   "id": "prepper-08",
+   "name": "Rename a place",
+   "where": "location and container detail",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R32",
+    "R33"
+   ],
+   "match_note": "A place carries the name of what it is.",
+   "facets": [
+    "places"
+   ]
+  },
+  {
+   "id": "prepper-09",
+   "name": "Delete an empty place",
+   "where": "location and container detail",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R117"
+   ],
+   "match_note": "Deleting a place is implied (R117) but not defined.",
+   "facets": [
+    "places",
+    "edit"
+   ]
+  },
+  {
+   "id": "prepper-10",
+   "name": "Move a place with its contents",
+   "where": "move location, move container",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R24",
+    "R32",
+    "R100"
+   ],
+   "match_note": "Moving a box with its contents is borrowed from this app; no scan needed.",
+   "facets": [
+    "places",
+    "move"
+   ]
+  },
+  {
+   "id": "prepper-11",
+   "name": "Add a container inside a place",
+   "where": "register container",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R32"
+   ],
+   "match_note": "Places nest to any depth.",
+   "facets": [
+    "places"
+   ]
+  },
+  {
+   "id": "prepper-12",
+   "name": "See and tap a place's path",
+   "where": "container detail",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R24",
+    "R32"
+   ],
+   "match_note": "Breadcrumb path borrowed from this app.",
+   "facets": [
+    "places",
+    "inside"
+   ]
+  },
+  {
+   "id": "prepper-13",
+   "name": "Give a place extra barcodes",
+   "where": "location detail",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R88"
+   ],
+   "match_note": "One QR per printed label; no alias codes.",
+   "facets": [
+    "codes",
+    "places"
+   ]
+  },
+  {
+   "id": "prepper-14",
+   "name": "Add a photo to a place",
+   "where": "register location, detail",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R33",
+    "R41"
+   ],
+   "match_note": "Place photos.",
+   "facets": [
+    "photos",
+    "places"
+   ]
+  },
+  {
+   "id": "prepper-15",
+   "name": "Add a supply into a container",
+   "where": "add supply",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R111"
+   ],
+   "match_note": "Items are added to a place by name; no barcode needed.",
+   "facets": [
+    "add",
+    "inside"
+   ]
+  },
+  {
+   "id": "prepper-16",
+   "name": "Record pack size, unit and count",
+   "where": "add supply",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R26",
+    "R44",
+    "R134",
+    "R147"
+   ],
+   "match_note": "Quantity, number fields with units and Pantry counting units; pack sizes live only in the price book.",
+   "facets": [
+    "qty",
+    "fields"
+   ]
+  },
+  {
+   "id": "prepper-17",
+   "name": "Work out expiry from shelf life",
+   "where": "add supply",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R45",
+    "R109"
+   ],
+   "match_note": "Expiry date and months after opening exist; no shelf life per type.",
+   "facets": [
+    "expiry"
+   ]
+  },
+  {
+   "id": "prepper-18",
+   "name": "Record packaging and storage details",
+   "where": "add supply",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R43",
+    "R44"
+   ],
+   "match_note": "Custom checkbox and text fields.",
+   "facets": [
+    "fields"
+   ]
+  },
+  {
+   "id": "prepper-19",
+   "name": "Record retail brand and SKU",
+   "where": "add supply, optional details",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R45"
+   ],
+   "match_note": "Brand is a ready-made field; no SKU or barcode.",
+   "facets": [
+    "fields"
+   ]
+  },
+  {
+   "id": "prepper-20",
+   "name": "Manage supply types with shelf life",
+   "where": "supply types",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R34",
+    "R46"
+   ],
+   "match_note": "Tags group items and fields attach to tags; a value shared by a whole type is not defined.",
+   "facets": [
+    "tags",
+    "expiry"
+   ]
+  },
+  {
+   "id": "prepper-21",
+   "name": "Verify a supply's barcode",
+   "where": "supply detail",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R88"
+   ],
+   "match_note": "No item barcodes.",
+   "facets": [
+    "codes"
+   ]
+  },
+  {
+   "id": "prepper-22",
+   "name": "Duplicate a supply",
+   "where": "supply detail",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R28"
+   ],
+   "match_note": "An item with a quantity can be split into separate items; no duplicate action.",
+   "facets": [
+    "add",
+    "edit"
+   ]
+  },
+  {
+   "id": "prepper-23",
+   "name": "Move a supply to another place",
+   "where": "move supply",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R11",
+    "R100"
+   ],
+   "match_note": "Move without scanning the destination.",
+   "facets": [
+    "move"
+   ]
+  },
+  {
+   "id": "prepper-24",
+   "name": "Delete a supply",
+   "where": "supply detail",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R143"
+   ],
+   "match_note": "Deleting an item is mentioned only in passing; no rule defines it.",
+   "facets": [
+    "edit"
+   ]
+  },
+  {
+   "id": "prepper-25",
+   "name": "See totals per type in chosen locations",
+   "where": "inventory summary",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R10",
+    "R97"
+   ],
+   "match_note": "Search filters by place and expiring soon exists; no per-type totals.",
+   "facets": [
+    "qty",
+    "browse"
+   ]
+  },
+  {
+   "id": "prepper-26",
+   "name": "Switch units between metric and imperial",
+   "where": "inventory summary",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R44"
+   ],
+   "match_note": "Metric units only; no conversion.",
+   "facets": [
+    "settings"
+   ]
+  },
+  {
+   "id": "prepper-27",
+   "name": "See every instance of a type",
+   "where": "supply instances",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R05",
+    "R81"
+   ],
+   "match_note": "A tag search lists its items; showing their places is left to screen design.",
+   "facets": [
+    "browse",
+    "tags"
+   ]
+  },
+  {
+   "id": "prepper-28",
+   "name": "See each supply's expiry status",
+   "where": "expiry badges",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R24",
+    "R97"
+   ],
+   "match_note": "Expiry badge borrowed from this app, for expiring soon.",
+   "facets": [
+    "expiry"
+   ]
+  },
+  {
+   "id": "prepper-29",
+   "name": "Set the expiry warning window",
+   "where": "settings",
+   "from_code": false,
+   "match": "partial",
+   "match_rules": [
+    "R97",
+    "R150"
+   ],
+   "match_note": "Expiring soon exists; only the run-out lead time is a setting.",
+   "facets": [
+    "expiry",
+    "settings"
+   ]
+  },
+  {
+   "id": "prepper-30",
+   "name": "Export a backup with photos",
+   "where": "overflow menu",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R60"
+   ],
+   "match_note": "Export of JSON and photos.",
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "prepper-31",
+   "name": "Import a backup, skipping duplicates",
+   "where": "overflow menu",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R61"
+   ],
+   "match_note": "Restore merges by sync stamps.",
+   "facets": [
+    "data"
+   ]
+  }
+ ]
+}

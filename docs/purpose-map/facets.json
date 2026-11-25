@@ -1,0 +1,32 @@
+{
+ "facets": {
+  "add": "log a thing by hand: name, form, next item",
+  "recog": "log from a photo: proposals, corrections, suggestions, recognisers",
+  "edit": "change or delete a thing's details",
+  "fields": "define custom fields and presets",
+  "qty": "how many: counts, amounts, splitting identical things",
+  "places": "the place tree: make, rename, move, delete places",
+  "inside": "see what a place holds",
+  "move": "move things between places",
+  "tags": "tags, parents, kinds, labels",
+  "away": "where a thing is now: in use, away, kept together, lent",
+  "photos": "view and look after photos",
+  "search": "find by name, tag or place",
+  "browse": "lists, grids, counts and overviews",
+  "map": "the visual place map",
+  "codes": "QR, barcode and NFC labels",
+  "surface": "homepage, widget, object of the day, lock screen",
+  "expiry": "expiry and opening dates",
+  "consume": "use up stock: usage, minimum, run-out",
+  "wear": "clothes: worn, laundry, outfits, seasons",
+  "lists": "shopping, wish and store lists",
+  "buy": "ticking things bought, receipts, discounts",
+  "prices": "shop prices, stores, comparisons",
+  "savings": "categories and the savings export",
+  "notify": "reminders and notifications",
+  "data": "sync, backup, export, import, history",
+  "settings": "theme, language, units, modules, models",
+  "help": "tutorials, help, feedback",
+  "value": "money value of belongings"
+ }
+}

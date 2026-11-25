@@ -456,3 +456,7 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-25 · R84 · changed · homepage designed last, after every module · owner
 - 2026-11-25 · R97 · changed · Inventory view: expiration timeline · owner
 - 2026-11-25 · R153 · added · expiration timeline, closest first · owner
+- 2026-11-25 · R84 · changed · the app opens on Search and results until the homepage is designed · owner
+- 2026-11-25 · R100 · changed · stage 10 holds module screens in the purpose map, the expiry views and the homepage, last · owner
+- 2026-11-25 · R152 · changed · deleting a site, a module's tag; an item's list entries go, prices and receipts stay · owner
+- 2026-11-25 · R153 · changed · expired items at the top, marked as expired · owner

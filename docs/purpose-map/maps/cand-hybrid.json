@@ -1,0 +1,548 @@
+{
+ "name": "hybrid",
+ "control": false,
+ "purpose_set": "S5",
+ "screens": [
+  {
+   "id": "home",
+   "name": "Homepage",
+   "purpose": "P2",
+   "features": [
+    "ch-48",
+    "ch-49",
+    "ch-50"
+   ],
+   "homepage": true
+  },
+  {
+   "id": "search",
+   "name": "Search and results",
+   "purpose": "P2",
+   "features": [
+    "ch-43",
+    "ch-44",
+    "ch-06",
+    "ch-14",
+    "ch-18",
+    "ch-27",
+    "ch-60"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "timeline",
+   "name": "Expiration timeline",
+   "purpose": "P4",
+   "features": [
+    "ch-107"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "item",
+   "name": "Item page",
+   "purpose": "P1",
+   "features": [
+    "ch-03",
+    "ch-04",
+    "ch-05",
+    "ch-07",
+    "ch-13",
+    "ch-16",
+    "ch-26",
+    "ch-59",
+    "ch-62",
+    "ch-101"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "add",
+   "name": "Quick add",
+   "purpose": "P1",
+   "features": [
+    "ch-01",
+    "ch-41"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "capture",
+   "name": "Capture and proposals",
+   "purpose": "P1",
+   "features": [
+    "ch-02",
+    "ch-28",
+    "ch-30",
+    "ch-31",
+    "ch-32",
+    "ch-33",
+    "ch-34",
+    "ch-35",
+    "ch-36",
+    "ch-37",
+    "ch-40"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "fields",
+   "name": "Fields",
+   "purpose": "P1",
+   "features": [
+    "ch-23",
+    "ch-24",
+    "ch-25"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "place",
+   "name": "Place page",
+   "purpose": "P3",
+   "features": [
+    "ch-09",
+    "ch-10",
+    "ch-11",
+    "ch-12",
+    "ch-15",
+    "ch-29",
+    "ch-53",
+    "ch-54",
+    "ch-55"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "map",
+   "name": "Place map",
+   "purpose": "P2",
+   "features": [
+    "ch-45",
+    "ch-46",
+    "ch-47"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "tags",
+   "name": "Tags",
+   "purpose": "P3",
+   "features": [
+    "ch-17",
+    "ch-19",
+    "ch-20",
+    "ch-21",
+    "ch-22"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "photos",
+   "name": "Photos",
+   "purpose": "P2",
+   "features": [
+    "ch-08",
+    "ch-52"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "backup",
+   "name": "Backup and restore",
+   "purpose": "P5",
+   "features": [
+    "ch-103",
+    "ch-104",
+    "ch-105"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "pantry",
+   "name": "Pantry",
+   "purpose": "P4",
+   "features": [
+    "ch-61",
+    "ch-66",
+    "ch-67",
+    "ch-68"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "wardrobe",
+   "name": "Wardrobe",
+   "purpose": "P4",
+   "features": [
+    "ch-63",
+    "ch-64",
+    "ch-65"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "shopping",
+   "name": "Shopping list",
+   "purpose": "P4",
+   "features": [
+    "ch-69",
+    "ch-70",
+    "ch-71",
+    "ch-72",
+    "ch-73",
+    "ch-92"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "store",
+   "name": "Store list",
+   "purpose": "P4",
+   "features": [
+    "ch-74",
+    "ch-75",
+    "ch-76",
+    "ch-77",
+    "ch-78",
+    "ch-79",
+    "ch-80",
+    "ch-81",
+    "ch-82",
+    "ch-83",
+    "ch-85",
+    "ch-91"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "prices",
+   "name": "Prices",
+   "purpose": "P4",
+   "features": [
+    "ch-84",
+    "ch-86",
+    "ch-87",
+    "ch-88"
+   ],
+   "homepage": false
+  },
+  {
+   "id": "settings",
+   "name": "Settings",
+   "purpose": "P5",
+   "features": [
+    "ch-38",
+    "ch-39",
+    "ch-42",
+    "ch-58",
+    "ch-89",
+    "ch-90",
+    "ch-100",
+    "ch-102",
+    "ch-106",
+    "ch-93",
+    "ch-94",
+    "ch-95",
+    "ch-96",
+    "ch-97",
+    "ch-98",
+    "ch-99"
+   ]
+  },
+  {
+   "id": "surface",
+   "name": "Widget, lock screen and prompts",
+   "purpose": null,
+   "features": [
+    "ch-51",
+    "ch-56",
+    "ch-57"
+   ],
+   "surface": true
+  }
+ ],
+ "where": [
+  {
+   "thing": "an item's details",
+   "home": "item"
+  },
+  {
+   "thing": "a place and what it holds",
+   "home": "place"
+  },
+  {
+   "thing": "the tag tree",
+   "home": "tags"
+  },
+  {
+   "thing": "custom fields",
+   "home": "fields"
+  },
+  {
+   "thing": "an item's quantity",
+   "home": "item",
+   "repeats": [
+    [
+     "pantry",
+     "stock counted with − and + in Pantry"
+    ]
+   ]
+  },
+  {
+   "thing": "an item's expiry date",
+   "home": "item"
+  },
+  {
+   "thing": "last worn and laundry",
+   "home": "item",
+   "repeats": [
+    [
+     "wardrobe",
+     "laundry marked in Wardrobe"
+    ]
+   ]
+  },
+  {
+   "thing": "the shopping list",
+   "home": "shopping"
+  },
+  {
+   "thing": "a store list",
+   "home": "store"
+  },
+  {
+   "thing": "shop prices",
+   "home": "prices"
+  },
+  {
+   "thing": "settings",
+   "home": "settings"
+  },
+  {
+   "thing": "notification switches",
+   "home": "settings"
+  },
+  {
+   "thing": "backups",
+   "home": "backup"
+  },
+  {
+   "thing": "shopping-list entries",
+   "home": "shopping",
+   "repeats": [
+    [
+     "store",
+     "entries removed or ticked from a store list (R137)"
+    ]
+   ]
+  }
+ ],
+ "runs": {
+  "R05": [
+   {
+    "screen": "home",
+    "do": "search the tag sewing",
+    "recall": null
+   },
+   {
+    "screen": "search",
+    "do": "Select",
+    "recall": null
+   },
+   {
+    "screen": "search",
+    "do": "tick the items needed",
+    "recall": null
+   },
+   {
+    "screen": "search",
+    "do": "Add tag: red skirt",
+    "recall": null
+   },
+   {
+    "screen": "home",
+    "do": "search red skirt",
+    "recall": null
+   }
+  ],
+  "R06": [
+   {
+    "screen": "home",
+    "do": "camera",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "shoot three headphones",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "untick the tag PC",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "save",
+    "recall": null
+   }
+  ],
+  "R07": [
+   {
+    "screen": "home",
+    "do": "camera",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "shoot the drawer",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "clear all suggested tags",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "add junk, to be sorted",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "place: new, junk drawer",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "save",
+    "recall": null
+   }
+  ],
+  "R08": [
+   {
+    "screen": "home",
+    "do": "camera",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "shoot the box",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "correct the wrong lines",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "place: the box",
+    "recall": null
+   },
+   {
+    "screen": "capture",
+    "do": "save",
+    "recall": null
+   }
+  ],
+  "R09": [
+   {
+    "screen": "home",
+    "do": "Places card",
+    "recall": null
+   },
+   {
+    "screen": "map",
+    "do": "bathroom",
+    "recall": null
+   },
+   {
+    "screen": "place",
+    "do": "cabinet under the sink: its contents",
+    "recall": null
+   }
+  ],
+  "R10": [
+   {
+    "screen": "home",
+    "do": "Places card",
+    "recall": null
+   },
+   {
+    "screen": "map",
+    "do": "edit: add the places",
+    "recall": null
+   },
+   {
+    "screen": "home",
+    "do": "search shoes",
+    "recall": null
+   },
+   {
+    "screen": "search",
+    "do": "pick the house or floor",
+    "recall": null
+   }
+  ],
+  "R11": [
+   {
+    "screen": "home",
+    "do": "Wardrobe",
+    "recall": null
+   },
+   {
+    "screen": "wardrobe",
+    "do": "seasonal swap",
+    "recall": null
+   },
+   {
+    "screen": "wardrobe",
+    "do": "confirm the swap",
+    "recall": null
+   }
+  ],
+  "R114": [
+   {
+    "screen": "home",
+    "do": "Prices",
+    "recall": null
+   },
+   {
+    "screen": "prices",
+    "do": "the tag cookies",
+    "recall": null
+   }
+  ],
+  "R115": [
+   {
+    "screen": "home",
+    "do": "Shopping",
+    "recall": null
+   },
+   {
+    "screen": "store",
+    "do": "store list of Supermarket A",
+    "recall": null
+   },
+   {
+    "screen": "store",
+    "do": "tick cookies Q",
+    "recall": null
+   },
+   {
+    "screen": "store",
+    "do": "type 1,29 over 1,59",
+    "recall": null
+   },
+   {
+    "screen": "store",
+    "do": "confirm",
+    "recall": null
+   }
+  ]
+ },
+ "shared": [],
+ "not_placed": []
+}

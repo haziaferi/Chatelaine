@@ -832,11 +832,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 | Deleted | What happens to what it held |
 |---|---|
-| an item | its photos are deleted with it |
+| an item | its photos are deleted with it, and its shopping-list and store-list entries go; its prices and past receipts stay |
 | a place | the items and places inside move to its parent place; inside a site, to the site |
+| a site | the items directly inside become unplaced (R30); its places stay, with no site above them |
 | a tag | its sub-tags move to its parent tag, or become top-level; its items lose only that tag |
+| a module's tag (R151) | the delete warns that its items leave the module; their preset values are hidden, not deleted, as when the module is turned off |
 
-**Acceptance:** Each delete asks before it acts. Deleting a drawer moves its items and partitions into the chest of drawers that held it; deleting the tag "sewing" leaves "red skirt" under the parent of "sewing", or top-level, and its items keep their other tags; deleting an item removes its photos.
+**Acceptance:** Each delete asks before it acts. Deleting a drawer moves its items and partitions into the chest of drawers that held it; deleting the tag "sewing" leaves "red skirt" under the parent of "sewing", or top-level, and its items keep their other tags; deleting an item removes its photos and its list entries and keeps its prices and receipts; deleting a site leaves its items unplaced; deleting "consumable" warns first, and its items' minimum stock is hidden, not deleted.
 
 **Since:** 2026-11-25 · owner · agreed rewording
 
@@ -1237,7 +1239,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### Q-R84 · Homepage layout
 
-**Rule:** What does the homepage hold, and how is it laid out? It is designed last, after every module is designed (R97, stage 10); the owner's sketch below is an input, not a decided layout.
+**Rule:** What does the homepage hold, and how is it laid out? It is designed last, after every module is designed (R97, stage 10), and until then the app opens on Search and results; the owner's sketch below is an input, not a decided layout.
 
 **Default:** The owner's sketch, as the rows below give it, with reach and density following R95, plus a shortcut to each module's main screen.
 
@@ -1983,9 +1985,9 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 ### D-R153 · Expiration timeline
 
-**Rule:** The expiration timeline lists every item with an expiry date, closest first, the past ones at the top. An item's date is its expiry date or, once it is opened, its opened-on date plus its months after opening (R109), whichever comes first; a date given as a month and year sorts as that month's last day.
+**Rule:** The expiration timeline lists every item with an expiry date, closest first, with the expired ones at the top, marked as expired. An item's date is its expiry date or, once it is opened, its opened-on date plus its months after opening (R109), whichever comes first; a date given as a month and year sorts as that month's last day.
 
-**Acceptance:** Items expiring on 3 March 2027, in April 2027 (no day given) and 10 April 2027 list as 3 March, 10 April 2027, then April 2027; an item opened on 1 January with "12M" and an expiry date in 2028 lists at 1 January of the next year; an item with no expiry date is not listed.
+**Acceptance:** Items expiring on 3 March 2027, in April 2027 (no day given) and 10 April 2027 list as 3 March, 10 April 2027, then April 2027; an item opened on 1 January with "12M" and an expiry date in 2028 lists at 1 January of the next year; an item past its date shows at the top, marked as expired; an item with no expiry date is not listed.
 
 **Since:** 2026-11-25 · owner · agreed rewording
 
@@ -2053,7 +2055,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 | 7 Clear-box surfaces | photo browsing; home-screen widget; label PDF with QR; object of the day | owner uses the widget and labels for a week | — |
 | 8 Voice | dictated logging in Italian and English on the phone (R21); speech model downloaded on first use (R19); splitting a list into items | a dictated list of ten things becomes ten items | — |
 | 9 Optional models | large recogniser; labeller LLM; download screen; licence checks | each optional model measurably improves a scenario | — |
-| 10 Modules | the modules of R97, each designed with the owner first; notifications by module, expiry included (R99); the price-comparison library (R119) and the savings export (R98) | each module passes its own scenarios, to be written with the owner; R114 and R115 pass | R114, R115 |
+| 10 Modules | the modules of R97, each designed with the owner first, and their screens confirmed in the purpose map (R90); the expiry views, expiring soon and the expiration timeline (R153); notifications by module, expiry included (R99); the price-comparison library (R119) and the savings export (R98); the homepage, last (R84) | each module passes its own scenarios, to be written with the owner; R114 and R115 pass | R114, R115 |
 | 11 Later | lending; app lock; NFC; lock-screen surface; rediscover prompt; free-drawing map editor; F-Droid build | each gets its own decision first | — |
 
 **Acceptance:** Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
@@ -2163,7 +2165,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R45 · Field presets: With each module on, its presets appear on the items carrying the tag in their row or one of its sub-tags, on every item and wish, or can be added to single items and wishes, as the row says. The bag mark can be added to several wishes in one bulk edit and appears only on those. A renamed counting unit choice still counts stock as before, and the counting unit and laundry offer no choice to add or remove. A preset that a view of its module needs offers no delete while the module is on. The new-field picker offers brand, model and purchase date, and none is on an item until the user adds it.
 - R46 · Where a field attaches: A field attached to a tag appears on every item that carries the tag or one of its sub-tags, including items tagged later. A field added to one item appears only on that item. A preset for every item and wish appears on each while its module is on, and on none while it is off.
 - R47 · User-editable lists: The user can add, rename and remove tag kinds, homepage cards and widget content, and the change shows at once.
-- R152 · Deleting items, places and tags: Each delete asks before it acts. Deleting a drawer moves its items and partitions into the chest of drawers that held it; deleting the tag "sewing" leaves "red skirt" under the parent of "sewing", or top-level, and its items keep their other tags; deleting an item removes its photos.
+- R152 · Deleting items, places and tags: Each delete asks before it acts. Deleting a drawer moves its items and partitions into the chest of drawers that held it; deleting the tag "sewing" leaves "red skirt" under the parent of "sewing", or top-level, and its items keep their other tags; deleting an item removes its photos and its list entries and keeps its prices and receipts; deleting a site leaves its items unplaced; deleting "consumable" warns first, and its items' minimum stock is hidden, not deleted.
 - R48 · Local database: Each device opens its own database with the network off.
 - R49 · Database library: The shared data module builds with Room KMP for Android and for the desktop JVM, and stage 1's round-trip tests pass on both (R100).
 - R50 · A database that fails to open: In stage 1's round-trip tests, a corrupted database is kept, not deleted (R100).
@@ -2239,7 +2241,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R116 · Price paid in the savings export: Each row's purchase, ticked as bought, adds the amount in its last column to the receipt's exported total, and no export carries a difference or a saving as a separate amount.
 - R121 · Showing the difference: Ticking an item as bought below or above its saved price shows no difference or saving at the tick step, and reading every Shopping screen's text finds none elsewhere.
 - R109 · Expiry dates: A photo of a label in each format fills the right field, and each field can be typed or edited by hand. In the Italian interface a date shows as dd/mm/yyyy.
-- R153 · Expiration timeline: Items expiring on 3 March 2027, in April 2027 (no day given) and 10 April 2027 list as 3 March, 10 April 2027, then April 2027; an item opened on 1 January with "12M" and an expiry date in 2028 lists at 1 January of the next year; an item with no expiry date is not listed.
+- R153 · Expiration timeline: Items expiring on 3 March 2027, in April 2027 (no day given) and 10 April 2027 list as 3 March, 10 April 2027, then April 2027; an item opened on 1 January with "12M" and an expiry date in 2028 lists at 1 January of the next year; an item past its date shows at the top, marked as expired; an item with no expiry date is not listed.
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and with the savings export on (R125) each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 - R99 · Reminders: With any of its modules off, a notification can neither be turned on nor arrive. The Inventory module's notifications can be turned on at any time.

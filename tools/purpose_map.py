@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Score Chatelaine's purpose map (SPEC R90, R91), check it, and write docs/purpose-map.md.
 
-    python tools/purpose_map.py WORK            score every purpose set and map in WORK, print the tables
-    python tools/purpose_map.py WORK --check    also fail (exit 1) on any placement fault
+    python tools/purpose_map.py docs/purpose-map    score every purpose set and map in a folder (WORK), print the tables
+    python tools/purpose_map.py WORK --check        also fail (exit 1) on any placement fault
     python tools/purpose_map.py --render        write docs/purpose-map.md from docs/purpose-map.json
     python tools/purpose_map.py --selftest
 

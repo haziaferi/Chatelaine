@@ -1,0 +1,210 @@
+{
+ "app": "StuffList",
+ "features": [
+  {
+   "id": "StuffList-01",
+   "name": "Read a tutorial",
+   "where": "intro",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [],
+   "match_note": "No rule defines a tutorial.",
+   "facets": [
+    "help"
+   ]
+  },
+  {
+   "id": "StuffList-02",
+   "name": "Make a list for a trip",
+   "where": "main",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R05",
+    "R37"
+   ],
+   "match_note": "A project tag gathers items; no trip list with entries of its own.",
+   "facets": [
+    "lists",
+    "away"
+   ]
+  },
+  {
+   "id": "StuffList-03",
+   "name": "Delete a trip with its items",
+   "where": "main, long press",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R34"
+   ],
+   "match_note": "Deleting a tag, or a group with its items, is not defined.",
+   "facets": [
+    "lists",
+    "edit"
+   ]
+  },
+  {
+   "id": "StuffList-04",
+   "name": "See a trip as a photo grid",
+   "where": "trip",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R87"
+   ],
+   "match_note": "Photo browsing shows places by their photos; a tag's items as a grid is not defined.",
+   "facets": [
+    "browse",
+    "photos"
+   ]
+  },
+  {
+   "id": "StuffList-05",
+   "name": "Add an item with photo and note",
+   "where": "add item",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R25",
+    "R41"
+   ],
+   "match_note": "Name, notes and an optional photo.",
+   "facets": [
+    "add",
+    "photos"
+   ]
+  },
+  {
+   "id": "StuffList-06",
+   "name": "Rotate a photo",
+   "where": "add item menu",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R24"
+   ],
+   "match_note": "Automatic rotation is borrowed (R24); no manual rotate.",
+   "facets": [
+    "photos"
+   ]
+  },
+  {
+   "id": "StuffList-07",
+   "name": "Save and add the next item",
+   "where": "add item menu",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R25",
+    "R100"
+   ],
+   "match_note": "Quick add by name exists; no save-and-add-next.",
+   "facets": [
+    "add"
+   ]
+  },
+  {
+   "id": "StuffList-08",
+   "name": "Mark an item taken and brought back",
+   "where": "add item",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R30"
+   ],
+   "match_note": "The in use / away state covers out and back; no packing check per trip.",
+   "facets": [
+    "away",
+    "lists"
+   ]
+  },
+  {
+   "id": "StuffList-09",
+   "name": "Sort trips and items, forgotten first",
+   "where": "settings",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [],
+   "match_note": "No rule defines list sorting.",
+   "facets": [
+    "browse",
+    "away"
+   ]
+  },
+  {
+   "id": "StuffList-10",
+   "name": "Get a reminder of what is missing",
+   "where": "schedule dialog, notification",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [
+    "R86",
+    "R87",
+    "R99"
+   ],
+   "match_note": "No departure reminders; the later rediscover prompt is not about missing things.",
+   "facets": [
+    "notify",
+    "away"
+   ]
+  },
+  {
+   "id": "StuffList-11",
+   "name": "Edit an item",
+   "where": "trip grid",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R25"
+   ],
+   "match_note": "Item editor.",
+   "facets": [
+    "edit"
+   ]
+  },
+  {
+   "id": "StuffList-12",
+   "name": "Delete an item or its photo",
+   "where": "long press, add item",
+   "from_code": true,
+   "match": "partial",
+   "match_rules": [
+    "R143"
+   ],
+   "match_note": "Deleting an item is mentioned only in passing; deleting a photo is not defined.",
+   "facets": [
+    "edit",
+    "photos"
+   ]
+  },
+  {
+   "id": "StuffList-13",
+   "name": "View a photo full screen",
+   "where": "photo viewer",
+   "from_code": true,
+   "match": "full",
+   "match_rules": [
+    "R41",
+    "R87"
+   ],
+   "match_note": "Item and place photos, and photo browsing.",
+   "facets": [
+    "photos"
+   ]
+  },
+  {
+   "id": "StuffList-14",
+   "name": "Share an item's photo",
+   "where": "long press",
+   "from_code": true,
+   "match": "none",
+   "match_rules": [],
+   "match_note": "No rule defines sharing.",
+   "facets": [
+    "photos",
+    "data"
+   ]
+  }
+ ]
+}

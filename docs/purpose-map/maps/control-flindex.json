@@ -1,0 +1,58 @@
+{"name": "flindex", "control": true, "purpose_set": null,
+ "screens": [
+  {"id": "home", "name": "Home: enter or scan a code", "purpose": null, "features": [], "surface": false, "homepage": true},
+  {"id": "scanner", "name": "QR and barcode scanner", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "search", "name": "Search in inventories", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "overview", "name": "Inventory list", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "view", "name": "Inventory view (read-only items)", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "edit", "name": "Edit inventory: name, add and remove items, delete", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "settings", "name": "Settings: theme, export, import", "purpose": null, "features": [], "surface": false, "homepage": false}
+ ],
+ "where": [
+  {"thing": "inventory (box, by code)", "home": "edit", "repeats": []},
+  {"thing": "item", "home": "edit", "repeats": []},
+  {"thing": "theme", "home": "settings", "repeats": []},
+  {"thing": "data export and import", "home": "settings", "repeats": []}
+ ],
+ "runs": {
+  "R05": null,
+  "R06": null,
+  "R07": null,
+  "R08": null,
+  "R09": [
+   {"screen": "home", "do": "open the inventory list", "recall": null},
+   {"screen": "overview", "do": "tap the under-sink inventory", "recall": null}
+  ],
+  "R10": null,
+  "R11": [
+   {"screen": "home", "do": "open the inventory list", "recall": null},
+   {"screen": "overview", "do": "tap the winter storage box", "recall": null},
+   {"screen": "view", "do": "pencil: edit", "recall": null},
+   {"screen": "edit", "do": "remove winter item 1", "recall": null},
+   {"screen": "edit", "do": "remove winter item 2", "recall": null},
+   {"screen": "edit", "do": "remove winter item 3", "recall": null},
+   {"screen": "edit", "do": "type summer item 1's name", "recall": "the summer things' names: listed only in the closet box"},
+   {"screen": "edit", "do": "+ add", "recall": null},
+   {"screen": "edit", "do": "type summer item 2's name", "recall": "the summer things' names: listed only in the closet box"},
+   {"screen": "edit", "do": "+ add", "recall": null},
+   {"screen": "edit", "do": "type summer item 3's name", "recall": "the summer things' names: listed only in the closet box"},
+   {"screen": "edit", "do": "+ add", "recall": null},
+   {"screen": "edit", "do": "back to the view", "recall": null},
+   {"screen": "view", "do": "back to the inventory list", "recall": null},
+   {"screen": "overview", "do": "tap the closet box", "recall": null},
+   {"screen": "view", "do": "pencil: edit", "recall": null},
+   {"screen": "edit", "do": "remove summer item 1", "recall": null},
+   {"screen": "edit", "do": "remove summer item 2", "recall": null},
+   {"screen": "edit", "do": "remove summer item 3", "recall": null},
+   {"screen": "edit", "do": "type winter item 1's name", "recall": "the winter things' names: removed from the storage box, no longer shown"},
+   {"screen": "edit", "do": "+ add", "recall": null},
+   {"screen": "edit", "do": "type winter item 2's name", "recall": "the winter things' names: removed from the storage box, no longer shown"},
+   {"screen": "edit", "do": "+ add", "recall": null},
+   {"screen": "edit", "do": "type winter item 3's name", "recall": "the winter things' names: removed from the storage box, no longer shown"},
+   {"screen": "edit", "do": "+ add", "recall": null}
+  ],
+  "R114": null,
+  "R115": null
+ },
+ "notes": "Seven screens from the walk; the navigation drawer and the delete confirmation are not counted. Each item and each inventory has one home, the edit screen, with no repeats (the view and search results are read-only; opening an unknown code on home creates an inventory, which is creation, not a repeat). One step per tap, and tapping a field and typing is one step. R09 opens the box from the inventory list (2 taps); a scan is 1 step but needs the box in hand, which the before-buying scenario does not give. R11 treats a box as the group and the place, as the app's model does, and moves by removing and retyping, the only way the app allows (the walk notes give about 8 taps per move); the retyped names are recall because the other box is not shown. R05 is null (no tags), R06-R08 null (no photos or recognition), R10 null (one level of boxes, no map), R114 and R115 null (no prices)."
+}

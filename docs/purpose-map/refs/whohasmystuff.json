@@ -1,0 +1,126 @@
+{
+ "app": "whohasmystuff",
+ "features": [
+  {
+   "id": "whohasmystuff-01",
+   "name": "See what is lent and to whom",
+   "where": "main list",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R30",
+    "R105"
+   ],
+   "match_note": "Lending is out of scope for v1 (R105); R30 only reserves a lent state.",
+   "facets": [
+    "away",
+    "browse"
+   ]
+  },
+  {
+   "id": "whohasmystuff-02",
+   "name": "Record or edit a loan",
+   "where": "add new, edit",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R105"
+   ],
+   "match_note": "Lending is out of scope for v1.",
+   "facets": [
+    "away"
+   ]
+  },
+  {
+   "id": "whohasmystuff-03",
+   "name": "Add a loan to the calendar",
+   "where": "add new",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R99",
+    "R105"
+   ],
+   "match_note": "No lending and no calendar entries.",
+   "facets": [
+    "away",
+    "notify"
+   ]
+  },
+  {
+   "id": "whohasmystuff-04",
+   "name": "Mark a loan as returned",
+   "where": "edit, long press",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R30",
+    "R105"
+   ],
+   "match_note": "Lending is out of scope for v1.",
+   "facets": [
+    "away"
+   ]
+  },
+  {
+   "id": "whohasmystuff-05",
+   "name": "See returned items",
+   "where": "history",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R52",
+    "R105"
+   ],
+   "match_note": "Record history exists, but no lending history.",
+   "facets": [
+    "away",
+    "browse"
+   ]
+  },
+  {
+   "id": "whohasmystuff-06",
+   "name": "Lend an item again",
+   "where": "history",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R105"
+   ],
+   "match_note": "Lending is out of scope for v1.",
+   "facets": [
+    "away"
+   ]
+  },
+  {
+   "id": "whohasmystuff-07",
+   "name": "Delete a loan",
+   "where": "long press",
+   "from_code": false,
+   "match": "none",
+   "match_rules": [
+    "R105"
+   ],
+   "match_note": "Lending is out of scope for v1.",
+   "facets": [
+    "away",
+    "edit"
+   ]
+  },
+  {
+   "id": "whohasmystuff-08",
+   "name": "Back up and restore data",
+   "where": "overflow menu",
+   "from_code": false,
+   "match": "full",
+   "match_rules": [
+    "R60",
+    "R61"
+   ],
+   "match_note": "Backup to a folder, export and a merging restore.",
+   "facets": [
+    "data"
+   ]
+  }
+ ]
+}

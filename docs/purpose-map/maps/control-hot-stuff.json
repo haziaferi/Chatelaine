@@ -1,0 +1,68 @@
+{"name": "hot-stuff", "control": true, "purpose_set": null,
+ "screens": [
+  {"id": "onboard", "name": "Onboarding intro pages (first run)", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "building", "name": "Create Building (first run)", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "home", "name": "Home: totals and charts", "purpose": null, "features": [], "surface": false, "homepage": true},
+  {"id": "items", "name": "Items list with search and export", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "details", "name": "Item details: edit, delete", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "edit", "name": "Edit item", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "create", "name": "Create item", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "learn", "name": "Learn: list of articles", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "article", "name": "Article", "purpose": null, "features": [], "surface": false, "homepage": false},
+  {"id": "settings", "name": "Settings: theme, currency, building, contact", "purpose": null, "features": [], "surface": false, "homepage": false}
+ ],
+ "where": [
+  {"thing": "item (with its category, room, photo, value)", "home": "edit", "repeats": []},
+  {"thing": "building", "home": "settings", "repeats": []},
+  {"thing": "theme", "home": "settings", "repeats": []},
+  {"thing": "currency", "home": "settings", "repeats": []}
+ ],
+ "runs": {
+  "R05": null,
+  "R06": null,
+  "R07": null,
+  "R08": null,
+  "R09": [
+   {"screen": "home", "do": "Items tab", "recall": null},
+   {"screen": "items", "do": "search icon", "recall": null},
+   {"screen": "items", "do": "type the room text for the cabinet under the sink", "recall": "the room as typed when logging: rooms are free text, no list of rooms in use"}
+  ],
+  "R10": null,
+  "R11": [
+   {"screen": "home", "do": "Items tab", "recall": null},
+   {"screen": "items", "do": "search icon", "recall": null},
+   {"screen": "items", "do": "type winter clothes (the category)", "recall": "the category as typed when grouping: no list of categories in use"},
+   {"screen": "items", "do": "tap winter item 1", "recall": null},
+   {"screen": "details", "do": "Edit", "recall": null},
+   {"screen": "edit", "do": "type the closet as Room", "recall": null},
+   {"screen": "edit", "do": "Save changes", "recall": null},
+   {"screen": "items", "do": "tap winter item 2", "recall": null},
+   {"screen": "details", "do": "Edit", "recall": null},
+   {"screen": "edit", "do": "type the closet as Room", "recall": null},
+   {"screen": "edit", "do": "Save changes", "recall": null},
+   {"screen": "items", "do": "tap winter item 3", "recall": null},
+   {"screen": "details", "do": "Edit", "recall": null},
+   {"screen": "edit", "do": "type the closet as Room", "recall": null},
+   {"screen": "edit", "do": "Save changes", "recall": null},
+   {"screen": "items", "do": "type the closet's room text in the search", "recall": "the room as typed: no list of rooms in use"},
+   {"screen": "items", "do": "tap summer item 1", "recall": null},
+   {"screen": "details", "do": "Edit", "recall": null},
+   {"screen": "edit", "do": "type summer clothes as Category", "recall": null},
+   {"screen": "edit", "do": "type the storage room as Room", "recall": null},
+   {"screen": "edit", "do": "Save changes", "recall": null},
+   {"screen": "items", "do": "tap summer item 2", "recall": null},
+   {"screen": "details", "do": "Edit", "recall": null},
+   {"screen": "edit", "do": "type summer clothes as Category", "recall": "the same category text, typed again: suggestions are a fixed list"},
+   {"screen": "edit", "do": "type the storage room as Room", "recall": null},
+   {"screen": "edit", "do": "Save changes", "recall": null},
+   {"screen": "items", "do": "tap summer item 3", "recall": null},
+   {"screen": "details", "do": "Edit", "recall": null},
+   {"screen": "edit", "do": "type summer clothes as Category", "recall": "the same category text, typed again: suggestions are a fixed list"},
+   {"screen": "edit", "do": "type the storage room as Room", "recall": null},
+   {"screen": "edit", "do": "Save changes", "recall": null}
+  ],
+  "R114": null,
+  "R115": null
+ },
+ "notes": "Read from code only (the device walk stopped at the terms screen), so every count is from the code notes. Ten screens: the two first-run screens are counted because a person meets them once, Home is the launch screen after setup; the export and delete confirmations and the settings choice dialogs are not counted. Category and room are text fields on the item, not things, so the item has one home (edit); details is its read view and Create is creation, so no repeats; the building is made in onboarding (creation) and edited only in Settings. One step per tap, typing a field is one step. Fewest-tap reading: Save changes is taken to return to the filtered Items list, and room names typed into Room are taken from the fixed suggestion list (no recall). R05 is null: one category per item, so adding red skirt would replace sewing (using the brand field as a tag was not counted). R09 and R11 use the free-text room as the place and the category as the group. R06-R08 null (one photo per item, no recognition), R10 null (one building, rooms only, no map), R114 and R115 null (a value per item, no price comparison or price book)."
+}

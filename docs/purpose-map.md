@@ -1,6 +1,6 @@
 # Purpose map
 
-Which purpose each screen serves, decided before any screen is built (R90) and scored on R91's axes against the seven walked reference apps. The Inventory screens, under purpose set S5, approved by the owner on 2026-11-25; the Wardrobe, Pantry and Shopping screens are provisional until each module is designed (R97, stage 10), and the homepage is designed last (R84). Replaces the unscored draft of 2026-10-28 (in git history); its purposes, scored as set SD, came last of five.
+Which purpose each screen serves, decided before any screen is built (R90) and scored on R91's axes against the seven walked reference apps. The Inventory screens, under purpose set S5, approved by the owner on 2026-11-25; the Wardrobe, Pantry and Shopping screens are provisional until each module is designed (R97, stage 10), and the homepage is designed last (R84). The scored data is in `docs/purpose-map/`. Replaces the unscored draft of 2026-10-28 (in git history); its purposes, scored as set SD, came last of five.
 
 Generated from `docs/purpose-map.json` by `tools/purpose_map.py --render`; edit the JSON, not this page.
 

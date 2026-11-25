@@ -1,0 +1,207 @@
+{
+ "scenarios": [
+  {
+   "id": "R05-1",
+   "rule": "R05",
+   "name": "Search the tag sewing",
+   "facets": [
+    "search",
+    "tags"
+   ]
+  },
+  {
+   "id": "R05-2",
+   "rule": "R05",
+   "name": "Add red skirt to the chosen items at once",
+   "facets": [
+    "tags"
+   ]
+  },
+  {
+   "id": "R05-3",
+   "rule": "R05",
+   "name": "Find them later by red skirt",
+   "facets": [
+    "search",
+    "tags"
+   ]
+  },
+  {
+   "id": "R06-1",
+   "rule": "R06",
+   "name": "Photograph three headphones",
+   "facets": [
+    "recog",
+    "photos"
+   ]
+  },
+  {
+   "id": "R06-2",
+   "rule": "R06",
+   "name": "Drop the wrong suggested tag and save",
+   "facets": [
+    "recog",
+    "tags"
+   ]
+  },
+  {
+   "id": "R07-1",
+   "rule": "R07",
+   "name": "Photograph a full drawer",
+   "facets": [
+    "recog",
+    "photos"
+   ]
+  },
+  {
+   "id": "R07-2",
+   "rule": "R07",
+   "name": "Clear every suggested tag at once",
+   "facets": [
+    "recog",
+    "tags"
+   ]
+  },
+  {
+   "id": "R07-3",
+   "rule": "R07",
+   "name": "Add own tags and name the drawer",
+   "facets": [
+    "tags",
+    "places"
+   ]
+  },
+  {
+   "id": "R08-1",
+   "rule": "R08",
+   "name": "Photograph a box of many things",
+   "facets": [
+    "recog",
+    "photos"
+   ]
+  },
+  {
+   "id": "R08-2",
+   "rule": "R08",
+   "name": "Correct the wrong lines",
+   "facets": [
+    "recog"
+   ]
+  },
+  {
+   "id": "R08-3",
+   "rule": "R08",
+   "name": "Save each kind with its count in the box",
+   "facets": [
+    "recog",
+    "qty",
+    "inside"
+   ]
+  },
+  {
+   "id": "R09-1",
+   "rule": "R09",
+   "name": "Open the cabinet under the sink",
+   "facets": [
+    "inside",
+    "places"
+   ]
+  },
+  {
+   "id": "R09-2",
+   "rule": "R09",
+   "name": "See which cleaning supplies are there",
+   "facets": [
+    "inside"
+   ]
+  },
+  {
+   "id": "R10-1",
+   "rule": "R10",
+   "name": "Build the place map up to several houses",
+   "facets": [
+    "map",
+    "places"
+   ]
+  },
+  {
+   "id": "R10-2",
+   "rule": "R10",
+   "name": "Search shoes within a house or floor",
+   "facets": [
+    "search",
+    "places"
+   ]
+  },
+  {
+   "id": "R10-3",
+   "rule": "R10",
+   "name": "See results from other places when none",
+   "facets": [
+    "search"
+   ]
+  },
+  {
+   "id": "R11-1",
+   "rule": "R11",
+   "name": "Find the winter clothes",
+   "facets": [
+    "wear",
+    "tags"
+   ]
+  },
+  {
+   "id": "R11-2",
+   "rule": "R11",
+   "name": "Swap the closet",
+   "facets": [
+    "wear",
+    "move"
+   ]
+  },
+  {
+   "id": "R11-3",
+   "rule": "R11",
+   "name": "Group the summer clothes put away",
+   "facets": [
+    "wear",
+    "tags"
+   ]
+  },
+  {
+   "id": "R114-1",
+   "rule": "R114",
+   "name": "Select the tag cookies",
+   "facets": [
+    "prices",
+    "tags"
+   ]
+  },
+  {
+   "id": "R114-2",
+   "rule": "R114",
+   "name": "See the packs ranked per kg",
+   "facets": [
+    "prices"
+   ]
+  },
+  {
+   "id": "R115-1",
+   "rule": "R115",
+   "name": "Tick cookies bought below the saved price",
+   "facets": [
+    "buy",
+    "prices"
+   ]
+  },
+  {
+   "id": "R115-2",
+   "rule": "R115",
+   "name": "Receipt counts the price paid",
+   "facets": [
+    "buy",
+    "savings"
+   ]
+  }
+ ]
+}

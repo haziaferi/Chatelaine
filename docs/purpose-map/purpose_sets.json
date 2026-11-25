@@ -1,0 +1,359 @@
+{
+ "sets": {
+  "S5": {
+   "name": "five, by what the user is doing",
+   "purposes": {
+    "P1": {
+     "name": "Log",
+     "job": "get things into the app, by hand or from a photo, and fix what was logged",
+     "facets": [
+      "add",
+      "recog",
+      "edit",
+      "fields",
+      "qty",
+      "photos"
+     ]
+    },
+    "P2": {
+     "name": "Find",
+     "job": "find a thing and see where it is",
+     "facets": [
+      "search",
+      "browse",
+      "map",
+      "codes",
+      "surface"
+     ]
+    },
+    "P3": {
+     "name": "Arrange",
+     "job": "keep places and tags in order and things where they belong",
+     "facets": [
+      "places",
+      "inside",
+      "move",
+      "tags",
+      "away"
+     ]
+    },
+    "P4": {
+     "name": "Use up and buy",
+     "job": "keep track of what runs out, wears or needs buying, and buy it",
+     "facets": [
+      "expiry",
+      "consume",
+      "wear",
+      "lists",
+      "buy",
+      "prices",
+      "savings",
+      "notify"
+     ]
+    },
+    "P5": {
+     "name": "Look after the app",
+     "job": "keep the data safe and the app set up",
+     "facets": [
+      "data",
+      "settings",
+      "help"
+     ]
+    }
+   },
+   "outside": [
+    "value"
+   ]
+  },
+  "S7": {
+   "name": "seven, by job",
+   "purposes": {
+    "P1": {
+     "name": "Log",
+     "job": "get things into the app, by hand or from a photo, and fix what was logged",
+     "facets": [
+      "add",
+      "recog",
+      "edit",
+      "fields",
+      "qty"
+     ]
+    },
+    "P2": {
+     "name": "Find",
+     "job": "find a thing and see where it is",
+     "facets": [
+      "search",
+      "browse",
+      "codes",
+      "surface"
+     ]
+    },
+    "P3": {
+     "name": "Places",
+     "job": "build the places and see what each holds",
+     "facets": [
+      "places",
+      "inside",
+      "move",
+      "map",
+      "photos"
+     ]
+    },
+    "P4": {
+     "name": "Tags",
+     "job": "group things by tags, and know which are away",
+     "facets": [
+      "tags",
+      "away"
+     ]
+    },
+    "P5": {
+     "name": "Run out and wear",
+     "job": "know what expires, runs out or needs washing",
+     "facets": [
+      "expiry",
+      "consume",
+      "wear",
+      "notify"
+     ]
+    },
+    "P6": {
+     "name": "Shop",
+     "job": "list what to buy, where and at what price, and record it",
+     "facets": [
+      "lists",
+      "buy",
+      "prices",
+      "savings"
+     ]
+    },
+    "P7": {
+     "name": "Look after the app",
+     "job": "keep the data safe and the app set up",
+     "facets": [
+      "data",
+      "settings",
+      "help"
+     ]
+    }
+   },
+   "outside": [
+    "value"
+   ]
+  },
+  "SM": {
+   "name": "one purpose per module",
+   "purposes": {
+    "P1": {
+     "name": "Inventory",
+     "job": "log, place, tag and find the things owned",
+     "facets": [
+      "add",
+      "recog",
+      "edit",
+      "fields",
+      "qty",
+      "places",
+      "inside",
+      "move",
+      "tags",
+      "away",
+      "photos",
+      "search",
+      "browse",
+      "map",
+      "codes",
+      "surface",
+      "expiry"
+     ]
+    },
+    "P2": {
+     "name": "Wardrobe",
+     "job": "look after what is worn",
+     "facets": [
+      "wear"
+     ]
+    },
+    "P3": {
+     "name": "Pantry",
+     "job": "know what runs out",
+     "facets": [
+      "consume"
+     ]
+    },
+    "P4": {
+     "name": "Shopping",
+     "job": "list what to buy, where and at what price, and record it",
+     "facets": [
+      "lists",
+      "buy",
+      "prices",
+      "savings"
+     ]
+    },
+    "P5": {
+     "name": "App",
+     "job": "keep the data safe, the app set up, and say when something needs doing",
+     "facets": [
+      "data",
+      "settings",
+      "help",
+      "notify"
+     ]
+    }
+   },
+   "outside": [
+    "value"
+   ]
+  },
+  "S6": {
+   "name": "six, by job",
+   "purposes": {
+    "P1": {
+     "name": "Log",
+     "job": "get things into the app, by hand or from a photo, and fix what was logged",
+     "facets": [
+      "add",
+      "recog",
+      "edit",
+      "fields",
+      "qty"
+     ]
+    },
+    "P2": {
+     "name": "Find",
+     "job": "find a thing and see where it is",
+     "facets": [
+      "search",
+      "browse",
+      "map",
+      "codes",
+      "surface",
+      "photos"
+     ]
+    },
+    "P3": {
+     "name": "Arrange",
+     "job": "keep places and tags in order and things where they belong",
+     "facets": [
+      "places",
+      "inside",
+      "move",
+      "tags",
+      "away"
+     ]
+    },
+    "P4": {
+     "name": "Run out and wear",
+     "job": "know what expires, runs out or needs washing",
+     "facets": [
+      "expiry",
+      "consume",
+      "wear",
+      "notify"
+     ]
+    },
+    "P5": {
+     "name": "Shop",
+     "job": "list what to buy, where and at what price, and record it",
+     "facets": [
+      "lists",
+      "buy",
+      "prices",
+      "savings"
+     ]
+    },
+    "P6": {
+     "name": "Look after the app",
+     "job": "keep the data safe and the app set up",
+     "facets": [
+      "data",
+      "settings",
+      "help"
+     ]
+    }
+   },
+   "outside": [
+    "value"
+   ]
+  },
+  "SD": {
+   "name": "the 2026-10-28 draft, its modules section as one purpose",
+   "purposes": {
+    "P1": {
+     "name": "Find",
+     "job": "get to a thing, or everything for a task, by name, tag, meaning or place",
+     "facets": [
+      "search",
+      "browse",
+      "codes"
+     ]
+    },
+    "P2": {
+     "name": "Record",
+     "job": "get things into the app with the least effort; correct what the models got wrong",
+     "facets": [
+      "add",
+      "recog",
+      "edit",
+      "qty"
+     ]
+    },
+    "P3": {
+     "name": "Organise",
+     "job": "shape tags and parent tags, keep things together, move them, swap seasons",
+     "facets": [
+      "tags",
+      "away",
+      "move"
+     ]
+    },
+    "P4": {
+     "name": "Know the storage",
+     "job": "the places themselves and how they look",
+     "facets": [
+      "places",
+      "inside",
+      "map"
+     ]
+    },
+    "P5": {
+     "name": "Keep in view",
+     "job": "stored things come back into sight without being asked",
+     "facets": [
+      "surface",
+      "photos",
+      "notify"
+     ]
+    },
+    "P6": {
+     "name": "Look after it",
+     "job": "backup, sync, languages, models, customisation, lock",
+     "facets": [
+      "data",
+      "settings",
+      "help",
+      "fields"
+     ]
+    },
+    "P7": {
+     "name": "Modules",
+     "job": "the module views, mapped when each module is designed",
+     "facets": [
+      "expiry",
+      "consume",
+      "wear",
+      "lists",
+      "buy",
+      "prices",
+      "savings"
+     ]
+    }
+   },
+   "outside": [
+    "value"
+   ]
+  }
+ }
+}

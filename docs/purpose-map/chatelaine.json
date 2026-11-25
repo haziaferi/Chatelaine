@@ -1,0 +1,1356 @@
+{
+ "app": "Chatelaine",
+ "features": [
+  {
+   "id": "ch-01",
+   "name": "Add an item by name only",
+   "where": "quick add",
+   "rules": [
+    "R25",
+    "R29",
+    "R100"
+   ],
+   "facets": [
+    "add"
+   ]
+  },
+  {
+   "id": "ch-02",
+   "name": "Log an item photo first, name later",
+   "where": "camera, item editor",
+   "rules": [
+    "R29",
+    "R41"
+   ],
+   "facets": [
+    "recog",
+    "photos"
+   ]
+  },
+  {
+   "id": "ch-03",
+   "name": "Edit an item's name, notes and fields",
+   "where": "item editor",
+   "rules": [
+    "R25",
+    "R29"
+   ],
+   "facets": [
+    "edit"
+   ]
+  },
+  {
+   "id": "ch-04",
+   "name": "Record an item's quantity",
+   "where": "item editor",
+   "rules": [
+    "R26",
+    "R28"
+   ],
+   "facets": [
+    "qty"
+   ]
+  },
+  {
+   "id": "ch-05",
+   "name": "Split identical things into separate items",
+   "where": "item editor",
+   "rules": [
+    "R28"
+   ],
+   "facets": [
+    "qty"
+   ]
+  },
+  {
+   "id": "ch-06",
+   "name": "See items not yet placed",
+   "where": "unplaced inbox",
+   "rules": [
+    "R29",
+    "R30",
+    "R100"
+   ],
+   "facets": [
+    "browse"
+   ]
+  },
+  {
+   "id": "ch-07",
+   "name": "Mark an item away and back",
+   "where": "item screen",
+   "rules": [
+    "R30"
+   ],
+   "facets": [
+    "away"
+   ]
+  },
+  {
+   "id": "ch-08",
+   "name": "See which photos are outdated",
+   "where": "item and place screens",
+   "rules": [
+    "R31"
+   ],
+   "facets": [
+    "photos"
+   ]
+  },
+  {
+   "id": "ch-09",
+   "name": "Build a place tree across several sites",
+   "where": "place tree",
+   "rules": [
+    "R32",
+    "R111",
+    "R33"
+   ],
+   "facets": [
+    "places"
+   ]
+  },
+  {
+   "id": "ch-10",
+   "name": "Give a place tags, notes, photo",
+   "where": "place screen",
+   "rules": [
+    "R33",
+    "R41"
+   ],
+   "facets": [
+    "places",
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-11",
+   "name": "See what is inside a place",
+   "where": "place contents",
+   "rules": [
+    "R09",
+    "R111",
+    "R100"
+   ],
+   "facets": [
+    "inside"
+   ]
+  },
+  {
+   "id": "ch-12",
+   "name": "See a place's path up the tree",
+   "where": "place screen",
+   "rules": [
+    "R24",
+    "R32"
+   ],
+   "facets": [
+    "places",
+    "inside"
+   ]
+  },
+  {
+   "id": "ch-13",
+   "name": "Move an item to another place",
+   "where": "item screen",
+   "rules": [
+    "R11",
+    "R31",
+    "R100"
+   ],
+   "facets": [
+    "move"
+   ]
+  },
+  {
+   "id": "ch-14",
+   "name": "Move several items at once",
+   "where": "bulk move",
+   "rules": [
+    "R11",
+    "R100"
+   ],
+   "facets": [
+    "move"
+   ]
+  },
+  {
+   "id": "ch-15",
+   "name": "Move a place with its contents",
+   "where": "place screen",
+   "rules": [
+    "R24",
+    "R32",
+    "R100"
+   ],
+   "facets": [
+    "places",
+    "move"
+   ]
+  },
+  {
+   "id": "ch-16",
+   "name": "Tag items and places",
+   "where": "item and place screens",
+   "rules": [
+    "R34"
+   ],
+   "facets": [
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-17",
+   "name": "Nest tags under a parent tag",
+   "where": "tag screen",
+   "rules": [
+    "R34",
+    "R35"
+   ],
+   "facets": [
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-18",
+   "name": "Add or remove tags in bulk",
+   "where": "search results, multi-select",
+   "rules": [
+    "R05",
+    "R40",
+    "R100"
+   ],
+   "facets": [
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-19",
+   "name": "Give a kept-together tag a home place",
+   "where": "tag screen",
+   "rules": [
+    "R36"
+   ],
+   "facets": [
+    "away",
+    "places"
+   ]
+  },
+  {
+   "id": "ch-20",
+   "name": "See a tag's items away from home",
+   "where": "tag screen",
+   "rules": [
+    "R36",
+    "R11"
+   ],
+   "facets": [
+    "away"
+   ]
+  },
+  {
+   "id": "ch-21",
+   "name": "Set a tag's kind and edit kinds",
+   "where": "tag screen, settings",
+   "rules": [
+    "R37",
+    "R38",
+    "R47"
+   ],
+   "facets": [
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-22",
+   "name": "Browse top-level tags",
+   "where": "homepage tags card",
+   "rules": [
+    "R84",
+    "R85"
+   ],
+   "facets": [
+    "tags",
+    "browse"
+   ]
+  },
+  {
+   "id": "ch-23",
+   "name": "Define custom fields",
+   "where": "field editor",
+   "rules": [
+    "R43",
+    "R44"
+   ],
+   "facets": [
+    "fields"
+   ]
+  },
+  {
+   "id": "ch-24",
+   "name": "Attach a field to tags or items",
+   "where": "field editor",
+   "rules": [
+    "R46"
+   ],
+   "facets": [
+    "fields",
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-25",
+   "name": "Rename, hide or edit module preset fields",
+   "where": "field editor",
+   "rules": [
+    "R45"
+   ],
+   "facets": [
+    "fields"
+   ]
+  },
+  {
+   "id": "ch-26",
+   "name": "Add a brand, model or purchase date",
+   "where": "new-field picker",
+   "rules": [
+    "R45"
+   ],
+   "facets": [
+    "fields"
+   ]
+  },
+  {
+   "id": "ch-27",
+   "name": "Bulk edit fields on several items",
+   "where": "multi-select",
+   "rules": [
+    "R21",
+    "R40",
+    "R45"
+   ],
+   "facets": [
+    "fields",
+    "edit"
+   ]
+  },
+  {
+   "id": "ch-28",
+   "name": "Take photos of items and places",
+   "where": "camera",
+   "rules": [
+    "R21",
+    "R41",
+    "R100"
+   ],
+   "phone_only": true,
+   "facets": [
+    "photos"
+   ]
+  },
+  {
+   "id": "ch-29",
+   "name": "Mark items on a settled-area photo",
+   "where": "place photo",
+   "rules": [
+    "R29",
+    "R41"
+   ],
+   "facets": [
+    "photos",
+    "places"
+   ]
+  },
+  {
+   "id": "ch-30",
+   "name": "Log things from a photo as proposals",
+   "where": "logging form",
+   "rules": [
+    "R06",
+    "R42",
+    "R62",
+    "R68",
+    "R69"
+   ],
+   "facets": [
+    "recog"
+   ]
+  },
+  {
+   "id": "ch-31",
+   "name": "Correct proposed lines in a few taps",
+   "where": "logging form",
+   "rules": [
+    "R74",
+    "R79",
+    "R80"
+   ],
+   "facets": [
+    "recog"
+   ]
+  },
+  {
+   "id": "ch-32",
+   "name": "Split a photo into items with counts",
+   "where": "logging form",
+   "rules": [
+    "R08",
+    "R42"
+   ],
+   "facets": [
+    "recog",
+    "qty"
+   ]
+  },
+  {
+   "id": "ch-33",
+   "name": "Accept or delete suggested tags",
+   "where": "logging form, item editor",
+   "rules": [
+    "R06",
+    "R39",
+    "R40"
+   ],
+   "facets": [
+    "recog",
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-34",
+   "name": "Clear all suggested tags at once",
+   "where": "logging form",
+   "rules": [
+    "R07",
+    "R40"
+   ],
+   "facets": [
+    "recog",
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-35",
+   "name": "Get tag and place suggestions",
+   "where": "logging form, item editor",
+   "rules": [
+    "R63",
+    "R67",
+    "R70",
+    "R71"
+   ],
+   "facets": [
+    "recog",
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-36",
+   "name": "Group logged things by similarity",
+   "where": "first tidy",
+   "rules": [
+    "R02",
+    "R63"
+   ],
+   "facets": [
+    "recog",
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-37",
+   "name": "Read expiry dates from label photos",
+   "where": "logging form",
+   "rules": [
+    "R63",
+    "R109"
+   ],
+   "facets": [
+    "recog",
+    "expiry"
+   ]
+  },
+  {
+   "id": "ch-38",
+   "name": "Download larger optional models",
+   "where": "model download screen",
+   "rules": [
+    "R62",
+    "R63",
+    "R64",
+    "R72",
+    "R100"
+   ],
+   "facets": [
+    "settings",
+    "recog"
+   ]
+  },
+  {
+   "id": "ch-39",
+   "name": "Use an AI-service key for recognition",
+   "where": "settings",
+   "rules": [
+    "R15",
+    "R78"
+   ],
+   "facets": [
+    "settings",
+    "recog"
+   ]
+  },
+  {
+   "id": "ch-40",
+   "name": "Recognise phone photos on the PC",
+   "where": "Windows companion",
+   "rules": [
+    "R21",
+    "R62"
+   ],
+   "facets": [
+    "recog"
+   ]
+  },
+  {
+   "id": "ch-41",
+   "name": "Dictate a list of things to log",
+   "where": "dictation",
+   "rules": [
+    "R18",
+    "R19",
+    "R63",
+    "R100"
+   ],
+   "phone_only": true,
+   "facets": [
+    "recog"
+   ]
+  },
+  {
+   "id": "ch-42",
+   "name": "Choose approximate or exact counts",
+   "where": "settings",
+   "rules": [
+    "R26"
+   ],
+   "facets": [
+    "settings",
+    "qty"
+   ]
+  },
+  {
+   "id": "ch-43",
+   "name": "Search items by name or tag",
+   "where": "search",
+   "rules": [
+    "R25",
+    "R63",
+    "R81",
+    "R82"
+   ],
+   "facets": [
+    "search"
+   ]
+  },
+  {
+   "id": "ch-44",
+   "name": "Filter search by house or floor",
+   "where": "search, place map",
+   "rules": [
+    "R10",
+    "R100"
+   ],
+   "facets": [
+    "search",
+    "places"
+   ]
+  },
+  {
+   "id": "ch-45",
+   "name": "Browse a visual map of places",
+   "where": "place map",
+   "rules": [
+    "R10",
+    "R33",
+    "R83"
+   ],
+   "facets": [
+    "map",
+    "places"
+   ]
+  },
+  {
+   "id": "ch-46",
+   "name": "Rearrange place blocks on the map",
+   "where": "place map",
+   "rules": [
+    "R83"
+   ],
+   "facets": [
+    "map"
+   ]
+  },
+  {
+   "id": "ch-47",
+   "name": "Draw the place map freely",
+   "where": "place map",
+   "rules": [
+    "R83",
+    "R100"
+   ],
+   "facets": [
+    "map"
+   ]
+  },
+  {
+   "id": "ch-48",
+   "name": "Open places from the homepage",
+   "where": "homepage places card",
+   "rules": [
+    "R84"
+   ],
+   "facets": [
+    "surface",
+    "places"
+   ]
+  },
+  {
+   "id": "ch-49",
+   "name": "See an object of the day",
+   "where": "homepage",
+   "rules": [
+    "R84",
+    "R87"
+   ],
+   "facets": [
+    "surface"
+   ]
+  },
+  {
+   "id": "ch-50",
+   "name": "Choose the homepage cards",
+   "where": "homepage",
+   "rules": [
+    "R47"
+   ],
+   "facets": [
+    "surface"
+   ]
+  },
+  {
+   "id": "ch-51",
+   "name": "Keep a place or tag in view",
+   "where": "home-screen widget",
+   "rules": [
+    "R47",
+    "R87",
+    "R89"
+   ],
+   "facets": [
+    "surface"
+   ]
+  },
+  {
+   "id": "ch-52",
+   "name": "Browse places by their photos",
+   "where": "photo browsing",
+   "rules": [
+    "R87"
+   ],
+   "facets": [
+    "photos",
+    "browse"
+   ]
+  },
+  {
+   "id": "ch-53",
+   "name": "Print photo labels with a QR code",
+   "where": "labels",
+   "rules": [
+    "R14",
+    "R21",
+    "R88"
+   ],
+   "facets": [
+    "codes",
+    "photos"
+   ]
+  },
+  {
+   "id": "ch-54",
+   "name": "Open a place from its label QR",
+   "where": "labels",
+   "rules": [
+    "R88"
+   ],
+   "facets": [
+    "codes",
+    "places"
+   ]
+  },
+  {
+   "id": "ch-55",
+   "name": "Open a place from an NFC tag",
+   "where": "labels",
+   "rules": [
+    "R88",
+    "R100"
+   ],
+   "facets": [
+    "codes",
+    "places"
+   ]
+  },
+  {
+   "id": "ch-56",
+   "name": "Show stored things on the lock screen",
+   "where": "lock screen or wallpaper",
+   "rules": [
+    "R87",
+    "R100"
+   ],
+   "facets": [
+    "surface"
+   ]
+  },
+  {
+   "id": "ch-57",
+   "name": "Get an opt-in rediscover prompt",
+   "where": "notification",
+   "rules": [
+    "R86",
+    "R87",
+    "R100"
+   ],
+   "facets": [
+    "surface",
+    "notify"
+   ]
+  },
+  {
+   "id": "ch-58",
+   "name": "Turn modules on or off",
+   "where": "settings",
+   "rules": [
+    "R97",
+    "R142",
+    "R151"
+   ],
+   "facets": [
+    "settings"
+   ]
+  },
+  {
+   "id": "ch-59",
+   "name": "Set expiry and opening dates",
+   "where": "item editor",
+   "rules": [
+    "R45",
+    "R109"
+   ],
+   "facets": [
+    "expiry"
+   ]
+  },
+  {
+   "id": "ch-60",
+   "name": "See things expiring soon",
+   "where": "Inventory module view",
+   "rules": [
+    "R24",
+    "R45",
+    "R97"
+   ],
+   "facets": [
+    "expiry",
+    "browse"
+   ]
+  },
+  {
+   "id": "ch-61",
+   "name": "See an item's usage rate",
+   "where": "Pantry and Wardrobe views",
+   "rules": [
+    "R97",
+    "R110"
+   ],
+   "facets": [
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-62",
+   "name": "Record last worn and laundry state",
+   "where": "Wardrobe item",
+   "rules": [
+    "R45",
+    "R110"
+   ],
+   "facets": [
+    "wear"
+   ]
+  },
+  {
+   "id": "ch-63",
+   "name": "Put together outfits",
+   "where": "Wardrobe view",
+   "rules": [
+    "R97"
+   ],
+   "facets": [
+    "wear"
+   ]
+  },
+  {
+   "id": "ch-64",
+   "name": "Swap clothes at the change of season",
+   "where": "Wardrobe view",
+   "rules": [
+    "R11",
+    "R36",
+    "R97"
+   ],
+   "facets": [
+    "wear",
+    "move"
+   ]
+  },
+  {
+   "id": "ch-65",
+   "name": "See clothes not worn in a year",
+   "where": "Wardrobe view",
+   "rules": [
+    "R97"
+   ],
+   "facets": [
+    "wear",
+    "browse"
+   ]
+  },
+  {
+   "id": "ch-66",
+   "name": "Count stock with − and +",
+   "where": "Pantry item",
+   "rules": [
+    "R147"
+   ],
+   "facets": [
+    "qty",
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-67",
+   "name": "Set a minimum stock",
+   "where": "Pantry item",
+   "rules": [
+    "R27",
+    "R45"
+   ],
+   "facets": [
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-68",
+   "name": "See an estimated run-out day",
+   "where": "Pantry item",
+   "rules": [
+    "R148"
+   ],
+   "facets": [
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-69",
+   "name": "Send finished consumables to the shopping list",
+   "where": "Pantry item, shopping list",
+   "rules": [
+    "R117",
+    "R143"
+   ],
+   "facets": [
+    "lists",
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-70",
+   "name": "Keep a shopping list",
+   "where": "shopping list",
+   "rules": [
+    "R112",
+    "R137"
+   ],
+   "facets": [
+    "lists"
+   ]
+  },
+  {
+   "id": "ch-71",
+   "name": "Keep a wish list",
+   "where": "wish list",
+   "rules": [
+    "R117"
+   ],
+   "facets": [
+    "lists"
+   ]
+  },
+  {
+   "id": "ch-72",
+   "name": "Add low-stock items to the list",
+   "where": "shopping list",
+   "rules": [
+    "R112",
+    "R126"
+   ],
+   "facets": [
+    "lists",
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-73",
+   "name": "See what is already owned and where",
+   "where": "shopping list",
+   "rules": [
+    "R97",
+    "R98"
+   ],
+   "facets": [
+    "lists",
+    "inside"
+   ]
+  },
+  {
+   "id": "ch-74",
+   "name": "Make a store list",
+   "where": "store list",
+   "rules": [
+    "R127",
+    "R129"
+   ],
+   "facets": [
+    "lists"
+   ]
+  },
+  {
+   "id": "ch-75",
+   "name": "Pin a store list for repeated runs",
+   "where": "store list",
+   "rules": [
+    "R131"
+   ],
+   "facets": [
+    "lists"
+   ]
+  },
+  {
+   "id": "ch-76",
+   "name": "Tick items bought with price paid",
+   "where": "store list, shopping list",
+   "rules": [
+    "R115",
+    "R117",
+    "R124",
+    "R140"
+   ],
+   "phone_only": true,
+   "facets": [
+    "buy"
+   ]
+  },
+  {
+   "id": "ch-77",
+   "name": "Tick products sold by weight",
+   "where": "store list",
+   "rules": [
+    "R145"
+   ],
+   "phone_only": true,
+   "facets": [
+    "buy"
+   ]
+  },
+  {
+   "id": "ch-78",
+   "name": "Add a bag when ticking",
+   "where": "store list",
+   "rules": [
+    "R146"
+   ],
+   "phone_only": true,
+   "facets": [
+    "buy"
+   ]
+  },
+  {
+   "id": "ch-79",
+   "name": "Mark a discount when ticking",
+   "where": "store list",
+   "rules": [
+    "R135"
+   ],
+   "phone_only": true,
+   "facets": [
+    "buy"
+   ]
+  },
+  {
+   "id": "ch-80",
+   "name": "Untick before the receipt closes",
+   "where": "store list",
+   "rules": [
+    "R138"
+   ],
+   "phone_only": true,
+   "facets": [
+    "buy"
+   ]
+  },
+  {
+   "id": "ch-81",
+   "name": "Close a receipt at the till",
+   "where": "store list",
+   "rules": [
+    "R124",
+    "R140"
+   ],
+   "phone_only": true,
+   "facets": [
+    "buy",
+    "savings"
+   ]
+  },
+  {
+   "id": "ch-82",
+   "name": "Discount a whole receipt",
+   "where": "store list",
+   "rules": [
+    "R136"
+   ],
+   "phone_only": true,
+   "facets": [
+    "buy"
+   ]
+  },
+  {
+   "id": "ch-83",
+   "name": "Get warned about other store lists",
+   "where": "store list",
+   "rules": [
+    "R121",
+    "R130"
+   ],
+   "phone_only": true,
+   "facets": [
+    "lists",
+    "prices"
+   ]
+  },
+  {
+   "id": "ch-84",
+   "name": "Compare packs by price per unit",
+   "where": "price comparison",
+   "rules": [
+    "R114",
+    "R119",
+    "R134",
+    "R144"
+   ],
+   "facets": [
+    "prices",
+    "tags"
+   ]
+  },
+  {
+   "id": "ch-85",
+   "name": "Compare one product across stores",
+   "where": "store list entry",
+   "rules": [
+    "R132"
+   ],
+   "facets": [
+    "prices"
+   ]
+  },
+  {
+   "id": "ch-86",
+   "name": "Keep shop prices and promotions",
+   "where": "price book",
+   "rules": [
+    "R115",
+    "R134",
+    "R135"
+   ],
+   "facets": [
+    "prices"
+   ]
+  },
+  {
+   "id": "ch-87",
+   "name": "Add, rename and delete stores",
+   "where": "Shopping settings",
+   "rules": [
+    "R141"
+   ],
+   "facets": [
+    "prices"
+   ]
+  },
+  {
+   "id": "ch-88",
+   "name": "Mark products a store carries",
+   "where": "store list",
+   "rules": [
+    "R129"
+   ],
+   "facets": [
+    "prices"
+   ]
+  },
+  {
+   "id": "ch-89",
+   "name": "Give items and wishes a savings category",
+   "where": "item editor, shopping list",
+   "rules": [
+    "R122",
+    "R125",
+    "R126"
+   ],
+   "facets": [
+    "savings"
+   ]
+  },
+  {
+   "id": "ch-90",
+   "name": "Turn on the savings export",
+   "where": "Shopping settings, one-time offer",
+   "rules": [
+    "R125",
+    "R128"
+   ],
+   "facets": [
+    "savings"
+   ]
+  },
+  {
+   "id": "ch-91",
+   "name": "Send receipts to the savings app",
+   "where": "receipt folder",
+   "rules": [
+    "R113",
+    "R116",
+    "R123",
+    "R139"
+   ],
+   "facets": [
+    "savings",
+    "data"
+   ]
+  },
+  {
+   "id": "ch-92",
+   "name": "Edit shopping lists on the PC",
+   "where": "Windows companion",
+   "rules": [
+    "R21",
+    "R140"
+   ],
+   "facets": [
+    "lists"
+   ]
+  },
+  {
+   "id": "ch-93",
+   "name": "Get expiry notifications",
+   "where": "notifications",
+   "rules": [
+    "R86",
+    "R99"
+   ],
+   "facets": [
+    "notify",
+    "expiry"
+   ]
+  },
+  {
+   "id": "ch-94",
+   "name": "Get low-stock notifications",
+   "where": "notifications",
+   "rules": [
+    "R27",
+    "R99"
+   ],
+   "facets": [
+    "notify",
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-95",
+   "name": "Get add-to-list notifications",
+   "where": "notifications",
+   "rules": [
+    "R99"
+   ],
+   "facets": [
+    "notify",
+    "lists"
+   ]
+  },
+  {
+   "id": "ch-96",
+   "name": "Get usage-rate notifications",
+   "where": "notifications",
+   "rules": [
+    "R99",
+    "R110"
+   ],
+   "facets": [
+    "notify",
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-97",
+   "name": "Get run-out notifications for chosen items",
+   "where": "notifications, Pantry multi-select",
+   "rules": [
+    "R99",
+    "R149",
+    "R150"
+   ],
+   "facets": [
+    "notify",
+    "consume"
+   ]
+  },
+  {
+   "id": "ch-98",
+   "name": "Get laundry notifications",
+   "where": "notifications",
+   "rules": [
+    "R99"
+   ],
+   "facets": [
+    "notify",
+    "wear"
+   ]
+  },
+  {
+   "id": "ch-99",
+   "name": "Get a seasonal swap notification",
+   "where": "notifications",
+   "rules": [
+    "R99"
+   ],
+   "facets": [
+    "notify",
+    "wear"
+   ]
+  },
+  {
+   "id": "ch-100",
+   "name": "Sync phone and PC through a folder",
+   "where": "settings",
+   "rules": [
+    "R51",
+    "R53",
+    "R54",
+    "R55",
+    "R56",
+    "R57",
+    "R118"
+   ],
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "ch-101",
+   "name": "Restore an overwritten value from history",
+   "where": "item history",
+   "rules": [
+    "R52",
+    "R54",
+    "R55"
+   ],
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "ch-102",
+   "name": "Back up automatically to a chosen folder",
+   "where": "settings",
+   "rules": [
+    "R21",
+    "R60"
+   ],
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "ch-103",
+   "name": "Export and import data with photos",
+   "where": "settings",
+   "rules": [
+    "R60",
+    "R118"
+   ],
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "ch-104",
+   "name": "Restore a backup by merging",
+   "where": "settings",
+   "rules": [
+    "R61"
+   ],
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "ch-105",
+   "name": "Roll back to a backup",
+   "where": "settings",
+   "rules": [
+    "R61"
+   ],
+   "facets": [
+    "data"
+   ]
+  },
+  {
+   "id": "ch-106",
+   "name": "Switch the app's language",
+   "where": "settings",
+   "rules": [
+    "R18",
+    "R82"
+   ],
+   "facets": [
+    "settings"
+   ]
+  },
+  {
+   "id": "ch-107",
+   "name": "See every expiry date, closest first",
+   "rules": [
+    "R97",
+    "R153"
+   ],
+   "facets": [
+    "expiry",
+    "browse"
+   ]
+  }
+ ]
+}
