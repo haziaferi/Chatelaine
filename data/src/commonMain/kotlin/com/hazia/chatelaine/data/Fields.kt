@@ -252,24 +252,33 @@ class Fields internal constructor(private val db: ChatelaineDatabase, private va
 
     /**
      * Sets what [ownerId], an item or a place, holds in [defId]. The input must match the field's type; a choice
-     * names options of the field, one unless the field takes several.
+     * names options of the field, one unless the field takes several. A new value of an item with a photo is an edit
+     * of the item, and raises its "photo outdated" flag in the same write (R31).
      */
     suspend fun set(ownerId: String, defId: String, value: FieldInput) {
         val id = valueId(ownerId, defId)
         val json = encodeInput(value)
+        var photographed = false
         writes.write({
             val def = requireNotNull(defs.def(defId)) { "no field $defId" }.toFieldDef()
-            require(items.item(ownerId) != null || places.place(ownerId) != null) { "no item or place $ownerId" }
+            val item = items.item(ownerId)
+            require(item != null || places.place(ownerId) != null) { "no item or place $ownerId" }
             requireFits(def, fieldOptions.optionsOf(defId).map { it.toOption() }, value)
-            mapOf(FIELD_VALUE to listOf(id))
+            photographed = item != null && db.photoDao().itemIdsWithPhotos(listOf(ownerId)).isNotEmpty()
+            mapOf(FIELD_VALUE to listOf(id), ITEM to if (photographed) listOf(ownerId) else emptyList())
         }) { store, _ ->
             val row = store.row(id)
+            val s = if (row == null || row.groups.getValue(VALUE).values["json"] != json) writes.clock.tick() else return@write
             if (row == null) {
                 writes.createDerived(store, Row(FIELD_VALUE, id, mapOf(
-                    VALUE to Group(writes.clock.tick(), mapOf("ownerId" to ownerId, "defId" to defId, "json" to json)),
+                    VALUE to Group(s, mapOf("ownerId" to ownerId, "defId" to defId, "json" to json)),
                 )))
-            } else if (row.groups.getValue(VALUE).values["json"] != json) {
-                store.put(row.edit(VALUE, writes.clock.tick(), mapOf("json" to json)))
+            } else {
+                store.put(row.edit(VALUE, s, mapOf("json" to json)))
+            }
+            if (photographed) {
+                val owner = requireNotNull(store.row(ownerId)) { "no item $ownerId" }
+                owner.raisedOutdated(s).takeIf { it !== owner }?.let(store::put)
             }
         }
     }

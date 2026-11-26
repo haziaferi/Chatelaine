@@ -21,6 +21,7 @@ class PhotoTest {
     private val clock = HybridClock("device-a", { now++ })
     private val writes = LocalWrites(db, clock)
     private val inventory = Inventory(db, writes)
+    private val fields = Fields(db, writes)
     private val hash = "a".repeat(64)
 
     @AfterTest
@@ -123,6 +124,50 @@ class PhotoTest {
         assertTrue(inventory.getPlace(box)!!.photoOutdated, "the place's own photo is the one that clears it")
         inventory.addPhoto(null, box, "c".repeat(64))
         assertFalse(inventory.getPlace(box)!!.photoOutdated)
+    }
+
+    /** R31: editing an item after its last photo raises the flag, here by renaming it; an item with no photo keeps it down. */
+    @Test
+    fun renamingAPhotographedItemRaisesOutdated() = run {
+        val clip = inventory.addItem("paper clip")
+        val pin = inventory.addItem("pin")
+        inventory.addPhoto(clip, null, hash)
+
+        inventory.rename(clip, "big paper clip")
+        inventory.rename(pin, "long pin")
+
+        assertTrue(inventory.getItem(clip)!!.photoOutdated)
+        assertFalse(inventory.getItem(pin)!!.photoOutdated, "the item has no photo")
+    }
+
+    /** R31: a field value set on a photographed item is an edit of it. */
+    @Test
+    fun aFieldValueOnAPhotographedItemRaisesOutdated() = run {
+        val clip = inventory.addItem("paper clip")
+        inventory.addPhoto(clip, null, hash)
+        val size = fields.define("size", FieldType.TEXT)
+
+        fields.set(clip, size, FieldInput.Text("big"))
+
+        assertTrue(inventory.getItem(clip)!!.photoOutdated)
+    }
+
+    /** R31: the item's other edits raise it too: notes, quantity, taking it out, splitting it. */
+    @Test
+    fun everyEditOfAPhotographedItemRaisesOutdated() = run {
+        val clip = inventory.addItem("paper clip")
+        val edits = listOf<suspend () -> Unit>(
+            { inventory.setNotes(clip, "the blue one") },
+            { inventory.setQuantity(clip, 2, approx = false) },
+            { inventory.setAway(clip, true) },
+            { inventory.splitItem(clip, 2) },
+        )
+        for ((i, edit) in edits.withIndex()) {
+            inventory.addPhoto(clip, null, "${i + 1}".repeat(64))
+            assertFalse(inventory.getItem(clip)!!.photoOutdated)
+            edit()
+            assertTrue(inventory.getItem(clip)!!.photoOutdated, "edit $i")
+        }
     }
 
     /** Only a photographed item or place can be out of date. */
