@@ -328,6 +328,70 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         return readChunked(ids) { items.items(it) }.toItems().sortedBy { it.id }
     }
 
+    // ---- search and tag edits ----
+
+    /**
+     * The items [query] matches (R81), by name, case ignored. Names are compared here, not in SQL, so a letter's
+     * accent is kept. A suggested tag does not count, for the text or for a filter. Reads items, tags and links in
+     * a fixed number of queries.
+     */
+    suspend fun search(query: SearchQuery): List<Item> {
+        val text = query.text.trim()
+        val allTags = tags.allTags()
+        val children = allTags.filter { it.parentId != null }.groupBy({ it.parentId!! }, { it.id })
+        val byText = if (text.isEmpty()) emptySet() else
+            allTags.filter { it.name.contains(text, ignoreCase = true) }.flatMapTo(mutableSetOf()) { subTree(it.id, children) }
+        val byFilter = query.tagIds.associateWith { subTree(it, children) }
+        val wanted = (byText + byFilter.values.flatten()).toList()
+        val tagsOfItem = readChunked(wanted) { links.linksOfTags(it) }.filter { !it.suggested }
+            .groupBy({ it.itemId }, { it.tagId }).mapValues { it.value.toSet() }
+        return items.allItems().toItems().filter { item ->
+            val carried = tagsOfItem[item.id].orEmpty()
+            (text.isEmpty() || item.name.contains(text, ignoreCase = true) || carried.any { it in byText }) &&
+                byFilter.values.all { tree -> carried.any { it in tree } } &&
+                (!query.unplacedOnly || (item.placeId == null && !item.away))
+        }.sortedWith(compareBy({ it.name.lowercase() }, { it.id }))
+    }
+
+    /** Tags whose name contains [text], ignoring case; those starting with it first, then by name. Nothing for blank [text]. */
+    suspend fun matchingTags(text: String, limit: Int = 8): List<Tag> {
+        val needle = text.trim()
+        if (needle.isEmpty()) return emptyList()
+        return tags.allTags().toTags().filter { it.name.contains(needle, ignoreCase = true) }
+            .sortedWith(compareBy({ !it.name.startsWith(needle, ignoreCase = true) }, { it.name.lowercase() }, { it.id }))
+            .take(limit)
+    }
+
+    /** [tagId] and every tag below it. */
+    suspend fun subTagIds(tagId: String): Set<String> =
+        subTree(tagId, tags.allTags().filter { it.parentId != null }.groupBy({ it.parentId!! }, { it.id }))
+
+    private fun subTree(rootId: String, children: Map<String, List<String>>): Set<String> {
+        val seen = mutableSetOf<String>()
+        val todo = ArrayDeque(listOf(rootId))
+        while (todo.isNotEmpty()) {
+            val id = todo.removeLast()
+            if (seen.add(id)) todo += children[id].orEmpty()
+        }
+        return seen
+    }
+
+    /** The accepted tags on [itemIds], each with how many of those items carry it: most first, then by name. */
+    suspend fun tagCounts(itemIds: List<String>): List<TagCount> {
+        val wanted = itemIds.toSet()
+        val counts = links.allLinks().filter { it.itemId in wanted && !it.suggested }.groupingBy { it.tagId }.eachCount()
+        return readChunked(counts.keys.toList()) { tags.tags(it) }.toTags()
+            .map { TagCount(it, counts.getValue(it.id)) }
+            .sortedWith(compareBy({ -it.items }, { it.tag.name.lowercase() }, { it.tag.id }))
+    }
+
+    /** Gives the tag a new name (R151): one edit of its name, so its parent, kind, links and module stay. */
+    suspend fun renameTag(tagId: String, name: String) {
+        val trimmed = name.trim()
+        require(trimmed.isNotEmpty()) { "a tag needs a name" }
+        writes.edit(TAG, tagId, NAME, { requireNotNull(tags.tag(tagId)) { "no tag $tagId" } }) { mapOf("name" to trimmed) }
+    }
+
     // ---- tag kinds ----
 
     /** A new kind after the others (R47). */
