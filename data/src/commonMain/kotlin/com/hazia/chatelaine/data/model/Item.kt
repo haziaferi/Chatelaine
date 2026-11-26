@@ -72,7 +72,10 @@ internal interface ItemDao {
 }
 
 internal fun itemTable(dao: ItemDao) =
-    EntityTable(dao::items, dao::allItems, dao::putItems, dao::deleteItems, ItemEntity::toRow, Row::toItemEntity) { emptyList() }
+    EntityTable(
+        dao::items, dao::allItems, dao::putItems, dao::deleteItems, ItemEntity::toRow, Row::toItemEntity,
+        refsOf = { listOfNotNull(it.placeId) },
+    ) { emptyList() }
 
 internal fun ItemEntity.toRow() = Row(ITEM, id, mapOf(
     NAME to Group(Stamp(nameHlc, nameDevice), mapOf("name" to name)),

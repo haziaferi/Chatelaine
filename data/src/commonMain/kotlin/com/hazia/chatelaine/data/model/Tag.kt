@@ -82,7 +82,10 @@ internal interface TagDao {
 }
 
 internal fun tagTable(dao: TagDao) =
-    EntityTable(dao::tags, dao::allTags, dao::putTags, dao::deleteTags, TagEntity::toRow, Row::toTagEntity) { emptyList() }
+    EntityTable(
+        dao::tags, dao::allTags, dao::putTags, dao::deleteTags, TagEntity::toRow, Row::toTagEntity,
+        refsOf = { listOfNotNull(it.parentId, it.homePlaceId, it.kind) },
+    ) { emptyList() }
 
 internal fun TagEntity.toRow() = Row(TAG, id, mapOf(
     NAME to Group(Stamp(nameHlc, nameDevice), mapOf("name" to name)),

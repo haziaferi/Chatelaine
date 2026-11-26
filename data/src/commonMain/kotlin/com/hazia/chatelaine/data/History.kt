@@ -31,8 +31,8 @@ class History internal constructor(private val db: ChatelaineDatabase, private v
     /**
      * Writes [lost] back as a new local edit, so it wins everywhere. The version it replaces is kept in turn, and
      * [lost] stops being listed, in the same transaction. An entry already restored is refused
-     * (`IllegalArgumentException`); so is one whose row, or a row its value names, is gone
-     * (`IllegalStateException`). A restored parent that makes a cycle of tags or places is not refused here: the
+     * (`IllegalArgumentException`); so is one whose row, or a row its value names, is gone, a place, tag or kind it
+     * names being gone once it was deleted (`IllegalStateException`). A restored parent that makes a cycle of tags or places is not refused here: the
      * walks over those trees survive a cycle and a repair step ends it.
      */
     suspend fun restore(lost: LostValue) {
@@ -45,13 +45,18 @@ class History internal constructor(private val db: ChatelaineDatabase, private v
             val table = writes.tables.getValue(lost.table)
             val row = table.load(listOf(lost.id)).singleOrNull()
                 ?: throw IllegalStateException("cannot restore: the ${lost.table} row ${lost.id} is gone")
-            for ((parentTable, parentId) in table.parents(row.set(lost.group, lost.stamp, lost.values))) {
+            val restored = row.set(lost.group, lost.stamp, lost.values)
+            for ((parentTable, parentId) in table.parents(restored)) {
                 if (writes.tables.getValue(parentTable).load(listOf(parentId)).isEmpty()) {
                     throw IllegalStateException(
                         "cannot restore: it names the $parentTable row $parentId, which is gone",
                     )
                 }
             }
+            // A place, parent tag, home or kind deleted since: the delete moved the row off it (R152).
+            val named = table.refs(restored) - table.refs(row).toSet()
+            val deleted = if (named.isEmpty()) null else sync.purges(named).firstOrNull()
+            if (deleted != null) throw IllegalStateException("cannot restore: it names ${deleted.id}, which was deleted")
             sync.clearLost(listOf(lost.lostId))
             mapOf(lost.table to listOf(lost.id))
         }) { store, _ ->

@@ -184,8 +184,9 @@ class Backup(
      * where it can be restored. One transaction.
      *
      * Not undone by this: rows that exist now and not in the backup are left alone, not deleted; a row purged since
-     * the backup is not brought back; a value is skipped when it names a row that is gone, or one whose owner was
-     * purged (counted in the result). Photo files are not touched.
+     * the backup is not brought back; a value is skipped when it names a row that is gone (a parent, or a place, tag
+     * or kind purged since, [com.hazia.chatelaine.data.sync.RowTable.refs]), or one whose owner was purged (counted in
+     * the result). Photo files are not touched.
      *
      * @throws IllegalArgumentException when [zip] is not a complete backup.
      */
@@ -235,7 +236,12 @@ class Backup(
                 val mine = held.groups[group] ?: continue
                 if (mine.values == theirs.values) continue
                 val candidate = held.set(group, mine.stamp, theirs.values)
-                if (table.parents(candidate).any { (t, id) -> tables.getValue(t).load(listOf(id)).isEmpty() }) {
+                // A place, parent tag, home or kind the value names that was deleted since is as gone as a parent:
+                // the delete moved the row off it (R152). Only ids the value brings back count, not ones held now.
+                val named = table.refs(candidate) - table.refs(held).toSet()
+                if (table.parents(candidate).any { (t, id) -> tables.getValue(t).load(listOf(id)).isEmpty() } ||
+                    (named.isNotEmpty() && dao.purges(named).isNotEmpty())
+                ) {
                     missingParent++
                     continue
                 }

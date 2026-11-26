@@ -199,4 +199,21 @@ class HistoryTest {
         assertFailsWith<IllegalStateException> { history.restore(gone) }
         assertEquals(listOf(gone.lostId), history.overwritten(ITEM, id, NAME).map { it.lostId })
     }
+
+    /** R152 over R54: an item's earlier place that was deleted since is not restored; the entry stays listed. */
+    @Test
+    fun restoreIsRefusedWhenItNamesAPlaceDeletedSince() = run {
+        val drawer = inventory.addPlace("drawer")
+        val shelf = inventory.addPlace("shelf")
+        val id = inventory.addItem("scissors")
+        inventory.placeItem(id, drawer)
+        val theirs = Row(ITEM, id, mapOf(PLACE to Group(Stamp(5_000, "device-b"), mapOf("placeId" to shelf))))
+        importRow(ITEM, theirs)
+        val lost = history.overwritten(ITEM, id, PLACE).single()
+        inventory.deletePlace(drawer)
+
+        assertFailsWith<IllegalStateException> { history.restore(lost) }
+        assertEquals(shelf, inventory.getItem(id)?.placeId)
+        assertEquals(listOf(lost.lostId), history.overwritten(ITEM, id, PLACE).map { it.lostId })
+    }
 }

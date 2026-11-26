@@ -247,6 +247,23 @@ class BackupTest {
         assertFailsWith<IllegalArgumentException> { run { a.backup.restore(noPurges) } }
     }
 
+    /** R152 over R61: a roll back does not put an item back in a place deleted since the backup; its move up stays. */
+    @Test
+    fun rollBackLeavesAnItemOutOfAPlaceDeletedSinceTheBackup() {
+        val a = Phone("A")
+        val inv = a.device.inventory
+        val room = run { inv.addPlace("room") }
+        val drawer = run { inv.addPlace("drawer", room) }
+        val item = run { inv.addItem("scissors").also { inv.placeItem(it, drawer) } }
+        val zip = target.read(run { a.backup.write(target, 0) }!!)!!
+        run { inv.deletePlace(drawer) }
+
+        val report = run { a.backup.rollBack(zip) }
+
+        assertEquals(room, run { inv.getItem(item) }!!.placeId, "the item stays where the delete moved it")
+        assertEquals(RollBackReport(written = 0, missingParent = 1, purgedOwner = 0), report)
+    }
+
     /** Photo entries are stored as they are (JPEGs do not deflate). */
     @Test
     fun photoEntriesAreStoredNotDeflated() {
