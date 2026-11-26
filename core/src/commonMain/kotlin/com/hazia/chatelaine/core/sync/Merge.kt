@@ -25,7 +25,7 @@ interface SyncStore {
 }
 
 /**
- * Applies a peer's rows and purge registry (hybrid+).
+ * Applies a peer's rows and purge registry.
  *
  * Each group takes the higher stamp, except a group in [askGroups] that both sides changed since
  * their base to different values: that one is left alone and handed to a person. A group in
