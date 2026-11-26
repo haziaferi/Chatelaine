@@ -462,3 +462,5 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-25 · R153 · changed · expired items at the top, marked as expired · owner
 - 2026-11-25 · R58 · changed · random UUID ids, not ULID; line and database encryption not taken over in v1 · owner
 - 2026-11-25 · R60 · changed · backup format: daily zip of stamped JSON lines and photos, last 7 kept · owner
+- 2026-11-26 · R55 · changed · Evidence: change-log size measured in the stage 1 sync run · builder
+- 2026-11-26 · R57 · changed · Evidence: two-device sync passed with Syncthing and Syncthing-Fork · builder
