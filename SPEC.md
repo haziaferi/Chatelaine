@@ -948,14 +948,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 | Part | Holds | Taken over |
 |---|---|---|
-| `:core` engine | ULID ids, hybrid logical clock stamps, field groups, merge with a permanent purge registry | almost unchanged |
+| `:core` engine | random UUID ids, hybrid logical clock stamps, field groups, merge with a permanent purge registry | almost unchanged |
 | Folder layer | 16 KiB per-device log segments, snapshots every 64, atomic writes, conflict copies merged, found by known file-name patterns (Syncthing's first), waiting rows for missing parents, outbox, photos stored by SHA-256 under `blobs/` | adapted: database and group sets passed in, sync tables moved into Chatelaine's schema, new row adapters for items, places, tags and photos |
+| Line and database encryption | the sync folder's lines and the database, sealed with a passphrase key | not taken over in v1; a seam is kept so it can be added later |
 
 **Evidence:** Review of the earlier app, 2026-10-28.
 
 **Acceptance:** none: a choice of starting code; R51, R54 and R55 say what the result must do.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R59 · Sync lessons from the earlier app
 
@@ -979,11 +980,20 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R60 · Backup and export
 
-**Rule:** The app backs up automatically to a folder the user picks, and offers a manual export of JSON and photos.
+**Rule:** The app backs up automatically to a folder the user picks, and offers a manual export of JSON and photos, in the format below.
 
-**Acceptance:** Export → import passes stage 1's round-trip tests (R100).
+**Values:**
 
-**Since:** 2026-11-22 · owner · own words
+| Subject | Value |
+|---|---|
+| File | one zip per backup, `chatelaine-backup-YYYY-MM-DD.zip` |
+| Contents | every record as JSON lines with its sync stamps (R61), the purge registry, and the photos named by their hash (R56) |
+| Automatic backup | once a day; the last 7 are kept |
+| Manual export | the same format, to a folder the user picks |
+
+**Acceptance:** Export → import passes stage 1's round-trip tests (R100); an eighth daily backup leaves seven.
+
+**Since:** 2026-11-25 · owner · agreed rewording
 
 ### D-R61 · Restoring a backup
 
@@ -2177,7 +2187,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R56 · Photos in the sync folder: After a sync, each photo is in the folder as a file named by its content hash, and the other device shows it.
 - R57 · Any folder-sync tool: Stage 1's sync test passes with Syncthing (Syncthing-Fork on the phone), and the app has no code specific to one sync tool beyond the conflict-copy patterns. Before release, the test passes once with a second folder-sync tool.
 - R59 · Sync lessons from the earlier app: One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database re-reads its folder files.
-- R60 · Backup and export: Export → import passes stage 1's round-trip tests (R100).
+- R60 · Backup and export: Export → import passes stage 1's round-trip tests (R100); an eighth daily backup leaves seven.
 - R61 · Restoring a backup: Restoring a backup on one device keeps every edit made after the backup, on both devices. Rolling back is a separate action that adds a history entry, and the replaced state can be restored.
 - R62 · Image recognition: As stage 4's gate requires (R100), R65's bar is met on both target phones, and R06, R07 and R08 pass.
 - R63 · Model roles: Each optional model measurably improves a scenario, as stage 9's gate requires (R100).

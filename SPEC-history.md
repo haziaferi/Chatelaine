@@ -460,3 +460,5 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-25 · R100 · changed · stage 10 holds module screens in the purpose map, the expiry views and the homepage, last · owner
 - 2026-11-25 · R152 · changed · deleting a site, a module's tag; an item's list entries go, prices and receipts stay · owner
 - 2026-11-25 · R153 · changed · expired items at the top, marked as expired · owner
+- 2026-11-25 · R58 · changed · random UUID ids, not ULID; line and database encryption not taken over in v1 · owner
+- 2026-11-25 · R60 · changed · backup format: daily zip of stamped JSON lines and photos, last 7 kept · owner
