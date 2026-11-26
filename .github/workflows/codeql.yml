@@ -45,7 +45,9 @@ jobs:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
       - if: matrix.build-mode == 'manual'
-        run: ./gradlew --no-daemon :core:compileKotlinDesktop :data:compileKotlinDesktop :androidApp:compileDebugKotlin
+        # --no-build-cache: CodeQL reads the code by watching the compiler, so a compile
+        # restored from Gradle's cache leaves it nothing to analyse.
+        run: ./gradlew --no-daemon --no-build-cache :core:compileKotlinDesktop :data:compileKotlinDesktop :androidApp:compileDebugKotlin
       - uses: github/codeql-action/analyze@915412ff23e8b7659517e607487dbeae018f2934 # v4.39.5
         with:
           category: /language:${{ matrix.language }}
