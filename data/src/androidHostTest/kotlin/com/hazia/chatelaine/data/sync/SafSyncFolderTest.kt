@@ -3,6 +3,15 @@ package com.hazia.chatelaine.data.sync
 import android.content.pm.ProviderInfo
 import android.net.Uri
 import android.provider.DocumentsContract
+import com.hazia.chatelaine.core.sync.HybridClock
+import com.hazia.chatelaine.data.Inventory
+import com.hazia.chatelaine.data.LocalWrites
+import com.hazia.chatelaine.data.backup.Backup
+import com.hazia.chatelaine.data.backup.ZipBackup
+import com.hazia.chatelaine.data.blob.DirectoryBlobStore
+import com.hazia.chatelaine.data.openChatelaineDatabase
+import com.hazia.chatelaine.data.syncedTables
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -76,13 +85,14 @@ class SafSyncFolderTest {
         assertEquals(listOf("log-000000.jsonl"), onDisk("devices/A"))
     }
 
+    /** A temporary file is listed, as a directory lists it, so the code that clears leftovers sees it; never read as its name. */
     @Test
-    fun listReadAndDeleteLeaveTempFilesOut() {
+    fun listShowsTempFilesAndReadLeavesThemOut() {
         val folder = folder()
         folder.replace(path, old)
         File(dir, "devices/A/.tmp-log-000001.jsonl").writeBytes(new) // a write a crash cut short
 
-        assertEquals(listOf("log-000000.jsonl"), folder.list("devices/A"))
+        assertEquals(listOf(".tmp-log-000001.jsonl", "log-000000.jsonl"), folder.list("devices/A").sorted())
         assertEquals(listOf("A"), folder.list("devices"))
         assertEquals(emptyList(), folder.list("devices/B"))
         assertNull(folder.read("devices/A/log-000001.jsonl"))
@@ -92,6 +102,41 @@ class SafSyncFolderTest {
         folder.delete("devices/A/log-000001.jsonl")
         assertNull(folder.read(path))
         assertEquals(emptyList(), onDisk("devices/A"))
+    }
+
+    /** A backup cut short on the phone leaves its temporary file; the next backup clears it (R60). */
+    @Test
+    fun leftoverBackupTempFilesAreClearedOnTheNextWrite() {
+        val open = openChatelaineDatabase(RuntimeEnvironment.getApplication())
+        try {
+            val backup = Backup(open.database, DirectoryBlobStore(tmp.newFolder("photos").toPath()), HybridClock("A", { 0 }), ZipBackup, { 0 })
+            File(dir, ".tmp-chatelaine-backup-1999-01-01.zip").writeBytes(new)
+
+            val name = runBlocking { backup.write(folder(), 0) }
+
+            assertEquals(listOfNotNull(name), onDisk(""))
+        } finally {
+            open.database.close()
+        }
+    }
+
+    /** A segment write a crash cut short leaves its temporary file in the device's own directory; the next export clears it. */
+    @Test
+    fun leftoverSegmentTempFilesAreClearedOnTheNextExport() {
+        val open = openChatelaineDatabase(RuntimeEnvironment.getApplication())
+        try {
+            val db = open.database
+            val clock = HybridClock("A", { 0 })
+            runBlocking { Inventory(db, LocalWrites(db, clock)).addItem("kettle") }
+            File(dir, "devices/A").mkdirs()
+            File(dir, "devices/A/.tmp-log-000007.jsonl").writeBytes(new)
+
+            runBlocking { FolderSync(db, folder(), "A", clock, db.syncedTables(), wallMillis = { 0 }).export() }
+
+            assertEquals(listOf("log-000000.jsonl"), onDisk("devices/A"))
+        } finally {
+            open.database.close()
+        }
     }
 
     private class Crash : Error("invented crash")
@@ -110,7 +155,8 @@ class SafSyncFolderTest {
 
         val reopened = folder()
         assertContentEquals(old, reopened.read(path), "the last complete content is back")
-        assertEquals(listOf("log-000000.jsonl"), reopened.list("devices/A"))
+        // The temporary file of the write cut short is listed, for the exporter to clear; it is never read as the name.
+        assertEquals(listOf(".tmp-log-000000.jsonl", "log-000000.jsonl"), reopened.list("devices/A").sorted())
         assertEquals(old.size.toLong(), reopened.size(path))
 
         reopened.replace(path, new)

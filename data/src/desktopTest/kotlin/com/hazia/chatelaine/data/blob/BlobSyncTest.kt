@@ -83,6 +83,21 @@ class BlobSyncTest {
         assertEquals(listOf(first), b.store.list())
     }
 
+    /** A temporary file a write cut short left beside a whole copy of its file is cleared, not carried to every device. */
+    @Test
+    fun aLeftoverTempFileBesideItsFileIsCleared() = two(2) { a, b ->
+        syncthing.now = day
+        val hash = a.addPhoto(a.device.create("lamp"), bytes)
+        a.exchange()
+        syncthing.folder("A").replace("blobs/.tmp-$hash", bytes.copyOf(5))
+        val other = "b".repeat(64)
+        syncthing.folder("A").replace("blobs/.tmp-$other", bytes.copyOf(5)) // its file is not here: maybe still being written
+
+        a.exchange()
+
+        assertEquals(setOf("blobs/$hash", "blobs/.tmp-$other"), blobPaths("A"))
+    }
+
     @Test
     fun unreferencedBlobGoesAfterGracePeriod() = two(3) { a, b ->
         syncthing.now = day
