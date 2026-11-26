@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c12e2fab96825fa911063bdcb8c8c07b",
+    "identityHash": "a806073b6d4143adb4d986a6b96770c6",
     "entities": [
       {
         "tableName": "purge_registry",
@@ -323,7 +323,7 @@
       },
       {
         "tableName": "sync_own_log",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `recovered` INTEGER NOT NULL, `backups_held` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `recovered` INTEGER NOT NULL, `backups_held` INTEGER NOT NULL, `previous_device` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -342,6 +342,11 @@
             "columnName": "backups_held",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "previousDevice",
+            "columnName": "previous_device",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -1673,7 +1678,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c12e2fab96825fa911063bdcb8c8c07b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a806073b6d4143adb4d986a6b96770c6')"
     ]
   }
 }

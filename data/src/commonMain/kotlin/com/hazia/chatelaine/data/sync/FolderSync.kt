@@ -88,7 +88,10 @@ internal class FolderSync(
     private suspend fun readFiles(): ImportReport {
         forgetReadsIfTablesChanged()
         val ownLog = dao.ownLog()
-        val readOwn = ownLog != null
+        // The log to read back: this device's own, or, after a recovery gave the device a new id, the old id's, which
+        // is merged as a peer's files are while the new id's own files are skipped.
+        val readBack = ownLog?.previousDevice ?: device
+        val readOwn = ownLog != null && readBack == device
         val held = dao.reads().associate { it.path to it.readBytes }
         val present = mutableListOf<String>()
         var report = ImportReport(0, 0)
@@ -104,9 +107,9 @@ internal class FolderSync(
                 val path = "$dir/$name"
                 val copy = ConflictCopies.isCopy(name)
                 val data = FolderLayout.segmentSeq(name) != null || FolderLayout.snapshotSeq(name) != null
-                if (owner == device && data) ownFiles++
+                if (owner == readBack && data) ownFiles++
                 if (copy || (data && shared)) {
-                    val merged = importer.merge(completeLines(folder.read(path) ?: run { if (owner == device) ownMissed = true; null } ?: continue, 0), path = null, from = 0)
+                    val merged = importer.merge(completeLines(folder.read(path) ?: run { if (owner == readBack) ownMissed = true; null } ?: continue, 0), path = null, from = 0)
                     report += merged
                     // A copy holding a line set aside (too far ahead) is kept, and read whole again next
                     // time, until that line applies.
@@ -116,7 +119,7 @@ internal class FolderSync(
                     val from = held[path] ?: 0
                     // Unchanged since the last read: a peer's snapshot is read once, not on every import.
                     if (folder.size(path) == from) continue
-                    val bytes = folder.read(path) ?: run { if (owner == device) ownMissed = true; null } ?: continue
+                    val bytes = folder.read(path) ?: run { if (owner == readBack) ownMissed = true; null } ?: continue
                     // Shorter than what was read: rewritten under us (a torn SAF write); read it again.
                     val start = if (bytes.size < from) 0 else from.toInt()
                     report += importer.merge(completeLines(bytes, start), path, start)

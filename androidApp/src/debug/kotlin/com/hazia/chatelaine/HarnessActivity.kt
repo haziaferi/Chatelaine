@@ -26,37 +26,39 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.hazia.chatelaine.data.ChatelaineData
-import com.hazia.chatelaine.data.DEVICE_ID_DIR
-import com.hazia.chatelaine.data.HarnessItem
-import com.hazia.chatelaine.data.blob.DirectoryBlobStore
-import com.hazia.chatelaine.data.deviceId
+import com.hazia.chatelaine.data.DATABASE_NAME
+import com.hazia.chatelaine.data.ITEM
+import com.hazia.chatelaine.data.app.LocalAppData
 import com.hazia.chatelaine.data.openChatelaineDatabase
 import com.hazia.chatelaine.data.sync.SafSyncFolder
 import com.hazia.chatelaine.data.sync.SyncFolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
+
+/** An item as the harness lists it: its names that a later edit overwrote ([lost]) are what History holds. */
+private data class HarnessItem(val id: String, val name: String, val lost: List<String>)
 
 /**
  * Stage 1 debug harness (provisional, not a product screen, debug builds only: it lives in the `debug` source set, so
  * a release APK holds none of it). Plain controls for the five actions: add, edit (tap an item to pick it, then type
  * the new name), list, sync and backup. The sync folder and the backup folder, two different folders, are each picked
  * once with the system folder picker; the permissions are persisted and the folders are used through [SafSyncFolder].
- * The database and `identity/device-id` are in `filesDir`.
+ * The database and `identity/device-id` are in `filesDir`. It reaches them through [LocalAppData.shared], the
+ * process's one opener, so the harness and the app never open the database twice; the harness never closes it.
  *
  * Install: `./gradlew :androidApp:installDebug` (or `adb install -r androidApp/build/outputs/apk/debug/androidApp-debug.apk`).
  */
 class HarnessActivity : ComponentActivity() {
 
-    private val data: ChatelaineData by lazy {
-        ChatelaineData(
-            open = openChatelaineDatabase(this),
-            deviceId = deviceId(File(filesDir, "$DEVICE_ID_DIR/device-id")),
-            photos = DirectoryBlobStore(File(filesDir, "photos").toPath()),
-        )
+    private val data: LocalAppData by lazy {
+        LocalAppData.shared(applicationContext.getDatabasePath(DATABASE_NAME), filesDir, open = { openChatelaineDatabase(this) })
     }
+
+    private suspend fun list(): List<HarnessItem> =
+        data.inventory.items().sortedBy { it.name }.map { item ->
+            HarnessItem(item.id, item.name, data.history.overwritten(ITEM, item.id, NAME_GROUP).mapNotNull { it.values["name"] as? String })
+        }
 
     private val prefs get() = getSharedPreferences("harness", MODE_PRIVATE)
 
@@ -65,11 +67,6 @@ class HarnessActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { Harness() }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing) runCatching { data.close() }
     }
 
     @Composable
@@ -82,7 +79,7 @@ class HarnessActivity : ComponentActivity() {
         var items by remember { mutableStateOf(emptyList<HarnessItem>()) }
         var message by remember { mutableStateOf("") }
 
-        suspend fun refresh() { items = withContext(Dispatchers.IO) { data.list() } }
+        suspend fun refresh() { items = withContext(Dispatchers.IO) { list() } }
 
         fun act(what: String, block: suspend () -> String) {
             scope.launch {
@@ -122,13 +119,13 @@ class HarnessActivity : ComponentActivity() {
             }
             BasicTextField(name, { name = it }, Modifier.border(1.dp, Color.Gray).padding(8.dp))
             Row {
-                Button("Add") { act("add") { "added " + data.add(name).also { name = "" } } }
-                Button("Edit picked") { act("edit") { data.edit(requireNotNull(picked) { "tap an item first" }, name); name = ""; "edited" } }
+                Button("Add") { act("add") { "added " + data.inventory.addItem(name).also { name = "" } } }
+                Button("Edit picked") { act("edit") { data.inventory.rename(requireNotNull(picked) { "tap an item first" }, name); name = ""; "edited" } }
             }
             Row {
                 Button("List") { act("list") { "listed" } }
                 Button("Sync") { act("sync") { "synced in ${data.sync(syncFolder())} round(s)" } }
-                Button("Backup") { act("backup") { data.backup(backupTarget()) ?: "no backup now: re-reading its own log" } }
+                Button("Backup") { act("backup") { data.backup(backupTarget(), System.currentTimeMillis()) ?: "no backup now: re-reading its own log" } }
             }
             LazyColumn {
                 items(items) { item ->
@@ -149,6 +146,9 @@ class HarnessActivity : ComponentActivity() {
     private companion object {
         const val FOLDER = "folder"
         const val BACKUP_FOLDER = "backupFolder"
+
+        /** The field group of an item's name, as History keys it. */
+        const val NAME_GROUP = "name"
     }
 }
 

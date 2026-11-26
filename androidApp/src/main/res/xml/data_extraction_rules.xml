@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- The directory holding the device id (DEVICE_ID_DIR) stays out of cloud backup and out of a device-to-device
-     transfer (R59): a restored or transferred phone must not be a second copy of this one. -->
+     transfer (R59): a restored or transferred phone must not be a second copy of this one. So does the directory of
+     this phone's own settings (LOCAL_DIR): the folders picked here and the last backup's time mean nothing on another. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="file" path="identity" />
+        <exclude domain="file" path="local" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="identity" />
+        <exclude domain="file" path="local" />
     </device-transfer>
 </data-extraction-rules>

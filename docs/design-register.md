@@ -11,7 +11,6 @@ rule, in the code for anything else.
   restoring a backup, as that is what lets backups go on.
 - **Daily backup.** `BackupWorker` is not scheduled yet. It must build its folder from a stored URI.
 - **Roll back.** A roll back leaves one history entry per value, with no single undo.
-- **Database opener.** Each process must have exactly one database opener (the layer that owns the database).
 
 ## Stage 3 (places, photos and fields)
 

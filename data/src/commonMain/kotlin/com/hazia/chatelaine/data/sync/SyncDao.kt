@@ -36,12 +36,17 @@ internal data class ClockEntity(
  * export. [backupsHeld] keeps backups off meanwhile, as the near-empty database would rotate out the good ones; set
  * with [recovered], it goes when the own log is read or a backup is restored ([backupRestored]), which is the way back
  * for a device with no sync folder.
+ *
+ * [previousDevice] is the id this device wrote under before a recovery gave it a new one
+ * (`renewDeviceIdIfRecovered`): the log to read back is then that id's, read as a peer's is; null reads back the
+ * log of this device's own id.
  */
 @Entity(tableName = "sync_own_log")
 internal data class OwnLogEntity(
     @PrimaryKey val id: Int = 0,
     val recovered: Boolean,
     @ColumnInfo(name = "backups_held") val backupsHeld: Boolean = false,
+    @ColumnInfo(name = "previous_device") val previousDevice: String? = null,
 )
 
 /** The last stamp both sides agreed on for an asking group; local only. */
@@ -226,8 +231,12 @@ internal suspend fun SyncDao.rereadOwnLog() {
     if (ownLog() == null) putOwnLog(OwnLogEntity(recovered = false))
 }
 
-/** The database was made anew after a corrupt one was set aside: it waits for its own log ([OwnLogEntity.recovered]). */
-internal suspend fun SyncDao.markRecovered() = putOwnLog(OwnLogEntity(recovered = true, backupsHeld = true))
+/**
+ * The database was made anew after a corrupt one was set aside: it waits for its own log ([OwnLogEntity.recovered]),
+ * the log of [previousDevice] when the device took a new id since, and backups wait with it.
+ */
+internal suspend fun SyncDao.markRecovered(previousDevice: String? = null) =
+    putOwnLog(OwnLogEntity(recovered = true, backupsHeld = true, previousDevice = previousDevice))
 
 /**
  * A backup was restored into the database: it is no longer the near-empty one a recovery left, so backups go on. The
