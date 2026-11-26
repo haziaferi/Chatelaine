@@ -9,23 +9,16 @@ rule, in the code for anything else.
 - **Recovery notice.** A database made anew after a corrupt one waits for its own log before backing up again. The
   notice should key on the set-aside file being there, not on a flag. On a device with no sync folder it should offer
   restoring a backup, as that is what lets backups go on.
-- **Own log not there yet on recovery.** If the device's copy of the folder does not hold its own log yet (copy wiped,
-  still syncing), its first export starts a new log under the same id. The next import takes that new log for the old
-  one, and the old one then clashes with it when it arrives. Holding exports was tried and reverted: a device whose
-  own log never comes back could then never send an edit. Options: give a recovered database a new sync id (its old log
-  then reads as a peer's), or hold exports with a way out the user confirms.
-- **Crash during recovery.** A crash after the corrupt file is set aside, but before the new database is marked as
-  recovered, leaves a database that looks like a new device's.
 - **Daily backup.** `BackupWorker` is not scheduled yet. It must build its folder from a stored URI.
-- **Fields.** `Fields.set` does not check that the field applies to its owner, or that link ids exist. Places have no
-  `fieldsFor(place)`.
 - **Roll back.** A roll back leaves one history entry per value, with no single undo.
 - **Database opener.** Each process must have exactly one database opener (the layer that owns the database).
 
-## Stage 3 (camera)
+## Stage 3 (places, photos and fields)
 
 - **Blocker: photos in memory.** Backup and restore hold every photo in memory (entries map, zip, SAF read-back).
   Stream them to a temp file before the camera arrives.
+- **Fields.** `Fields.set` does not check that the field applies to its owner, or that link ids exist. Places have no
+  `fieldsFor(place)`.
 
 ## Stage 4 (photos and the logging form)
 
@@ -45,6 +38,8 @@ rule, in the code for anything else.
 - **Photo temp files.** A `blobs/.tmp-<hash>` with no whole file beside it is never cleared: it may be another device's
   write in progress. It can be left by a crash during the first upload of a photo that was deleted before the retry.
 - **History and backups.** History is not in backups.
+- **Retired device logs.** A recovered device takes a new id (R59); its old id's log stays in the folder, read as a
+  peer's that no longer writes, and nothing clears it yet.
 
 ## Before release
 
