@@ -187,10 +187,33 @@ class BackupTest {
 
     @Test
     fun noBackupWhileTheDatabaseReReadsItsOwnFiles() {
-        val a = Phone("A")
-        a.reading = true
+        val a = Phone(world, "A", recovered = true)
         assertNull(run { a.backup.write(target, 0) })
         assertEquals(emptyList(), target.list(""))
+    }
+
+    /** A restore that takes back a purge has the next import read every folder file again, this device's own too (R59). */
+    @Test
+    fun aRestoreThatTakesBackAPurgeReadsTheOwnLogAgain() {
+        val a = Phone("A")
+        val b = Phone("B")
+        val item = run { a.device.inventory.addItem("lamp") }
+        a.device.export()
+        world.syncthing.session("A", "B")
+        b.device.import()
+        world.syncthing.now = 10
+        run { a.device.inventory.deleteItem(item) }
+        world.syncthing.now = 20
+        run { b.device.inventory.rename(item, "lamp, edited after the purge") }
+        val name = run { b.backup.write(target, world.syncthing.now) }!!
+        assertFalse(run { a.device.sync.readingOwnLog() })
+
+        run { a.backup.restore(target.read(name)!!) }
+
+        assertNotNull(run { a.device.inventory.getItem(item) }, "the edit after the purge takes it back")
+        assertTrue(run { a.device.sync.readingOwnLog() }, "the own log is read again on the next import")
+        a.device.import()
+        assertFalse(run { a.device.sync.readingOwnLog() })
     }
 
     @Test

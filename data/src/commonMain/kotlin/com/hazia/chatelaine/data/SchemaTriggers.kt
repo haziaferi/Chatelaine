@@ -44,8 +44,12 @@ internal class SchemaTriggers(private val tables: List<String> = SYNCED_TABLES) 
      * A new database holds the five default tag kinds (R38). They are written before the triggers exist, so
      * they are not queued: every device makes the same rows (fixed ids, [NEVER_WRITTEN] stamps). Each group
      * also starts with that stamp as its base, so a peer's first edit is not taken for a clash.
+     *
+     * It also starts with the mark that its own log has not been read back (`OwnLogEntity`): a new database of a
+     * device whose log is in the folder reads it before anything compacts that log.
      */
     override fun onCreate(connection: SQLiteConnection) {
+        connection.execSQL("INSERT INTO sync_own_log(id, recovered) VALUES (0, 0)")
         DEFAULT_KINDS.forEachIndexed { position, (id, name) ->
             connection.execSQL(
                 "INSERT INTO tag_kind(id, name, name_hlc, name_device, position, order_hlc, order_device) " +

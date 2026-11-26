@@ -14,13 +14,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Instant
 
-/** A device of [world] with its photo files in memory, and the [Backup] over both. */
-internal class Phone(world: World, name: String) {
-    val device = world.Device(name)
+/** A device of [world] with its photo files in memory, and the [Backup] over both; [recovered] as for [World.Device]. */
+internal class Phone(world: World, name: String, recovered: Boolean = false) {
+    val device = world.Device(name, recovered = recovered)
     val store = MemoryBlobStore()
     val blobs = Blobs(device.db, store)
-    var reading = false
-    val backup = Backup(device.db, store, device.clock, ZipBackup, wallMillis = { world.syncthing.now }, readingOwnLog = { reading })
+    val backup = Backup(device.db, store, device.clock, ZipBackup, wallMillis = { world.syncthing.now })
 }
 
 private fun <T> run(block: suspend () -> T): T = runBlocking { block() }

@@ -12,6 +12,7 @@ import com.hazia.chatelaine.data.sync.ClockEntity
 import com.hazia.chatelaine.data.sync.KnownTablesEntity
 import com.hazia.chatelaine.data.sync.LostEntity
 import com.hazia.chatelaine.data.sync.OutboxEntity
+import com.hazia.chatelaine.data.sync.OwnLogEntity
 import com.hazia.chatelaine.data.sync.PurgeEntity
 import com.hazia.chatelaine.data.sync.ReadEntity
 import com.hazia.chatelaine.data.sync.SyncDao
@@ -26,7 +27,7 @@ import com.hazia.chatelaine.data.sync.WaitingEntity
     entities = [
         PurgeEntity::class, ClockEntity::class,
         BaseEntity::class, AskEntity::class, ReadEntity::class, OutboxEntity::class, KnownTablesEntity::class,
-        WaitingEntity::class, LostEntity::class, BlobSeenEntity::class,
+        WaitingEntity::class, LostEntity::class, BlobSeenEntity::class, OwnLogEntity::class,
         TagKindEntity::class, TagEntity::class, ItemEntity::class, ItemTagEntity::class,
         PlaceEntity::class, PlaceTagEntity::class, PhotoEntity::class, PhotoRegionEntity::class,
         FieldDefEntity::class, FieldOptionEntity::class, FieldAttachEntity::class, FieldValueEntity::class,

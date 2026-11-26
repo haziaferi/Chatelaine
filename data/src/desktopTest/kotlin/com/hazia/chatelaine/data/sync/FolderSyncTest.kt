@@ -350,10 +350,10 @@ class FolderSyncTest {
         val again = w.Device("A")
 
         assertTrue(again.rows().isEmpty(), "the new database starts empty")
-        assertTrue(again.sync.readingOwnLog)
+        assertTrue(runBlocking { again.sync.readingOwnLog() })
         again.import()
         assertEquals(ids, again.rows().keys)
-        assertFalse(again.sync.readingOwnLog)
+        assertFalse(runBlocking { again.sync.readingOwnLog() })
     }
 
     /** R59: the outbox, not a stamp cursor, says what to export; exporting empties it. */
@@ -1049,10 +1049,10 @@ class FolderSyncTest {
 
         val after = w.Device("A-new", id = "A", recovered = true)
         after.import() // the own log has not arrived in A-new's folder yet
-        assertTrue(after.sync.readingOwnLog, "nothing of the own log was read: still waiting")
+        assertTrue(runBlocking { after.sync.readingOwnLog() }, "nothing of the own log was read: still waiting")
         w.syncthing.session("A", "A-new")
         after.import()
-        assertFalse(after.sync.readingOwnLog, "the own log was read back")
+        assertFalse(runBlocking { after.sync.readingOwnLog() }, "the own log was read back")
         assertEquals(setOf(old), after.rows().keys)
     }
 
@@ -1291,6 +1291,30 @@ class FolderSyncTest {
         assertEquals(ImportReport(changed = 1, skipped = 1), b.import())
         assertEquals(setOf("x"), table.rows.keys)
         assertEquals(emptyList(), b.waiting(), "a refused line with no missing parent does not wait")
+    }
+
+    // ---- a recovered database across a restart (R59) ----
+
+    /**
+     * The process that set the corrupt file aside ends before its first sync: the next one opens the new database as
+     * it is, and still reads the own log back before its exports compact it.
+     */
+    @Test
+    fun aRecoveredDatabaseReopenedBeforeItsFirstSyncReadsItsOwnLogBack() {
+        val w = world(segmentBytes = 200, snapshotEvery = 2)
+        val a = w.Device("A")
+        val old = a.create()
+        repeat(2) { a.edit(old, NAME); a.export() }
+        a.db.close()
+        File(tmp.root, "A.db").writeBytes(Random(7).nextBytes(4096))
+        w.Device("A").db.close() // made anew here, then closed with no sync
+
+        val again = w.Device("A")
+        val fresh = again.create()
+        repeat(3) { again.edit(fresh, NAME); again.export() } // enough for a compaction, before the first import
+        again.import()
+
+        assertEquals(setOf(old, fresh), again.rows().keys, "the history written before the database was made anew is back")
     }
 
     // ---- the clock across a restart (R51, R54) ----

@@ -20,7 +20,7 @@ data class HarnessItem(val id: String, val name: String, val lost: List<String>)
  * the internal `FolderSync` and `BlobSync`; stage 2 replaces it with the app's real composition.
  */
 class ChatelaineData(
-    private val open: DatabaseOpen<ChatelaineDatabase>,
+    open: DatabaseOpen<ChatelaineDatabase>,
     val deviceId: String,
     private val photos: BlobStore,
     private val wallMillis: () -> Long = System::currentTimeMillis,
@@ -35,7 +35,7 @@ class ChatelaineData(
     private val lock = ImportLock()
     private var current: Pair<SyncFolder, FolderSync>? = null
     private val backup = Backup(
-        db, photos, clock, ZipBackup, wallMillis, readingOwnLog = { current?.second?.readingOwnLog == true }, importLock = lock,
+        db, photos, clock, ZipBackup, wallMillis, importLock = lock,
     )
 
     suspend fun add(name: String): String = inventory.addItem(name)
@@ -49,9 +49,9 @@ class ChatelaineData(
 
     /** Exports, imports and exchanges photo files with [folder], until an import changes nothing; returns the rounds. */
     suspend fun sync(folder: SyncFolder): Int {
-        // One FolderSync per folder: it remembers what it read and whether it still re-reads its own log.
+        // One FolderSync per folder; what it read, and whether the own log is still to be read back, is in the database.
         val s = current?.takeIf { it.first === folder }?.second ?: FolderSync(
-            db, folder, deviceId, clock, db.syncedTables(), PlainLines, wallMillis, recovered = open.recovered, importLock = lock,
+            db, folder, deviceId, clock, db.syncedTables(), PlainLines, wallMillis, importLock = lock,
         ).also { current = folder to it }
         var rounds = 0
         do {
@@ -63,7 +63,10 @@ class ChatelaineData(
         return rounds
     }
 
-    /** Today's backup in [folder], the last seven kept; its name, or null while the database re-reads its own log. */
+    /**
+     * Today's backup in [folder], the last seven kept; its name, or null while a database made anew after a corrupt one
+     * has not read its own log back.
+     */
     suspend fun backup(folder: SyncFolder): String? = backup.daily(folder, wallMillis())
 
     override fun close() = db.close()

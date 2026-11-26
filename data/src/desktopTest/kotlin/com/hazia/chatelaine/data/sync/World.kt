@@ -55,19 +55,19 @@ internal class World(private val dir: File, seed: Int, private val segmentBytes:
     /**
      * [id] is the sync identity; two devices given the same one model a cloned device id.
      * [extra] adds tables, or replaces a real one, for rows written straight into the folder.
-     * [recovered] says the database was made anew; left null it is whatever opening the file found.
+     * [recovered] marks the database as made anew after a corrupt one, as opening a corrupt file does.
      */
     inner class Device(
         val name: String,
         val id: String = name,
         extra: Map<String, RowTable> = emptyMap(),
-        recovered: Boolean? = null,
+        recovered: Boolean = false,
     ) {
         /** How far this device's wall clock is from the shared one, in milliseconds. */
         var skew = 0L
         private val wall = { syncthing.now + skew }
         private val open = openChatelaineDatabase(File(dir, "$name.db"))
-        val db = open.database.also { opened += it }
+        val db = open.database.also { opened += it }.also { if (recovered) runBlocking { it.syncDao().markRecovered() } }
         /** Resumed from the database, as the app's own clock is. */
         val clock = runBlocking { db.syncDao().loadClock(id, wall) }
         private val tables = db.syncedTables() + extra
@@ -77,7 +77,6 @@ internal class World(private val dir: File, seed: Int, private val segmentBytes:
         val history = History(db, writes)
         val sync = FolderSync(
             db, syncthing.folder(name), id, clock, tables, PlainLines, wall, segmentBytes, snapshotEvery,
-            recovered = recovered ?: open.recovered,
         )
 
         /** A new item, every group stamped with one tick. */
