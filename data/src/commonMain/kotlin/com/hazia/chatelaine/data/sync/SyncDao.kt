@@ -31,8 +31,9 @@ internal data class ClockEntity(
  * Present while this database has not read its own log back from the folder (R59); one row, local only, kept in the
  * database so it outlives the process. Every new database starts with it (`SchemaTriggers.onCreate`); it is set again
  * when an import or a restore takes back a purge. [recovered] marks a database made anew after a corrupt one was set
- * aside: its own log is surely in the folder, so it waits until that log is there and read, and no backup is made
- * meanwhile. Without it, a device with no log of its own in the folder (a new device) has nothing to read back, and
+ * aside: its own log is surely in the folder, so it waits until that log is there and read, and meanwhile exports
+ * nothing and makes no backup; restoring a backup lifts the mark ([backupRestored]), which is the way back for a device
+ * with no sync folder. Without it, a device with no log of its own in the folder (a new device) has nothing to read back, and
  * the mark goes on its first import or export.
  */
 @Entity(tableName = "sync_own_log")
@@ -225,6 +226,14 @@ internal suspend fun SyncDao.rereadOwnLog() {
 
 /** The database was made anew after a corrupt one was set aside: it waits for its own log ([OwnLogEntity.recovered]). */
 internal suspend fun SyncDao.markRecovered() = putOwnLog(OwnLogEntity(recovered = true))
+
+/**
+ * A backup was restored into the database: it is no longer the near-empty one a recovery left, so the recovered mark
+ * goes; the own log, if any, is still read back on the next import.
+ */
+internal suspend fun SyncDao.backupRestored() {
+    if (ownLog()?.recovered == true) putOwnLog(OwnLogEntity(recovered = false))
+}
 
 internal fun BaseEntity.stamp() = Stamp(hlc, device)
 

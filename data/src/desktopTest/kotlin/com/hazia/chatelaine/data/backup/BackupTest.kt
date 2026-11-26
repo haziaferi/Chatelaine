@@ -192,6 +192,23 @@ class BackupTest {
         assertEquals(emptyList(), target.list(""))
     }
 
+    /**
+     * A recovered device with no sync folder has only its backups to come back from: once one is restored, daily
+     * backups go on; its own log is still read back if it syncs later.
+     */
+    @Test
+    fun restoringABackupLetsARecoveredDatabaseBackUpAgain() {
+        val b = Phone("B")
+        run { b.device.inventory.addItem("lamp") }
+        val name = run { b.backup.write(target, 0) }!!
+        val a = Phone(world, "A", recovered = true)
+
+        run { a.backup.restore(target.read(name)!!) }
+
+        assertNotNull(run { a.backup.daily(target, day) }, "backups go on from the restored database")
+        assertTrue(run { a.device.sync.readingOwnLog() }, "its own log is still read back on its next import")
+    }
+
     /** A restore that takes back a purge has the next import read every folder file again, this device's own too (R59). */
     @Test
     fun aRestoreThatTakesBackAPurgeReadsTheOwnLogAgain() {

@@ -23,6 +23,7 @@ import com.hazia.chatelaine.data.sync.RowRecord
 import com.hazia.chatelaine.data.sync.StagedStore
 import com.hazia.chatelaine.data.sync.SyncFolder
 import com.hazia.chatelaine.data.sync.TEMP_PREFIX
+import com.hazia.chatelaine.data.sync.backupRestored
 import com.hazia.chatelaine.data.sync.completeLines
 import com.hazia.chatelaine.data.sync.plus
 import com.hazia.chatelaine.data.sync.repairParentCycles
@@ -89,7 +90,8 @@ class Backup(
     /**
      * Writes the backup of everything held now to [target] as `chatelaine-backup-<date of [now]>.zip` and returns its
      * name; null, and nothing written, while a database made anew after a corrupt one has not read its own folder
-     * files back (`OwnLogEntity.recovered`, kept in the database): it would miss what those files hold. Rows,
+     * files back nor had a backup restored (`OwnLogEntity.recovered`, kept in the database): it would miss what those
+     * hold, and seven such days would rotate out every good backup. Rows,
      * purges and photo hashes are read in one transaction, so the backup is one moment of the database; the photo
      * files are read after it. The file takes its name only through [SyncFolder.replace], so a crash leaves the old
      * file of that name or the whole new one; temp files an earlier crash left in [target] are deleted first.
@@ -143,7 +145,8 @@ class Backup(
      * Merges the backup in [zip] into this database as a peer's changes: per group the newer stamp wins, and a version
      * that loses is kept in History, so an edit made after the backup survives, here and, through sync, on every
      * device. Rows the backup lacks are kept. A row purged here stays purged unless the backup holds a newer edit of
-     * it. Photo files the backup holds and this device lacks are stored first (each checked against its hash).
+     * it. Photo files the backup holds and this device lacks are stored first (each checked against its hash). A
+     * database made anew after a corrupt one backs up again once a restore is done (`SyncDao.backupRestored`).
      *
      * @throws IllegalArgumentException when [zip] is not a complete backup.
      * @throws IllegalStateException before anything is written, when a record is stamped more than a day past this
@@ -174,6 +177,7 @@ class Backup(
         }
         report = report + importer.retryWaiting()
         importer.finish(writes)
+        dao.backupRestored()
         afterImport()
         report
     }
