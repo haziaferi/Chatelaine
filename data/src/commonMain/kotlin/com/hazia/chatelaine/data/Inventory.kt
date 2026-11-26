@@ -378,8 +378,8 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
 
     /** The accepted tags on [itemIds], each with how many of those items carry it: most first, then by name. */
     suspend fun tagCounts(itemIds: List<String>): List<TagCount> {
-        val wanted = itemIds.toSet()
-        val counts = links.allLinks().filter { it.itemId in wanted && !it.suggested }.groupingBy { it.tagId }.eachCount()
+        val counts = readChunked(itemIds.distinct()) { links.linksOfItems(it) }.filter { !it.suggested }
+            .groupingBy { it.tagId }.eachCount()
         return readChunked(counts.keys.toList()) { tags.tags(it) }.toTags()
             .map { TagCount(it, counts.getValue(it.id)) }
             .sortedWith(compareBy({ -it.items }, { it.tag.name.lowercase() }, { it.tag.id }))

@@ -2,6 +2,7 @@ package com.hazia.chatelaine.data
 
 import com.hazia.chatelaine.core.sync.HybridClock
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.AfterTest
@@ -132,11 +133,26 @@ class SearchTest {
 
     @Test
     fun subTagWalkStopsOnACycle() = run {
-        val a = inventory.addTag("a")
-        val b = inventory.addTag("b", a)
-        val rows = db.tagDao().tags(listOf(a)).map { it.copy(parentId = b) }
-        db.tagDao().putTags(rows)
-        assertEquals(setOf(a, b), inventory.subTagIds(a))
+        withTimeout(5_000) {
+            val a = inventory.addTag("a")
+            val b = inventory.addTag("b", a)
+            val rows = db.tagDao().tags(listOf(a)).map { it.copy(parentId = b) }
+            db.tagDao().putTags(rows)
+            assertEquals(setOf(a, b), inventory.subTagIds(a))
+        }
+    }
+
+    /** R81 through two levels. */
+    @Test
+    fun parentNameFindsAGrandchildsItem() = run {
+        val sewing = inventory.addTag("sewing")
+        val red = inventory.addTag("red skirt", sewing)
+        val hem = inventory.addTag("hem tape", red)
+        val item = inventory.addItem("tape roll")
+        inventory.tag(listOf(item), hem)
+        inventory.addItem("pins")
+        assertEquals(listOf(item), ids(SearchQuery("sewing")))
+        assertEquals(listOf(item), ids(SearchQuery(tagIds = setOf(sewing))))
     }
 
     /** R05 in the data layer: tag a few items with a new tag, then find them by it. */

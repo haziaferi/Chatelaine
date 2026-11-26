@@ -56,6 +56,19 @@ class TagEditTest {
     }
 
     @Test
+    fun tagCountsForAThousandItems() = run {
+        val a = inventory.addTag("a")
+        val b = inventory.addTag("b")
+        val items = List(1000) { inventory.addItem("item $it") }
+        inventory.tag(items, a)
+        inventory.tag(items.filterIndexed { i, _ -> i % 2 == 0 }, b)
+
+        val counts = inventory.tagCounts(items)
+
+        assertEquals(listOf(a to 1000, b to 500), counts.map { it.tag.id to it.items })
+    }
+
+    @Test
     fun tagCountsSaySomeOrAll() = run {
         val a = inventory.addTag("a")
         val b = inventory.addTag("b")
