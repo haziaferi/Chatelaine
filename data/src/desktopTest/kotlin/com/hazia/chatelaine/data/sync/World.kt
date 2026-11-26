@@ -1,7 +1,6 @@
 package com.hazia.chatelaine.data.sync
 
 import com.hazia.chatelaine.core.sync.Group
-import com.hazia.chatelaine.core.sync.HybridClock
 import com.hazia.chatelaine.core.sync.Row
 import com.hazia.chatelaine.data.ChatelaineDatabase
 import com.hazia.chatelaine.data.Fields
@@ -67,9 +66,10 @@ internal class World(private val dir: File, seed: Int, private val segmentBytes:
         /** How far this device's wall clock is from the shared one, in milliseconds. */
         var skew = 0L
         private val wall = { syncthing.now + skew }
-        val clock = HybridClock(id, wall)
         private val open = openChatelaineDatabase(File(dir, "$name.db"))
         val db = open.database.also { opened += it }
+        /** Resumed from the database, as the app's own clock is. */
+        val clock = runBlocking { db.syncDao().loadClock(id, wall) }
         private val tables = db.syncedTables() + extra
         val writes = LocalWrites(db, clock)
         val inventory = Inventory(db, writes)

@@ -1293,6 +1293,54 @@ class FolderSyncTest {
         assertEquals(emptyList(), b.waiting(), "a refused line with no missing parent does not wait")
     }
 
+    // ---- the clock across a restart (R51, R54) ----
+
+    /** A peer whose clock runs fast (within the day the guard allows) edits a name that this device then sees. */
+    private fun World.aheadPeerEdit(a: World.Device, b: World.Device): String {
+        b.skew = 6 * hour
+        val item = a.create("lamp")
+        settle(listOf(a, b))
+        syncthing.now = 1_000
+        b.edit(item, NAME, "B's name")
+        settle(listOf(a, b))
+        return item
+    }
+
+    /** A device restarted after seeing a stamp ahead of its wall clock still stamps its next edit above it. */
+    @Test
+    fun aRestartedDevicesEditOutranksAStampItSawAheadOfItsClock() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = w.aheadPeerEdit(a, b)
+        a.db.close()
+
+        val again = w.Device("A") // the same database, opened again
+        w.syncthing.now = 2_000
+        again.edit(item, NAME, "A's later name")
+        w.settle(listOf(again, b))
+
+        for (d in listOf(again, b)) {
+            assertEquals("A's later name", d.rows().getValue(item).groups.getValue(NAME).values["name"], "${d.name} holds the later edit")
+        }
+    }
+
+    /** With no stored clock at all (a fresh clock over the rows), a local edit still outranks the version it replaces. */
+    @Test
+    fun aLocalEditOutranksTheVersionItReplacesWithAFreshClock() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = w.aheadPeerEdit(a, b)
+        val seen = a.rows().getValue(item).groups.getValue(NAME).stamp
+
+        val fresh = HybridClock("A", wallMillis = { w.syncthing.now })
+        runBlocking { Inventory(a.db, LocalWrites(a.db, fresh)).rename(item, "A's later name") }
+
+        val written = a.rows().getValue(item).groups.getValue(NAME).stamp
+        assertTrue(written > seen, "the edit's stamp $written is above the one it replaced, $seen")
+    }
+
     /** A table that refuses to save the row [refused] as a foreign key would, and saves nothing of that call. */
     private class RefusingTable(private val refused: String) : RowTable {
         val rows = mutableMapOf<String, Row>()

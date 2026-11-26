@@ -53,6 +53,9 @@ internal class LocalWrites(private val db: ChatelaineDatabase, val clock: Hybrid
             connection.immediateTransaction {
                 val targets = ids()
                 val store = StagedStore.load(sync, tables, targets)
+                // Every tick of this write then outranks the versions it replaces, even with a clock that lost its
+                // stored value (a database made anew holds no clock row).
+                store.newestLoaded?.let(clock::observe)
                 block(store, targets)
                 store.flush(sync, tables)
                 sync.saveClock(clock)

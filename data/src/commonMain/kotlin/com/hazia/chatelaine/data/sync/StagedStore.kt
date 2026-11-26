@@ -33,6 +33,10 @@ internal class StagedStore private constructor(
     var undidPurge = false
         private set
 
+    /** The newest stamp of the rows and purges loaded, or null when none is here: a local write ticks past it. */
+    val newestLoaded: Stamp?
+        get() = (rows.values.mapNotNull { r -> r?.groups?.values?.maxOfOrNull { it.stamp } } + purges.values).maxOrNull()
+
     /** Ids whose row or purge this merge changed: the ones to export again. */
     val changed: Set<String> get() = changedRows + changedPurges
 

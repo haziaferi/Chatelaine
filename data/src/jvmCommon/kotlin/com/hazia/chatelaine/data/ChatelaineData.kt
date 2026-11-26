@@ -1,6 +1,5 @@
 package com.hazia.chatelaine.data
 
-import com.hazia.chatelaine.core.sync.HybridClock
 import com.hazia.chatelaine.data.backup.Backup
 import com.hazia.chatelaine.data.backup.ZipBackup
 import com.hazia.chatelaine.data.blob.BlobSync
@@ -9,6 +8,8 @@ import com.hazia.chatelaine.data.sync.FolderSync
 import com.hazia.chatelaine.data.sync.ImportLock
 import com.hazia.chatelaine.data.sync.PlainLines
 import com.hazia.chatelaine.data.sync.SyncFolder
+import com.hazia.chatelaine.data.sync.loadClock
+import kotlinx.coroutines.runBlocking
 
 /** An item as the debug harnesses list it: its names that a later edit overwrote ([lost]) are what History holds. */
 data class HarnessItem(val id: String, val name: String, val lost: List<String>)
@@ -25,7 +26,9 @@ class ChatelaineData(
     private val wallMillis: () -> Long = System::currentTimeMillis,
 ) : AutoCloseable {
     private val db = open.database
-    private val clock = HybridClock(deviceId, wallMillis)
+    // Resumed from the database (blocking, as opening it is): a fresh clock would stamp the next edit below a version
+    // already seen from a peer whose clock runs ahead, and that edit would lose everywhere but here.
+    private val clock = runBlocking { db.syncDao().loadClock(deviceId, wallMillis) }
     private val writes = LocalWrites(db, clock)
     private val inventory = Inventory(db, writes)
     private val history = History(db, writes)
