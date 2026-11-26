@@ -2,12 +2,13 @@ package com.hazia.chatelaine.data
 
 import com.hazia.chatelaine.core.sync.HybridClock
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
+import kotlin.concurrent.thread
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SearchTest {
@@ -133,13 +134,16 @@ class SearchTest {
 
     @Test
     fun subTagWalkStopsOnACycle() = run {
-        withTimeout(5_000) {
-            val a = inventory.addTag("a")
-            val b = inventory.addTag("b", a)
-            val rows = db.tagDao().tags(listOf(a)).map { it.copy(parentId = b) }
-            db.tagDao().putTags(rows)
-            assertEquals(setOf(a, b), inventory.subTagIds(a))
-        }
+        val a = inventory.addTag("a")
+        val b = inventory.addTag("b", a)
+        val rows = db.tagDao().tags(listOf(a)).map { it.copy(parentId = b) }
+        db.tagDao().putTags(rows)
+        // The walk never suspends, so a coroutine timeout could not stop it: a thread with a deadline does.
+        var found: Set<String>? = null
+        val walk = thread(isDaemon = true) { found = runBlocking { inventory.subTagIds(a) } }
+        walk.join(5_000)
+        assertFalse(walk.isAlive, "subTagIds did not return within 5 s: the walk loops on a cycle")
+        assertEquals(setOf(a, b), found)
     }
 
     /** R81 through two levels. */
