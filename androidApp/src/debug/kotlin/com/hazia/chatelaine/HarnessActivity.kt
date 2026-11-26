@@ -42,8 +42,9 @@ import java.io.File
 /**
  * Stage 1 debug harness (provisional, not a product screen, debug builds only: it lives in the `debug` source set, so
  * a release APK holds none of it). Plain controls for the five actions: add, edit (tap an item to pick it, then type
- * the new name), list, sync and backup. The sync folder is picked once with the system folder picker; the permission
- * is persisted and the folder is used through [SafSyncFolder]. The database and `identity/device-id` are in `filesDir`.
+ * the new name), list, sync and backup. The sync folder and the backup folder, two different folders, are each picked
+ * once with the system folder picker; the permissions are persisted and the folders are used through [SafSyncFolder].
+ * The database and `identity/device-id` are in `filesDir`.
  *
  * Install: `./gradlew :androidApp:installDebug` (or `adb install -r androidApp/build/outputs/apk/debug/androidApp-debug.apk`).
  */
@@ -59,7 +60,7 @@ class HarnessActivity : ComponentActivity() {
 
     private val prefs get() = getSharedPreferences("harness", MODE_PRIVATE)
 
-    private fun savedFolder(): Uri? = prefs.getString(FOLDER, null)?.let(Uri::parse)
+    private fun savedFolder(key: String): Uri? = prefs.getString(key, null)?.let(Uri::parse)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +77,8 @@ class HarnessActivity : ComponentActivity() {
         val scope = rememberCoroutineScope()
         var name by remember { mutableStateOf("") }
         var picked by remember { mutableStateOf<String?>(null) }
-        var folder by remember { mutableStateOf(savedFolder()) }
+        var folder by remember { mutableStateOf(savedFolder(FOLDER)) }
+        var backupFolder by remember { mutableStateOf(savedFolder(BACKUP_FOLDER)) }
         var items by remember { mutableStateOf(emptyList<HarnessItem>()) }
         var message by remember { mutableStateOf("") }
 
@@ -89,25 +91,35 @@ class HarnessActivity : ComponentActivity() {
             }
         }
 
+        fun keep(uri: Uri, key: String) {
+            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            prefs.edit().putString(key, uri.toString()).apply()
+        }
         val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
-            if (uri != null) {
-                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                prefs.edit().putString(FOLDER, uri.toString()).apply()
-                folder = uri
-            }
+            if (uri != null) { keep(uri, FOLDER); folder = uri }
+        }
+        val pickBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+            if (uri != null) { keep(uri, BACKUP_FOLDER); backupFolder = uri }
         }
 
         // One object per picked folder: the sync keeps what it read with it.
         val saf = remember(folder) { folder?.let { SafSyncFolder(this, it) } }
         fun syncFolder(): SyncFolder = requireNotNull(saf) { "pick the sync folder first" }
+        // Backups go to a folder of their own: in the sync folder, every device would carry every backup zip.
+        fun backupTarget(): SyncFolder =
+            SafSyncFolder(this, Uri.parse(backupFolderOf(backupFolder?.toString(), folder?.toString())))
 
         LaunchedEffect(Unit) { refresh() }
 
         Column(Modifier.padding(16.dp)) {
             BasicText("device ${data.deviceId}")
             BasicText("sync folder: ${folder ?: "none picked"}")
+            BasicText("backup folder: ${backupFolder ?: "none picked"}")
             BasicText(message)
-            Button("Pick sync folder") { pick.launch(null) }
+            Row {
+                Button("Pick sync folder") { pick.launch(null) }
+                Button("Pick backup folder") { pickBackup.launch(null) }
+            }
             BasicTextField(name, { name = it }, Modifier.border(1.dp, Color.Gray).padding(8.dp))
             Row {
                 Button("Add") { act("add") { "added " + data.add(name).also { name = "" } } }
@@ -116,7 +128,7 @@ class HarnessActivity : ComponentActivity() {
             Row {
                 Button("List") { act("list") { "listed" } }
                 Button("Sync") { act("sync") { "synced in ${data.sync(syncFolder())} round(s)" } }
-                Button("Backup") { act("backup") { data.backup(syncFolder()) ?: "no backup now: re-reading its own log" } }
+                Button("Backup") { act("backup") { data.backup(backupTarget()) ?: "no backup now: re-reading its own log" } }
             }
             LazyColumn {
                 items(items) { item ->
@@ -136,5 +148,16 @@ class HarnessActivity : ComponentActivity() {
 
     private companion object {
         const val FOLDER = "folder"
+        const val BACKUP_FOLDER = "backupFolder"
     }
+}
+
+/**
+ * The folder the harness's Backup button writes to, as a tree URI: its own pick, never the sync folder ([sync]), where
+ * every backup zip would travel to every device.
+ */
+internal fun backupFolderOf(backup: String?, sync: String?): String {
+    requireNotNull(backup) { "pick the backup folder first" }
+    require(backup != sync) { "the backup folder must be another folder than the sync folder" }
+    return backup
 }
