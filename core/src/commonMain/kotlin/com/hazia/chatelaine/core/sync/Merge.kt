@@ -104,6 +104,12 @@ class Merger(private val clock: HybridClock, private val askGroups: Set<String>,
             // not move the base, or a later change from the other side would look uncontested.
             if (base != null && theirs.stamp <= base) continue
             if (name in keepLoserGroups) {
+                // A version this device minted itself, older than the one here, is its own echo: seen already, so no
+                // loser. A peer took it through [created] and sent it back, or a clash kept it as the base.
+                if (theirs.stamp.device == clock.device && theirs.stamp < mine.stamp) {
+                    store.putBase(local.id, name, theirs.stamp)
+                    continue
+                }
                 val winner = if (theirs.stamp > mine.stamp) theirs else mine
                 // Both changed it since the base, to different text: the earlier is kept, not dropped.
                 if (mine.stamp != base && mine.values != theirs.values) store.lost(local.copy(groups = merged), name, if (winner === theirs) mine else theirs)
