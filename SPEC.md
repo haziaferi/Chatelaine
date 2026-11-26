@@ -399,11 +399,15 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R14 · Shared code
 
-**Rule:** Code is shared by default. Platform code is written only for the camera, file access, widgets, speech, model runtimes and printing.
+**Rule:** Code is shared by default: data, view state, theme, components and navigation are common code. Platform code is written only for the camera, file access, widgets, speech, model runtimes, printing and screen layouts: each screen has a phone layout and a Windows layout, each designed and approved on its own (R93).
 
-**Acceptance:** Platform source sets (for example `androidMain`, `jvmMain`) hold code only for the camera, file access, widgets, speech, model runtimes and printing. Everything else is in common code.
+**Why:** The phone is held in one hand and the PC is a desk companion with a keyboard and a large window (R21); one shared layout would serve one of them badly.
 
-**Since:** 2026-11-22 · owner · own words
+**Acceptance:** Platform source sets (for example `androidMain`, `desktopMain`) hold code only for the camera, file access, widgets, speech, model runtimes, printing and screen layouts. Everything else, view state, theme and components included, is in common code.
+
+**Not:** One layout shared by phone and PC: the first plan, dropped by the owner on 2026-11-26.
+
+**Since:** 2026-11-26 · owner · agreed rewording
 
 ### D-R15 · Offline first
 
@@ -970,13 +974,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 | Device-id file | keep it out of Android Auto Backup |
 | Export | through an outbox, not a stamp cursor |
 | Purge registry | permanent: purged rows are recorded for good, since time-limited tombstones let deleted rows come back |
-| Recovered database | re-reads its own folder files |
+| Recovered database | takes a new device id and reads its old id's folder files as a peer's |
 
 **Evidence:** Review of the earlier app, 2026-10-28.
 
-**Acceptance:** One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database re-reads its folder files.
+**Acceptance:** One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database takes a new device id and gets its old items back from its old id's files.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-26 · owner · agreed rewording
 
 ### D-R60 · Backup and export
 
@@ -1233,9 +1237,9 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Search matches across languages: "cucito" finds "sewing". Tags are stored once, as written; model suggestions are offered in the interface language, and built-in names such as tag kinds and starter place names switch with the language.
 
-**Acceptance:** With the interface in English, "cucito" finds items tagged "sewing", and the reverse works in Italian. Switching the language changes the built-in kind names but not the user's tags.
+**Acceptance:** With the interface in English, "cucito" finds items tagged "sewing", and the reverse works in Italian, as stage 5's gate requires (R100). Switching the language changes the built-in kind names but not the user's tags.
 
-**Since:** 2026-11-22 · owner · agreed rewording
+**Since:** 2026-11-26 · owner · agreed rewording
 
 ## 8. Place map, homepage and clear-box surfaces
 
@@ -1417,11 +1421,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R96 · Consistent elements
 
-**Rule:** The same element reads and acts the same on every screen, and controls at the same level keep the same size and place.
+**Rule:** The same element reads and acts the same on every screen, on the phone and on Windows; controls at the same level keep the same size and place among the screens of one platform (R14).
 
-**Acceptance:** Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
+**Acceptance:** Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases and across the screens of one platform.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-26 · owner · agreed rewording
 
 ## 10. Modules and the shopping list
 
@@ -2049,7 +2053,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 ### D-R100 · Stage plan
 
-**Rule:** The work runs in the stages below, in order of dependency. Each stage ends with its done-when check and, from stage 2 on, a walk on a real device.
+**Rule:** The work runs in the stages below, in order of dependency. Each stage ends with its done-when check and, from stage 2 on, a walk on a real device: the phone, and the Windows PC when the stage changes a Windows screen.
 
 **Values:**
 
@@ -2057,10 +2061,10 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 |---|---|---|---|
 | 0 Foundations | the spec; purpose map scored on the axes of R91; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed against R65 on the target phones; Compose Multiplatform window running on Android and Windows (R102) | owner approves the spec and the purpose map's Inventory screens (R90); spike timings recorded (`docs/evidence/stage0-recognition.md`); KMP spike run recorded (`docs/evidence/stage0-kmp.md`) | — |
 | 1 Data and safety | data model (items, places, tags with parents and kept-together, photos, states, custom fields, history); database; backup and export; change-file sync | round-trip tests: export → import, two-device sync with conflicts, a corrupted database is kept, not deleted | — |
-| 2 Logging and tags | quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove; search including sub-tags | owner-approved screens built; R05 passes | R05 |
-| 3 Places and photos | place tree; camera (phone only, R21); item and place photos; settled-area path; place contents view; in use / away; move and bulk move | R09 passes; the move part of R11 passes | R09 |
+| 2 Logging and tags | quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove through one selection toolbar; search including sub-tags, matching item and tag names as written, ignoring case; the look as theme tokens (R94); a minimal Settings: the sync folder, the backup folder with the daily backup, the app's language (R18) and the recovery notice; each screen in a phone layout and a Windows layout (R14) | owner-approved screens built, each layout approved on its own; R05 passes; walked on the owner's phone and on the Windows PC | R05 |
+| 3 Places and photos | place tree; camera (phone only, R21); item and place photos; settled-area path; place contents view; in use / away; move and bulk move; the custom fields screen, fields on the Item and place pages (R43–R46), and the Inventory module's fields: expiry date, opened on, months after opening (R97) | R09 passes; the move part of R11 passes | R09 |
 | 4 Recognition | small open-vocabulary recognition model on phone and PC (PC works on synced phone photos); suggestions from photos; count; split a photo into items; bulk clear of suggestions; expiry dates read from labels (R109) | the bar of R65 is met on both target phones; R06, R07 and R08 pass | R06, R07, R08 |
-| 5 Suggestions and grouping | embedding model; personal nearest-neighbour layer; tag suggestions for new items; kept-together tags with home and away views | suggestions accepted or corrected in one tap; R11 passes fully | R11 |
+| 5 Suggestions and grouping | embedding model; personal nearest-neighbour layer; tag suggestions for new items; kept-together tags with home and away views; search across languages (R82) | suggestions accepted or corrected in one tap; R11 passes fully; R82 passes | R11 |
 | 6 Visual map | automatic stylised place map with rearrangeable blocks; filter search by house or floor; fallback results from other places | R10 passes | R10 |
 | 7 Clear-box surfaces | photo browsing; home-screen widget; label PDF with QR; object of the day | owner uses the widget and labels for a week | — |
 | 8 Voice | dictated logging in Italian and English on the phone (R21); speech model downloaded on first use (R19); splitting a list into items | a dictated list of ten things becomes ten items | — |
@@ -2070,7 +2074,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 
 **Evidence:** Stage 1 closed 2026-11-26: `StageGateTest` passes its three round trips (export → import, two-device sync with conflicts, a corrupted database kept), and the two-device run on real devices converged (`docs/evidence/stage1-sync.md`). Open design questions from it are in `docs/design-register.md`.
 
-**Acceptance:** Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
+**Acceptance:** Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device: the phone, and the Windows PC when the stage changes a Windows screen.
 
 **Since:** 2026-11-26 · owner · agreed rewording
 
@@ -2148,7 +2152,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R114 · Cheapest pack under a tag: The three packs appear in that order with those prices per kg, as stage 10's gate requires (R100).
 - R115 · Cheaper than the saved price: After the purchase the cookies rank by 1,29 € (2,15 €/kg), 1,59 € stays in the price history, and the receipt's savings export counts 1,29 €, as stage 10's gate requires (R100).
 - R13 · Framework and targets: A Compose Multiplatform window runs on Android and on Windows, as stage 0 holds (R100, R102).
-- R14 · Shared code: Platform source sets (for example `androidMain`, `jvmMain`) hold code only for the camera, file access, widgets, speech, model runtimes and printing. Everything else is in common code.
+- R14 · Shared code: Platform source sets (for example `androidMain`, `desktopMain`) hold code only for the camera, file access, widgets, speech, model runtimes, printing and screen layouts. Everything else, view state, theme and components included, is in common code.
 - R15 · Offline first: With the optional network uses off, a network capture over a full run of R05 to R11 shows no request at all.
 - R16 · No Google Play services: On every build, the core module's resolved dependencies hold no `com.google.android.gms` or `com.google.firebase` artifact.
 - R18 · Languages: A dictated list of ten things becomes ten items, in Italian and in English, as stage 8's gate requires (R100).
@@ -2188,7 +2192,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R55 · Sync groups: When the two devices edit different fields of one item at the same time, both edits survive. The losing value of a same-field conflict is in history.
 - R56 · Photos in the sync folder: After a sync, each photo is in the folder as a file named by its content hash, and the other device shows it.
 - R57 · Any folder-sync tool: Stage 1's sync test passes with Syncthing (Syncthing-Fork on the phone), and the app has no code specific to one sync tool beyond the conflict-copy patterns. Before release, the test passes once with a second folder-sync tool.
-- R59 · Sync lessons from the earlier app: One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database re-reads its folder files.
+- R59 · Sync lessons from the earlier app: One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database takes a new device id and gets its old items back from its old id's files.
 - R60 · Backup and export: Export → import passes stage 1's round-trip tests (R100); an eighth daily backup leaves seven.
 - R61 · Restoring a backup: Restoring a backup on one device keeps every edit made after the backup, on both devices. Rolling back is a separate action that adds a history entry, and the replaced state can be restored.
 - R62 · Image recognition: As stage 4's gate requires (R100), R65's bar is met on both target phones, and R06, R07 and R08 pass.
@@ -2205,7 +2209,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R79 · Correction-first logging form: On the built form, a typical drawer (10 lines: 8 right, 1.5 close, 0.5 wrong) is corrected within the time and the taps that the typical-drawer task model predicts for the chosen layout, and the owner's tap check on the phone confirms it. The limits are set when the form's layout is chosen.
 - R80 · Lump, then refine: On an open line, the owner's example takes four edits and a save, each one action. R79 counts the taps.
 - R81 · Search through sub-tags: With "red skirt" inside "sewing", a search for "sewing" finds the items tagged only "red skirt".
-- R82 · Search across languages: With the interface in English, "cucito" finds items tagged "sewing", and the reverse works in Italian. Switching the language changes the built-in kind names but not the user's tags.
+- R82 · Search across languages: With the interface in English, "cucito" finds items tagged "sewing", and the reverse works in Italian, as stage 5's gate requires (R100). Switching the language changes the built-in kind names but not the user's tags.
 - R83 · Visual place map: R10 passes, as stage 6's gate requires (R100).
 - R85 · Tag card: With "red skirt" inside "sewing", the tag card shows "sewing" and not "red skirt".
 - R86 · No push by default: A fresh install with default settings sends no notification during a week of use, and shows no prompt other than R128's offer, once.
@@ -2214,7 +2218,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R90 · Purpose map: The owner approves the spec and the purpose map's Inventory screens, as stage 0's gate requires (R100); each other module's screens are confirmed when that module is designed (R97, stage 10).
 - R91 · Scoring axes: Scored as controls, every reference app's total is below the chosen map's; while one is not, the axes are revised with the owner before the map is approved.
 - R93 · Screens before building: Every screen built is owner-approved, as stage 2's gate requires (R100).
-- R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases.
+- R96 · Consistent elements: Run on every screen's render, the look-alike check finds no two elements with different purposes that look alike, and the size check finds same-purpose elements the same size across phases and across the screens of one platform.
 - R97 · Modules: Each module passes its own scenarios, written with the owner, as stage 10's gate requires (R100).
 - R151 · Module tags: Turning Pantry on for the first time, with the interface in English, creates the tag "consumable"; an item tagged only "soap", inside "consumable", is a Pantry item with Pantry's presets. After the tag is renamed, the item keeps them. Turning Pantry off hides its counting unit and minimum stock, and turning it on again shows their earlier values. Wardrobe behaves the same with "wearable".
 - R112 · Shopping module: With Shopping on and Pantry off, a non-consumable thing can be put on the list as a wish (R117) and ticked as bought. With Pantry on, a low-stock item shows as a suggestion and joins the list only after one tap. With Shopping off, no list, price book, comparison or savings export appears.
@@ -2257,7 +2261,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 - R110 · Usage rate: An item's usage rate appears once its quantity (Pantry) or its last-worn date (Wardrobe) has changed, with no extra entry asked of the user.
 - R98 · Savings app and the shopping list: With Shopping on, putting an item on the shopping list shows how many are owned and where, and with the savings export on (R125) each receipt exports as store, date and total paid. With Shopping off, no shopping list or export appears. Chatelaine holds no budget or goal.
 - R99 · Reminders: With any of its modules off, a notification can neither be turned on nor arrive. The Inventory module's notifications can be turned on at any time.
-- R100 · Stage plan: Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
+- R100 · Stage plan: Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device: the phone, and the Windows PC when the stage changes a Windows screen.
 - R102 · Stage 0 spikes: A Compose Multiplatform window runs on Android and on Windows, and the spike timings are recorded, as stage 0 requires (R100).
 - R65 · Recognition pass bar: The bar is met on both target phones, as stage 4's gate requires (R100).
 

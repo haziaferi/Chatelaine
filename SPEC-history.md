@@ -465,3 +465,8 @@ Not a source of current rules: `SPEC.md` is. One line per change, newest at the 
 - 2026-11-26 · R55 · changed · Evidence: change-log size measured in the stage 1 sync run · builder
 - 2026-11-26 · R57 · changed · Evidence: two-device sync passed with Syncthing and Syncthing-Fork · builder
 - 2026-11-26 · R100 · changed · Evidence: stage 1 closed · builder
+- 2026-11-26 · R14 · changed · screen layouts are platform code: a phone and a Windows layout per screen, designed apart · owner
+- 2026-11-26 · R59 · changed · a recovered database takes a new device id · owner
+- 2026-11-26 · R82 · changed · cross-language search moves to stage 5 · owner
+- 2026-11-26 · R96 · changed · sizes compared within one platform's screens · owner
+- 2026-11-26 · R100 · changed · stage 2 scope: toolbar, look, minimal Settings, both layouts; walks on phone and PC; fields in stage 3; R82 in stage 5 · owner

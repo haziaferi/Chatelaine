@@ -17,15 +17,15 @@ rule, in the code for anything else.
 - **Crash during recovery.** A crash after the corrupt file is set aside, but before the new database is marked as
   recovered, leaves a database that looks like a new device's.
 - **Daily backup.** `BackupWorker` is not scheduled yet. It must build its folder from a stored URI.
-- **Fields.** `Fields.set` does not check that the field applies to its owner, or that link ids exist. Places have no
-  `fieldsFor(place)`.
 - **Roll back.** A roll back leaves one history entry per value, with no single undo.
 - **Database opener.** Each process must have exactly one database opener (the layer that owns the database).
 
-## Stage 3 (camera)
+## Stage 3 (places, photos and fields)
 
 - **Blocker: photos in memory.** Backup and restore hold every photo in memory (entries map, zip, SAF read-back).
   Stream them to a temp file before the camera arrives.
+- **Fields.** `Fields.set` does not check that the field applies to its owner, or that link ids exist. Places have no
+  `fieldsFor(place)`.
 
 ## Stage 4 (photos and the logging form)
 
