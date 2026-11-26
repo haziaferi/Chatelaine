@@ -141,7 +141,10 @@ internal class FolderSync(
         dao.saveKnownTables(KnownTablesEntity(names = names))
     }
 
-    /** Appends every row and purge in the outbox to this device's log, then compacts it if due. */
+    /**
+     * Appends every row and purge in the outbox to this device's log, then compacts it if due; nothing while a database
+     * made anew after a corrupt one waits for its own log ([OwnLogEntity.recovered]).
+     */
     suspend fun export(): Unit = importLock.mutex.withLock {
         val pending = dao.outbox()
         if (pending.isEmpty()) return
@@ -151,6 +154,10 @@ internal class FolderSync(
         val segments = names.mapNotNull(FolderLayout::segmentSeq).sorted()
         val snapshots = names.mapNotNull(FolderLayout::snapshotSeq)
         var ownLog = dao.ownLog()
+        // A database made anew after a corrupt one writes nothing until its own log is back and read: its lines would
+        // start a log beside the old one (or over it, if the old one has not arrived), which the next import would take
+        // for the old one. The outbox keeps them until then.
+        if (ownLog?.recovered == true) return
         // A new database, not one made anew after a corrupt one, with no log of its own here yet: a new device, with
         // nothing to read back. Settled before its first lines go in, or it would read them back as an old log.
         if (ownLog != null && !ownLog.recovered && segments.isEmpty() && snapshots.isEmpty()) {
