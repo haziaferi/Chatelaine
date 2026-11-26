@@ -1,5 +1,6 @@
 package com.hazia.chatelaine.data.blob
 
+import com.hazia.chatelaine.data.sync.SyncFolder
 import com.hazia.chatelaine.data.sync.World
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -25,12 +26,22 @@ class BlobSyncTest {
     private inner class Peer(val device: World.Device, world: World) {
         val store = MemoryBlobStore()
         val blobs = Blobs(device.db, store)
-        val sync = BlobSync(device.db, world.syncthing.folder(device.name), store) { world.syncthing.now }
+        val folder = CountingFolder(world.syncthing.folder(device.name))
+        val sync = BlobSync(device.db, folder, store) { world.syncthing.now }
         fun exchange() = runBlocking { sync.exchange() }
         fun addPhoto(itemId: String, bytes: ByteArray): String = runBlocking {
             val hash = blobs.add(bytes)
             device.inventory.addPhoto(itemId, null, hash)
             hash
+        }
+    }
+
+    /** A folder that remembers the path of every [replace] made through it. */
+    private class CountingFolder(private val folder: SyncFolder) : SyncFolder by folder {
+        val replaced = mutableListOf<String>()
+        override fun replace(path: String, bytes: ByteArray) {
+            replaced += path
+            folder.replace(path, bytes)
         }
     }
 
@@ -81,6 +92,9 @@ class BlobSyncTest {
         assertEquals(setOf("blobs/$first"), blobPaths("A"))
         assertEquals(setOf("blobs/$first"), blobPaths("B"))
         assertEquals(listOf(first), b.store.list())
+        assertEquals(1, a.store.writes, "the second add finds the file stored and writes nothing")
+        assertEquals(1, a.folder.replaced.count { it == "blobs/$first" }, "the file is published once, however many exchanges")
+        assertEquals(emptyList(), b.folder.replaced, "the device that fetched it never writes it back")
     }
 
     /** A temporary file a write cut short left beside a whole copy of its file is cleared, not carried to every device. */
