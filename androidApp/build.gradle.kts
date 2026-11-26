@@ -26,4 +26,5 @@ dependencies {
     implementation(project(":data"))
     implementation(libs.compose.foundation)
     implementation(libs.androidx.activity.compose)
+    testImplementation(libs.junit)
 }

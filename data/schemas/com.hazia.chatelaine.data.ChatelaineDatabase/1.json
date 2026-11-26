@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0cd67763bed28bec4ee7b26e1ca8c872",
+    "identityHash": "4698cc1062cf2f4731398cd5ea0be8af",
     "entities": [
       {
         "tableName": "purge_registry",
@@ -292,6 +292,34 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_sync_lost_tbl_row_id_grp` ON `${TABLE_NAME}` (`tbl`, `row_id`, `grp`)"
           }
         ]
+      },
+      {
+        "tableName": "blob_seen",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `folder_since` INTEGER, `local_since` INTEGER, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "folderSince",
+            "columnName": "folder_since",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "localSince",
+            "columnName": "local_since",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
       },
       {
         "tableName": "tag_kind",
@@ -1615,7 +1643,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0cd67763bed28bec4ee7b26e1ca8c872')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4698cc1062cf2f4731398cd5ea0be8af')"
     ]
   }
 }

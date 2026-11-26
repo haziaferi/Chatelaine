@@ -251,13 +251,19 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         val childIds = mutableListOf<String>()
         val linkIds = mutableListOf<String>()
         val placeLinkIds = mutableListOf<String>()
+        val attachIds = mutableListOf<String>()
         writes.write({
             requireNotNull(tags.tag(tagId)) { "no tag $tagId" }
+            attachIds += fieldAttaches.attachesToTags(listOf(tagId)).map { it.id }
             childIds += tags.childrenOf(tagId).map { it.id }
             linkIds += links.linksOfTag(tagId).map { it.id }
             placeLinkIds += placeLinks.linksOfTag(tagId).map { it.id }
-            mapOf(TAG to listOf(tagId) + childIds, ITEM_TAG to linkIds.toList(), PLACE_TAG to placeLinkIds.toList())
+            mapOf(
+                TAG to listOf(tagId) + childIds, ITEM_TAG to linkIds.toList(), PLACE_TAG to placeLinkIds.toList(),
+                FIELD_ATTACH to attachIds.toList(),
+            )
         }) { store, _ ->
+            attachIds.forEach { writes.merger.purge(store, it) }
             placeLinkIds.forEach { writes.merger.purge(store, it) }
             val up = requireNotNull(store.row(tagId)).groups.getValue(PARENT).values["parentId"] as String?
             val s = writes.clock.tick()
@@ -564,7 +570,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
      */
     suspend fun addPhoto(ownerItemId: String?, ownerPlaceId: String?, hash: String): String {
         require((ownerItemId == null) != (ownerPlaceId == null)) { "a photo is on an item or on a place, not both and not neither" }
-        require(HASH.matches(hash)) { "a photo hash is 64 lower-case hex digits" }
+        require(PHOTO_HASH.matches(hash)) { "a photo hash is 64 lower-case hex digits" }
         val id = Ids.new()
         val table = if (ownerItemId != null) ITEM else PLACE_TABLE
         val ownerId = ownerItemId ?: requireNotNull(ownerPlaceId)
@@ -592,7 +598,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
      * [h] its size, all as fractions of the photo, so the area lies inside it and has a size.
      */
     suspend fun addRegion(photoId: String, x: Double, y: Double, w: Double, h: Double, itemId: String): String {
-        require(x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= 1 + EDGE && y + h <= 1 + EDGE) {
+        require(regionFits(x, y, w, h)) {
             "a region lies inside the photo: x=$x y=$y w=$w h=$h"
         }
         val id = Ids.new()
@@ -619,13 +625,6 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             ?.takeIf { items.item(it) != null }
 
     // ---- helpers ----
-
-    private companion object {
-        val HASH = Regex("[0-9a-f]{64}")
-
-        /** Room for the rounding of an edge that sums to one. */
-        const val EDGE = 1e-9
-    }
 
     private class LinkCopy(val item: String, val tag: String, val suggested: Boolean)
 

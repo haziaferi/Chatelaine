@@ -58,6 +58,13 @@ internal interface FieldAttachDao {
     @Query("SELECT * FROM field_attach WHERE every_item ORDER BY id")
     suspend fun attachesToEveryItem(): List<FieldAttachEntity>
 
+    /** Removes the attachments to an item or tag that was purged: those ids have no foreign key, so nothing cascades. */
+    @Query(
+        "DELETE FROM field_attach WHERE item_id IN (SELECT id FROM purge_registry) " +
+            "OR tag_id IN (SELECT id FROM purge_registry)",
+    )
+    suspend fun deleteOfPurgedTargets()
+
     @Upsert
     suspend fun putAttaches(rows: List<FieldAttachEntity>)
 
@@ -69,6 +76,7 @@ internal fun fieldAttachTable(dao: FieldAttachDao) =
     EntityTable(
         dao::attaches, dao::allAttaches, dao::putAttaches, dao::deleteAttaches,
         FieldAttachEntity::toRow, Row::toFieldAttachEntity,
+        ownersOf = { listOfNotNull(it.itemId, it.tagId) },
     ) {
         listOf(FIELD_DEF to it.defId)
     }

@@ -28,6 +28,12 @@ internal interface RowTable {
 
     /** The rows [row] needs present first, as (table, id): what its foreign keys name. */
     fun parents(row: Row): List<Pair<String, String>>
+
+    /**
+     * Ids [row] names with no foreign key, and is dead without: a row naming one that was purged is dropped on import.
+     * Unlike a parent, one that is not here yet is no reason to wait: the id reads as none until the row arrives.
+     */
+    fun owners(row: Row): List<String> = emptyList()
 }
 
 /**
@@ -42,6 +48,7 @@ internal class EntityTable<E>(
     private val toRow: (E) -> Row,
     private val fromRow: (Row) -> E,
     private val upgradeRow: (Row) -> Row = { it },
+    private val ownersOf: (E) -> List<String> = { emptyList() },
     private val parentsOf: (E) -> List<Pair<String, String>>,
 ) : RowTable {
     override fun upgrade(row: Row) = upgradeRow(row)
@@ -51,4 +58,5 @@ internal class EntityTable<E>(
     override suspend fun delete(ids: Collection<String>) = remove(ids.toList())
     override fun fits(row: Row) = runCatching { fromRow(row) }.isSuccess
     override fun parents(row: Row) = parentsOf(fromRow(row))
+    override fun owners(row: Row) = ownersOf(fromRow(row))
 }

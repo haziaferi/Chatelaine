@@ -47,5 +47,8 @@ fun <T> openOrRecover(
 /** True when [failure] or one of its causes reports SQLITE_CORRUPT or SQLITE_NOTADB. */
 expect fun isCorruptDatabase(failure: Throwable): Boolean
 
+/** True when [failure] or one of its causes reports SQLITE_CONSTRAINT: a CHECK trigger, a foreign key or a unique key refused a write. */
+expect fun isConstraintViolation(failure: Throwable): Boolean
+
 /** Marks a file set aside because it would not open; not `.bak`, since the app makes no backups. */
 const val UNOPENABLE_SUFFIX = ".unopenable"

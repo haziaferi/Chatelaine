@@ -4,6 +4,8 @@ import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
+import com.hazia.chatelaine.data.blob.BlobDao
+import com.hazia.chatelaine.data.blob.BlobSeenEntity
 import com.hazia.chatelaine.data.sync.AskEntity
 import com.hazia.chatelaine.data.sync.BaseEntity
 import com.hazia.chatelaine.data.sync.ClockEntity
@@ -24,7 +26,7 @@ import com.hazia.chatelaine.data.sync.WaitingEntity
     entities = [
         PurgeEntity::class, ClockEntity::class,
         BaseEntity::class, AskEntity::class, ReadEntity::class, OutboxEntity::class, KnownTablesEntity::class,
-        WaitingEntity::class, LostEntity::class,
+        WaitingEntity::class, LostEntity::class, BlobSeenEntity::class,
         TagKindEntity::class, TagEntity::class, ItemEntity::class, ItemTagEntity::class,
         PlaceEntity::class, PlaceTagEntity::class, PhotoEntity::class, PhotoRegionEntity::class,
         FieldDefEntity::class, FieldOptionEntity::class, FieldAttachEntity::class, FieldValueEntity::class,
@@ -35,6 +37,7 @@ import com.hazia.chatelaine.data.sync.WaitingEntity
 @ConstructedBy(ChatelaineDatabaseConstructor::class)
 abstract class ChatelaineDatabase : RoomDatabase() {
     internal abstract fun syncDao(): SyncDao
+    internal abstract fun blobDao(): BlobDao
     internal abstract fun itemDao(): ItemDao
     internal abstract fun tagDao(): TagDao
     internal abstract fun tagKindDao(): TagKindDao
