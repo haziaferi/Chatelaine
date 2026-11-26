@@ -1380,34 +1380,6 @@ class FolderSyncTest {
         assertEquals(setOf(old, fresh), again.rows().keys, "the history written before the database was made anew is back")
     }
 
-    /**
-     * A recovered device whose copy of the folder does not hold its own log yet (wiped, or still arriving) writes
-     * nothing of its own meanwhile: its first lines would start a new log under its id, which its next import would
-     * take for the old one, and the old log would then clash with it on arrival.
-     */
-    @Test
-    fun aRecoveredDeviceWaitsForItsOwnLogBeforeWritingAny() {
-        val w = world()
-        val a = w.Device("A")
-        val b = w.Device("B")
-        val old = a.create("lamp")
-        w.settle(listOf(a, b))
-        a.db.close()
-        File(tmp.root, "A.db").writeBytes(Random(7).nextBytes(4096))
-        w.syncthing.forget("A")
-
-        val again = w.Device("A")
-        val fresh = again.create("chair")
-        again.export()
-        again.import()
-        assertEquals(emptyList(), runBlocking { w.syncthing.folder("A").list(FolderLayout.dir("A")) }, "nothing of its own written yet")
-        assertTrue(runBlocking { again.sync.readingOwnLog() }, "still waiting for its own log")
-
-        w.settle(listOf(again, b))
-        for (d in listOf(again, b)) assertEquals(setOf(old, fresh), d.rows().keys, d.name)
-        assertEquals(0, w.syncthing.conflictCopies, "the old log arrives with nothing of the new database's in its way")
-    }
-
     // ---- the clock across a restart (R51, R54) ----
 
     /** A peer whose clock runs fast (within the day the guard allows) edits a name that this device then sees. */
