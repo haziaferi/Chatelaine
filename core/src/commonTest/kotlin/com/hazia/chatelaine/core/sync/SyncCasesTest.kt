@@ -7,12 +7,12 @@ import kotlin.test.assertTrue
 
 /**
  * The ten sync cases, each replaying its simulation scenario and each expecting the scored
- * outcome of the hybrid+ merge: 1 = the guarantee holds, 0.5 = a person is asked.
+ * outcome of the merge: 1 = the guarantee holds, 0.5 = a person is asked.
  */
 class SyncCasesTest {
 
     @Test // 1
-    fun chronicleGroupMerge() {
+    fun groupMerge() {
         val (a, b) = pairWithX()
         a.edit("x", 10, SCHEDULE, "due" to "d1"); b.edit("x", 11, STATUS, "done" to true); sync(listOf(a, b), 12)
 
@@ -20,7 +20,7 @@ class SyncCasesTest {
     }
 
     @Test // 0.5: a same-millisecond change to the schedule on both sides is asked, never dropped
-    fun chronicleTieConverges() {
+    fun tieIsAsked() {
         val (a, b) = pairWithX()
         a.edit("x", 10, SCHEDULE, "due" to "dA"); b.edit("x", 10, SCHEDULE, "due" to "dB"); sync(listOf(a, b), 11)
 
@@ -39,7 +39,7 @@ class SyncCasesTest {
     }
 
     @Test // 1
-    fun chronicleDeleteBeatsStatus() {
+    fun deleteBeatsStatus() {
         val (a, b) = pairWithX()
         a.delete("x", 10); b.edit("x", 11, STATUS, "done" to true); sync(listOf(a, b), 12)
 
@@ -47,7 +47,7 @@ class SyncCasesTest {
     }
 
     @Test // 1
-    fun tendrilPurgeHolds() {
+    fun purgeHolds() {
         val (a, b) = pairWithX()
         a.delete("x", 10); a.purge("x", 10 + 100 * DAY)
         sync(listOf(a, b), 11 + 100 * DAY)
@@ -56,7 +56,7 @@ class SyncCasesTest {
     }
 
     @Test // 1
-    fun tendrilLateJoin() {
+    fun lateJoin() {
         val a = Device("A")
         a.create("x", 0); a.create("y", 0); a.delete("y", 5)
         val c = Device("C"); sync(listOf(a, c), 7)
@@ -66,7 +66,7 @@ class SyncCasesTest {
     }
 
     @Test // 1
-    fun tendrilRemoteEditSilent() {
+    fun remoteEditSilent() {
         val (a, b) = pairWithX()
         a.edit("x", 10, SCHEDULE, "due" to "d1"); sync(listOf(a, b), 11)
 
@@ -75,7 +75,7 @@ class SyncCasesTest {
     }
 
     @Test // 1
-    fun mnemoSameTimeShown() {
+    fun sameTimeIsAsked() {
         val (a, b) = pairWithX()
         a.edit("x", 10, SCHEDULE, "due" to "dA"); b.edit("x", 11, SCHEDULE, "due" to "dB"); sync(listOf(a, b), 12)
 
@@ -83,7 +83,7 @@ class SyncCasesTest {
     }
 
     @Test // 1
-    fun mnemoDeleteVsEditShown() {
+    fun deleteVsEditIsAsked() {
         val (a, b) = pairWithX()
         a.delete("x", 10); b.edit("x", 11, SCHEDULE, "due" to "dB"); sync(listOf(a, b), 12)
 
