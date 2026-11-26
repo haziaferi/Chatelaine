@@ -964,7 +964,7 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 ### D-R59 · Sync lessons from the earlier app
 
-**Rule:** The sync follows the lessons below, adopted from the earlier app.
+**Rule:** The sync follows the lessons below, adopted from the earlier app, except the recovered database's, which the owner changed on 2026-11-26.
 
 **Values:**
 
@@ -979,6 +979,8 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 **Evidence:** Review of the earlier app, 2026-10-28.
 
 **Acceptance:** One test per lesson: a replayed old version is ignored; the device-id file is excluded from Android Auto Backup; export reads the outbox; a purged row never comes back; a recovered database takes a new device id and gets its old items back from its old id's files.
+
+**Not:** A recovered database keeping its device id and re-reading its own files, the earlier app's lesson: a log it starts again under the same id clashes with the old one when that arrives.
 
 **Since:** 2026-11-26 · owner · agreed rewording
 
@@ -2062,7 +2064,7 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 | 0 Foundations | the spec; purpose map scored on the axes of R91; screen-by-purpose decisions; reference apps walked on the Snapdragon 845 phone; throwaway spike: small LLM and open-vocabulary recognition timed against R65 on the target phones; Compose Multiplatform window running on Android and Windows (R102) | owner approves the spec and the purpose map's Inventory screens (R90); spike timings recorded (`docs/evidence/stage0-recognition.md`); KMP spike run recorded (`docs/evidence/stage0-kmp.md`) | — |
 | 1 Data and safety | data model (items, places, tags with parents and kept-together, photos, states, custom fields, history); database; backup and export; change-file sync | round-trip tests: export → import, two-device sync with conflicts, a corrupted database is kept, not deleted | — |
 | 2 Logging and tags | quick add by name; unplaced inbox; item editor; tags with parents; bulk tag add and remove through one selection toolbar; search including sub-tags, matching item and tag names as written, ignoring case; the look as theme tokens (R94); a minimal Settings: the sync folder, the backup folder with the daily backup, the app's language (R18) and the recovery notice; each screen in a phone layout and a Windows layout (R14) | owner-approved screens built, each layout approved on its own; R05 passes; walked on the owner's phone and on the Windows PC | R05 |
-| 3 Places and photos | place tree; camera (phone only, R21); item and place photos; settled-area path; place contents view; in use / away; move and bulk move; the custom fields screen, fields on the Item and place pages (R43–R46), and the Inventory module's fields: expiry date, opened on, months after opening (R97) | R09 passes; the move part of R11 passes | R09 |
+| 3 Places and photos | place tree; camera (phone only, R21); item and place photos; settled-area path; place contents view; in use / away; move and bulk move; the custom fields screen, fields on the Item and place pages (R43–R46), and the Inventory module's fields: expiry date, opened on, months after opening (R97) | R09 passes; the move part of R11 passes; R44 passes for items and places | R09 |
 | 4 Recognition | small open-vocabulary recognition model on phone and PC (PC works on synced phone photos); suggestions from photos; count; split a photo into items; bulk clear of suggestions; expiry dates read from labels (R109) | the bar of R65 is met on both target phones; R06, R07 and R08 pass | R06, R07, R08 |
 | 5 Suggestions and grouping | embedding model; personal nearest-neighbour layer; tag suggestions for new items; kept-together tags with home and away views; search across languages (R82) | suggestions accepted or corrected in one tap; R11 passes fully; R82 passes | R11 |
 | 6 Visual map | automatic stylised place map with rearrangeable blocks; filter search by house or floor; fallback results from other places | R10 passes | R10 |
