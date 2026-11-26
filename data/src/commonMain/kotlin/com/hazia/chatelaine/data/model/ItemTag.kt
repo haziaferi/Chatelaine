@@ -59,6 +59,12 @@ internal interface ItemTagDao {
     @Query("SELECT * FROM item_tag WHERE tag_id = :tagId ORDER BY id")
     suspend fun linksOfTag(tagId: String): List<ItemTagEntity>
 
+    @Query("SELECT * FROM item_tag WHERE item_id IN (:itemIds) ORDER BY id")
+    suspend fun linksOfItems(itemIds: List<String>): List<ItemTagEntity>
+
+    @Query("SELECT * FROM item_tag WHERE tag_id IN (:tagIds) ORDER BY id")
+    suspend fun linksOfTags(tagIds: List<String>): List<ItemTagEntity>
+
     @Upsert
     suspend fun putLinks(rows: List<ItemTagEntity>)
 
