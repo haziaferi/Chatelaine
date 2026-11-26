@@ -142,3 +142,6 @@ data class Tag(
 /** [parent], [kind] and [homeExists] say what exists: an id that names a row not here (yet, or any more) reads as none. */
 internal fun TagEntity.toTag(parent: Boolean = true, kindExists: Boolean = true, homeExists: Boolean = true) =
     Tag(id, name, parentId.takeIf { parent }, kind.takeIf { kindExists }, kept, homePlaceId.takeIf { homeExists }, moduleKey)
+
+/** The id of the tag of the module [moduleKey] (R151), the same on every device. */
+internal fun moduleTagId(moduleKey: String): String = linkId("module-tag", moduleKey)

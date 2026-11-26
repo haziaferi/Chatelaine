@@ -152,20 +152,34 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     // ---- tags ----
 
     /** A new tag, top-level or under [parentId] (R34, R35). */
-    suspend fun addTag(name: String, parentId: String? = null): String = createTag(name, parentId, null)
-
-    /** A module's tag (R151), carrying the module's [moduleKey]. */
-    internal suspend fun addModuleTag(name: String, moduleKey: String, parentId: String? = null): String =
-        createTag(name, parentId, moduleKey)
-
-    private suspend fun createTag(name: String, parentId: String?, moduleKey: String?): String {
+    suspend fun addTag(name: String, parentId: String? = null): String {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "a tag needs a name" }
         val id = Ids.new()
         writes.write({
             if (parentId != null) requireNotNull(tags.tag(parentId)) { "no tag $parentId" }
             mapOf(TAG to listOf(id))
-        }) { store, _ -> writes.merger.created(store, tagRow(id, writes.clock.tick(), trimmed, parentId, moduleKey)) }
+        }) { store, _ -> writes.merger.created(store, tagRow(id, writes.clock.tick(), trimmed, parentId)) }
+        return id
+    }
+
+    /**
+     * A module's tag (R151), carrying the module's [moduleKey]. Its id comes from the key, as a preset field's does, so
+     * two devices that turn the module on make one tag; made again, it is left as it is. Like any id derived from what
+     * it stands for, it has no base: the two first versions meet as a clash, and the earlier goes to History (R54).
+     */
+    internal suspend fun addModuleTag(name: String, moduleKey: String, parentId: String? = null): String {
+        val trimmed = name.trim()
+        require(trimmed.isNotEmpty()) { "a tag needs a name" }
+        val id = moduleTagId(moduleKey)
+        var fresh = false
+        writes.write({
+            if (parentId != null) requireNotNull(tags.tag(parentId)) { "no tag $parentId" }
+            fresh = tags.tag(id) == null
+            mapOf(TAG to if (fresh) listOf(id) else emptyList())
+        }) { store, _ ->
+            if (fresh) writes.createDerived(store, tagRow(id, writes.clock.tick(), trimmed, parentId, moduleKey))
+        }
         return id
     }
 

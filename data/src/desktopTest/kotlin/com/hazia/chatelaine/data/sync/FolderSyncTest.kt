@@ -1341,6 +1341,21 @@ class FolderSyncTest {
         }
     }
 
+    /** R151: two devices that each turn one module on make one tag for it between them, not two. */
+    @Test
+    fun twoDevicesTurningAModuleOnMakeOneTag() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val onA = runBlocking { a.inventory.addModuleTag("pantry", "pantry") }
+        w.syncthing.now = 5
+        val onB = runBlocking { b.inventory.addModuleTag("pantry", "pantry") }
+        w.settle(listOf(a, b))
+
+        for (d in listOf(a, b)) assertEquals(listOf<String?>("pantry"), runBlocking { d.inventory.tags() }.map { it.moduleKey }, d.name)
+        assertEquals(onA, onB)
+    }
+
     // ---- a recovered database across a restart (R59) ----
 
     /**
