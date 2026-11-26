@@ -2068,9 +2068,11 @@ Example, with made-up data: three packs of cookies Q 600 g under "3 x 2" (R135),
 | 10 Modules | the modules of R97, each designed with the owner first, and their screens confirmed in the purpose map (R90); the expiry views, expiring soon and the expiration timeline (R153); notifications by module, expiry included (R99); the price-comparison library (R119) and the savings export (R98); the homepage, last (R84) | each module passes its own scenarios, to be written with the owner; R114 and R115 pass | R114, R115 |
 | 11 Later | lending; app lock; NFC; lock-screen surface; rediscover prompt; free-drawing map editor; F-Droid build | each gets its own decision first | — |
 
+**Evidence:** Stage 1 closed 2026-11-26: `StageGateTest` passes its three round trips (export → import, two-device sync with conflicts, a corrupted database kept), and the two-device run on real devices converged (`docs/evidence/stage1-sync.md`). Open design questions from it are in `docs/design-register.md`.
+
 **Acceptance:** Each stage closes only when its done-when holds and, from stage 2 on, after a walk on a real device.
 
-**Since:** 2026-11-25 · owner · agreed rewording
+**Since:** 2026-11-26 · owner · agreed rewording
 
 ### D-R101 · Order of stages 4 to 6
 
