@@ -20,8 +20,10 @@ import com.hazia.chatelaine.data.sync.RowTable
 import com.hazia.chatelaine.data.sync.WaitingEntity
 
 /**
- * Chatelaine's one database. For now it holds the sync tables and the first records (items, tags, tag kinds and their
- * links), each with a stamp per field group. It starts at version 1, so there are no migrations yet.
+ * Chatelaine's one database. It holds the local sync tables (purge registry, clock, bases, outbox, read positions,
+ * waiting lines, lost versions, the own-log mark, seen photo files) and the synced records of [SYNCED_TABLES] (items,
+ * tags, tag kinds, places, photos, photo regions, custom fields and their links), each with a stamp per field group. It
+ * starts at version 1, so there are no migrations yet.
  */
 @Database(
     entities = [

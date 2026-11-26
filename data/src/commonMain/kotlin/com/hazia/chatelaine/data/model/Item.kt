@@ -41,7 +41,7 @@ internal data class ItemEntity(
     @ColumnInfo(name = "quantity_approx") val quantityApprox: Boolean,
     @ColumnInfo(name = "quantity_hlc") val quantityHlc: Long,
     @ColumnInfo(name = "quantity_device") val quantityDevice: String,
-    /** A place id; checked against the place table once places exist. */
+    /** A place id, not a foreign key: a place not here (yet, or any more) reads as none. */
     @ColumnInfo(name = "place_id") val placeId: String?,
     @ColumnInfo(name = "place_hlc") val placeHlc: Long,
     @ColumnInfo(name = "place_device") val placeDevice: String,
