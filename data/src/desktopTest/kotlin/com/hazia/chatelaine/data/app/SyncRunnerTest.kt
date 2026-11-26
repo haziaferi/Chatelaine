@@ -136,7 +136,7 @@ class SyncRunnerTest {
         runCurrent()
 
         assertEquals(1, most)
-        assertEquals(4, calls, "the start, two asked for, and one after the write")
+        assertEquals(2, calls, "the start, then one round for the two asked for during it and the write")
         assertFalse(runner.status.value.running)
     }
 }

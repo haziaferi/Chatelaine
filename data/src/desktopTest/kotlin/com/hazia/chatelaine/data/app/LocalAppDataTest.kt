@@ -89,26 +89,41 @@ class LocalAppDataTest {
     }
 
     /**
-     * A kept file beside a healthy database, as a crash between setting the old file aside and marking the new one
-     * leaves it: the notice is due on the file alone, and stays due once the own log was read and the mark is gone.
+     * A kept file beside a healthy database whose own log was read back (no own-log row), such as one left from
+     * stage 1: the notice is due on the file alone, and the device keeps its id and its backups, after a reopen too.
      */
     @Test
     fun keptFileShowsEvenWithoutTheMark() {
         val dir = tmp.newFolder("a")
         val folder = DirectorySyncFolder(tmp.newFolder("sync").toPath())
-        device(dir).use { app -> runBlocking { app.inventory.addItem("pins"); app.sync(folder) } }
+        val id = device(dir).use { app ->
+            runBlocking { app.inventory.addItem("pins"); app.sync(folder) }
+            app.deviceId
+        }
+        File(dir, kept).writeBytes(Random(7).nextBytes(4096))
+
+        repeat(2) {
+            device(dir).use { app ->
+                val state = runBlocking { app.recovery() }
+                assertTrue(state.due)
+                assertEquals(listOf(kept), state.keptFiles)
+                assertFalse(state.backupsHeld)
+                assertFalse(state.waitingForOwnLog)
+                assertEquals(id, app.deviceId)
+            }
+        }
+    }
+
+    /** A new database that has not read its own log back, beside a kept file, as a crash before marking leaves it. */
+    @Test
+    fun keptFileBesideANewDatabaseRenews() {
+        val dir = tmp.newFolder("a")
+        val id = device(dir).use { it.deviceId }
         File(dir, kept).writeBytes(Random(7).nextBytes(4096))
 
         device(dir).use { app ->
-            assertTrue(runBlocking { app.recovery() }.due)
-            runBlocking { app.sync(folder) }
-        }
-        device(dir).use { app ->
-            val state = runBlocking { app.recovery() }
-            assertTrue(state.due)
-            assertEquals(listOf(kept), state.keptFiles)
-            assertFalse(state.backupsHeld)
-            assertFalse(state.waitingForOwnLog)
+            assertNotEquals(id, app.deviceId)
+            assertTrue(runBlocking { app.recovery() }.backupsHeld)
         }
     }
 

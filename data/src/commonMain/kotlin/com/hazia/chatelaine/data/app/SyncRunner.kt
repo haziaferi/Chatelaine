@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 /** Decision 9: a sync this long after the last local change. */
 const val SYNC_QUIET_MILLIS = 3_000L
@@ -28,9 +28,10 @@ data class SyncStatus(val running: Boolean = false, val lastDoneMillis: Long? = 
 /**
  * Runs [sync] with the folder [folder] names (none while it is null): once at [start], [quietMillis] after the last
  * emission of [localWrites] when [pending] finds something to export (an import changes the database too, and must
- * not start another round), every [everyMillis], and on [syncNow]. Never two rounds at once: one asked for while
- * another runs follows it. A round that throws sets [SyncStatus.failure] and nothing else; the next one tries again.
- * Runs in [scope], whose dispatcher should allow blocking file access.
+ * not start another round), every [everyMillis], and on [syncNow]. One coroutine runs the rounds, so never two at
+ * once; every request made while a round runs, however many, makes one round after it. A round that throws sets
+ * [SyncStatus.failure] and nothing else; the next one tries again. Runs in [scope], whose dispatcher should allow
+ * blocking file access.
  */
 class SyncRunner(
     private val sync: suspend (SyncFolder) -> Int,
@@ -45,7 +46,8 @@ class SyncRunner(
     private val state = MutableStateFlow(SyncStatus())
     val status: StateFlow<SyncStatus> = state.asStateFlow()
 
-    private val one = Mutex()
+    /** The strongest request not yet taken: [NONE], [IF_PENDING] (after a local write) or [ALWAYS]. */
+    private val asked = MutableStateFlow(NONE)
     private var job: Job? = null
 
     /** Starts the rounds; a runner already started is left as it is. */
@@ -54,18 +56,22 @@ class SyncRunner(
         job = scope.launch {
             launch {
                 while (true) {
-                    round()
+                    asked.first { it != NONE }
+                    round(onlyIfPending = asked.getAndUpdate { NONE } == IF_PENDING)
+                }
+            }
+            launch {
+                while (true) {
+                    ask(ALWAYS)
                     delay(everyMillis)
                 }
             }
-            launch { quiet(localWrites).collect { round(onlyIfPending = true) } }
+            launch { quiet(localWrites).collect { ask(IF_PENDING) } }
         }
     }
 
     /** A round now, or right after the one running. */
-    fun syncNow() {
-        scope.launch { round() }
-    }
+    fun syncNow() = ask(ALWAYS)
 
     /** Stops the rounds; one running is cancelled. */
     fun stop() {
@@ -73,14 +79,16 @@ class SyncRunner(
         job = null
     }
 
+    private fun ask(level: Int) = asked.update { maxOf(it, level) }
+
     @OptIn(FlowPreview::class)
     private fun quiet(writes: Flow<Unit>) = writes.debounce(quietMillis)
 
-    private suspend fun round(onlyIfPending: Boolean = false) = one.withLock {
-        val target = folder() ?: return@withLock
+    private suspend fun round(onlyIfPending: Boolean) {
+        val target = folder() ?: return
         try {
-            // Asked inside the lock: a round that just ran may have exported what the write queued.
-            if (onlyIfPending && pending() == 0) return@withLock
+            // Asked when the round starts: a round that just ran may have exported what the write queued.
+            if (onlyIfPending && pending() == 0) return
             state.update { it.copy(running = true) }
             sync(target)
             state.value = SyncStatus(lastDoneMillis = wallMillis())
@@ -91,5 +99,11 @@ class SyncRunner(
         } finally {
             state.update { it.copy(running = false) }
         }
+    }
+
+    private companion object {
+        const val NONE = 0
+        const val IF_PENDING = 1
+        const val ALWAYS = 2
     }
 }

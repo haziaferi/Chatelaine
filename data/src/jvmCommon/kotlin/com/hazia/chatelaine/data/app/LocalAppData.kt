@@ -7,6 +7,7 @@ import com.hazia.chatelaine.data.DatabaseOpen
 import com.hazia.chatelaine.data.Fields
 import com.hazia.chatelaine.data.History
 import com.hazia.chatelaine.data.Inventory
+import com.hazia.chatelaine.data.KeptFile
 import com.hazia.chatelaine.data.LocalWrites
 import com.hazia.chatelaine.data.UNOPENABLE_SUFFIX
 import com.hazia.chatelaine.data.backup.Backup
@@ -32,9 +33,13 @@ import java.io.File
  * The unopenable database files kept beside [dbFile] (R50): the names in its folder that start with
  * `<name>.unopenable`, sorted. What the recovery notice and the device id renewal key on.
  */
-fun keptFilesBeside(dbFile: File): List<String> {
+fun keptFilesBeside(dbFile: File): List<String> = keptFileRecordsBeside(dbFile).map { it.name }
+
+/** [keptFilesBeside] with each file's size and time, as the device id renewal tells one kept file from another. */
+fun keptFileRecordsBeside(dbFile: File): List<KeptFile> {
     val prefix = "${dbFile.name}$UNOPENABLE_SUFFIX"
-    return dbFile.absoluteFile.parentFile?.list()?.filter { it.startsWith(prefix) }?.sorted().orEmpty()
+    val files = dbFile.absoluteFile.parentFile?.listFiles { f -> f.name.startsWith(prefix) }.orEmpty()
+    return files.sortedBy { it.name }.map { KeptFile(it.name, it.length(), it.lastModified()) }
 }
 
 /**
@@ -99,8 +104,8 @@ class LocalAppData private constructor(
 
         /**
          * Opens the database through [open] (blocking: call it off the main thread), then takes the device id,
-         * renewed when a kept unopenable file beside [dbFile] has no renewal yet (`renewDeviceIdIfRecovered`), and
-         * only then resumes the clock under that id.
+         * renewed when a kept unopenable file beside [dbFile] has no renewal yet and the database has not read its own
+         * log back (`renewDeviceIdIfRecovered`), and only then resumes the clock under that id.
          */
         fun open(
             dbFile: File,
@@ -112,7 +117,10 @@ class LocalAppData private constructor(
             try {
                 val (deviceId, clock) = runBlocking {
                     val id = renewDeviceIdIfRecovered(
-                        File(filesDir, DEVICE_ID_DIR), keptFilesBeside(dbFile), markRecovered = { db.syncDao().markRecovered(it) },
+                        File(filesDir, DEVICE_ID_DIR),
+                        keptFileRecordsBeside(dbFile),
+                        ownLogPending = db.syncDao().ownLog() != null,
+                        markRecovered = { db.syncDao().markRecovered(it) },
                     )
                     // Resumed from the database: a fresh clock would stamp the next edit below a version already seen
                     // from a peer whose clock runs ahead, and that edit would lose everywhere but here.
