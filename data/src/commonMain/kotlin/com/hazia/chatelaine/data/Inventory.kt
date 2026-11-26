@@ -414,27 +414,35 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
      * Puts every item in [itemIds] in [placeId] at once, or takes them out of their places for null. An item
      * moved into or out of a place raises its "photo outdated" flag, and so does each place it left or entered (R31);
      * an item or place with no photo has nothing to be out of date and keeps its flag down.
+     *
+     * Placing an item that is in use / away puts it back (R30), in its own place or another: it is placed again. One
+     * put back where it already is moves nothing, so only the item's own flag can rise, as for any edit of it.
      */
     suspend fun moveItems(itemIds: List<String>, placeId: String?) {
         val ids = itemIds.distinct()
         val moving = mutableListOf<String>()
-        val photographed = mutableSetOf<String>() // the moving items that have a photo
+        val back = mutableSetOf<String>() // the items that were away and are placed again
+        val photographed = mutableSetOf<String>() // the moving or returning items that have a photo
         writes.write({
             if (placeId != null) requireNotNull(places.place(placeId)) { "no place $placeId" }
             val found = readChunked(ids) { items.items(it) }
             require(found.size == ids.size) { "no item ${ids.first { id -> found.none { it.id == id } }}" }
             val shifting = found.filter { it.placeId != placeId }
             moving += shifting.map { it.id }
-            photographed += readChunked(moving.toList()) { photos.itemIdsWithPhotos(it) }
+            if (placeId != null) back += found.filter { it.away }.map { it.id }
+            val written = (moving + back).distinct()
+            photographed += readChunked(written) { photos.itemIdsWithPhotos(it) }
             val touched = shifting.mapNotNull { it.placeId }.toMutableSet()
             if (placeId != null && shifting.isNotEmpty()) touched += placeId
             val touchedPlaces = readChunked(touched.toList()) { places.places(it) }.map { it.id }
-            mapOf(ITEM to moving.toList(), PLACE_TABLE to readChunked(touchedPlaces) { photos.placeIdsWithPhotos(it) })
+            mapOf(ITEM to written, PLACE_TABLE to readChunked(touchedPlaces) { photos.placeIdsWithPhotos(it) })
         }) { store, targets ->
             val s = writes.clock.tick()
-            for (id in moving) {
-                val moved = requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to placeId))
-                store.put(if (id in photographed) moved.raisedOutdated(s) else moved)
+            for (id in targets.getValue(ITEM)) {
+                var row = requireNotNull(store.row(id))
+                if (id in moving) row = row.edit(PLACE, s, mapOf("placeId" to placeId))
+                if (id in back) row = row.edit(AWAY, s, mapOf("away" to false))
+                store.put(if (id in photographed) row.raisedOutdated(s) else row)
             }
             for (id in targets.getValue(PLACE_TABLE)) store.put(requireNotNull(store.row(id)).raisedOutdated(s))
         }
