@@ -43,6 +43,25 @@ class KeepLoserMergeTest {
         }
     }
 
+    /** A tie on the clock, the same hlc on A and B: the device id settles it, B's text on both, and A's is kept on both. */
+    @Test
+    fun aTieOnTheClockGoesToTheHigherDeviceAndTheOtherTextIsKept() {
+        val (onA, a) = device("A")
+        val (onB, b) = device("B")
+        onA.created(a, version(1, "A", "start"))
+        onB.created(b, version(1, "A", "start"))
+        val fromA = version(5, "A", "A's text").also { a.put(it) }
+        val fromB = version(5, "B", "B's text").also { b.put(it) }
+
+        onA.import(a, listOf(fromB), emptyMap())
+        onB.import(b, listOf(fromA), emptyMap())
+
+        for (store in listOf(a, b)) {
+            assertEquals("B's text", store.text())
+            assertEquals(listOf<Any?>("A's text"), store.losses.map { it.second.values["text"] })
+        }
+    }
+
     /** A version this device minted itself, coming back after a later local edit, is not a loser. */
     @Test
     fun aDevicesOwnOlderVersionEchoedBackIsNotLost() {
