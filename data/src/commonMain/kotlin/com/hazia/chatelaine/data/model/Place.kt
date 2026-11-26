@@ -81,6 +81,7 @@ internal fun placeTable(dao: PlaceDao) =
     EntityTable(
         dao::places, dao::allPlaces, dao::putPlaces, dao::deletePlaces, PlaceEntity::toRow, Row::toPlaceEntity,
         refsOf = { listOfNotNull(it.parentId) },
+        hasChildren = true, // its tag links and photos
     ) { emptyList() }
 
 internal fun PlaceEntity.toRow() = Row(PLACE_TABLE, id, mapOf(

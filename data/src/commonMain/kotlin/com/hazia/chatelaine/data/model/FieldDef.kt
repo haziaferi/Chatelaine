@@ -77,6 +77,7 @@ internal interface FieldDefDao {
 internal fun fieldDefTable(dao: FieldDefDao) =
     EntityTable(
         dao::defs, dao::allDefs, dao::putDefs, dao::deleteDefs, FieldDefEntity::toRow, Row::toFieldDefEntity,
+        hasChildren = true, // its options, attachments and values
     ) { emptyList() }
 
 internal fun FieldDefEntity.toRow() = Row(FIELD_DEF, id, mapOf(

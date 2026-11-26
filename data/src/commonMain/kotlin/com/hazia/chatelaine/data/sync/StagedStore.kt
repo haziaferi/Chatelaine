@@ -26,12 +26,16 @@ internal class StagedStore private constructor(
     private val changedAsks = mutableSetOf<Pair<String, String>>()
     private val lostOnes = mutableListOf<LostEntity>()
 
+    /** The ids whose purge, held here, this merge took back: each row was edited after its purge (the sync rules). */
+    private val undone = mutableSetOf<String>()
+
     /**
-     * Whether this merge took back a purge that was here: a row edited after its purge came back
-     * (the sync rules), but the rows under it went with the purge here, through the foreign keys.
+     * Whether this merge took back a purge of a row that rows of other tables hang from ([RowTable.hasChildren]): they
+     * went with the purge here, through the foreign keys, and are in files already read. A row of an unknown table
+     * counts as one.
      */
-    var undidPurge = false
-        private set
+    fun undidPurge(tables: Map<String, RowTable>): Boolean =
+        undone.any { id -> tableOf[id]?.let { tables[it]?.hasChildren } ?: true }
 
     /** The newest stamp of the rows and purges loaded, or null when none is here: a local write ticks past it. */
     val newestLoaded: Stamp?
@@ -70,7 +74,7 @@ internal class StagedStore private constructor(
     }
 
     override fun removePurge(id: String) {
-        if (id in purges) undidPurge = true
+        if (id in purges) undone += id
         loaded(id)
         purges.remove(id)
         changedPurges += id

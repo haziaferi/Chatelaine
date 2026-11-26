@@ -75,6 +75,7 @@ internal fun itemTable(dao: ItemDao) =
     EntityTable(
         dao::items, dao::allItems, dao::putItems, dao::deleteItems, ItemEntity::toRow, Row::toItemEntity,
         refsOf = { listOfNotNull(it.placeId) },
+        hasChildren = true, // its tag links, photos and regions
     ) { emptyList() }
 
 internal fun ItemEntity.toRow() = Row(ITEM, id, mapOf(

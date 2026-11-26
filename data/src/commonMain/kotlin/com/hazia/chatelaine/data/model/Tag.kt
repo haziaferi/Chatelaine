@@ -85,6 +85,7 @@ internal fun tagTable(dao: TagDao) =
     EntityTable(
         dao::tags, dao::allTags, dao::putTags, dao::deleteTags, TagEntity::toRow, Row::toTagEntity,
         refsOf = { listOfNotNull(it.parentId, it.homePlaceId, it.kind) },
+        hasChildren = true, // its item and place links
     ) { emptyList() }
 
 internal fun TagEntity.toRow() = Row(TAG, id, mapOf(

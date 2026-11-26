@@ -1,6 +1,8 @@
 package com.hazia.chatelaine.data.sync
 
 import androidx.sqlite.SQLiteException
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.hazia.chatelaine.data.SYNCED_TABLES
 import com.hazia.chatelaine.core.sync.Group
 import com.hazia.chatelaine.core.sync.Row
 import com.hazia.chatelaine.core.sync.Stamp
@@ -1291,6 +1293,52 @@ class FolderSyncTest {
         assertEquals(ImportReport(changed = 1, skipped = 1), b.import())
         assertEquals(setOf("x"), table.rows.keys)
         assertEquals(emptyList(), b.waiting(), "a refused line with no missing parent does not wait")
+    }
+
+    /**
+     * A peer that untags and tags an item again takes back the purge of the link, whose id is derived from the pair. A
+     * link has no rows under it, so this device does not read every file of the folder again for it.
+     */
+    @Test
+    fun aRetagOnAPeerDoesNotMakeThisDeviceReadTheWholeFolderAgain() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = a.create("lamp")
+        val tag = runBlocking { a.inventory.addTag("light").also { a.inventory.tag(listOf(item), it) } }
+        w.settle(listOf(a, b))
+        w.syncthing.now = 10
+        runBlocking { b.inventory.untag(listOf(item), tag) }
+        w.settle(listOf(a, b)) // A holds the link's purge
+        w.syncthing.now = 20
+        runBlocking { b.inventory.tag(listOf(item), tag) }
+        w.meet(b, a)
+
+        val before = w.syncthing.bytesRead
+        a.import()
+
+        assertEquals(listOf(tag), runBlocking { a.inventory.tagsOf(item) }.map { it.id }, "the link is back")
+        val grown = w.syncthing.folder("A").size(FolderLayout.segment("B", 0))
+        assertEquals(grown, w.syncthing.bytesRead - before, "only the peer's grown file is read, once")
+    }
+
+    /** The tables marked as having rows under them are exactly those a foreign key names. */
+    @Test
+    fun theTablesWithChildrenAreTheOnesForeignKeysName() {
+        val w = world()
+        val a = w.Device("A")
+        a.db.close()
+        val named = BundledSQLiteDriver().open(File(tmp.root, "A.db").path).use { c ->
+            SYNCED_TABLES.flatMap { t ->
+                c.prepare("PRAGMA foreign_key_list($t)").use { s -> buildList { while (s.step()) add(s.getText(2)) } }
+            }.toSet()
+        }
+        val db = openChatelaineDatabase(File(tmp.root, "check.db")).database
+        try {
+            assertEquals(named, db.syncedTables().filterValues { it.hasChildren }.keys)
+        } finally {
+            db.close()
+        }
     }
 
     // ---- a recovered database across a restart (R59) ----

@@ -16,6 +16,12 @@ internal interface RowTable {
 
     suspend fun delete(ids: Collection<String>)
 
+    /**
+     * Whether rows of other tables name this table's rows through a foreign key, so a purge here takes them too: when an
+     * import takes such a purge back, those rows are in files already read, and every file is read again.
+     */
+    val hasChildren: Boolean get() = false
+
     /** Whether [row] has this table's groups, fields and value types; one that does not is skipped on import. */
     fun fits(row: Row): Boolean
 
@@ -57,6 +63,7 @@ internal class EntityTable<E>(
     private val upgradeRow: (Row) -> Row = { it },
     private val ownersOf: (E) -> List<String> = { emptyList() },
     private val refsOf: (E) -> List<String> = { emptyList() },
+    override val hasChildren: Boolean = false,
     private val parentsOf: (E) -> List<Pair<String, String>>,
 ) : RowTable {
     override fun upgrade(row: Row) = upgradeRow(row)
