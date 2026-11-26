@@ -7,9 +7,9 @@ import kotlin.test.assertTrue
 
 class ClockAndIdTest {
 
-    // SPEC:R15 every record has a UUID made on the device.
+    // SPEC:R52 every record has a UUID made on the device.
     @Test
-    fun idsAreDistinct_SPEC_R15() {
+    fun idsAreDistinct_SPEC_R52() {
         val ids = List(1_000) { Ids.new() }
 
         assertEquals(1_000, ids.toSet().size)
