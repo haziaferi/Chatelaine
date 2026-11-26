@@ -90,7 +90,7 @@ class Backup(
     /**
      * Writes the backup of everything held now to [target] as `chatelaine-backup-<date of [now]>.zip` and returns its
      * name; null, and nothing written, while a database made anew after a corrupt one has not read its own folder
-     * files back nor had a backup restored (`OwnLogEntity.recovered`, kept in the database): it would miss what those
+     * files back nor had a backup restored (`OwnLogEntity.backupsHeld`, kept in the database): it would miss what those
      * hold, and seven such days would rotate out every good backup. Rows,
      * purges and photo hashes are read in one transaction, so the backup is one moment of the database; the photo
      * files are read after it. The file takes its name only through [SyncFolder.replace], so a crash leaves the old
@@ -98,7 +98,7 @@ class Backup(
      * Writing on the same day again replaces the day's file.
      */
     suspend fun write(target: SyncFolder, now: Long): String? = importLock.mutex.withLock {
-        if (dao.ownLog()?.recovered == true) return@withLock null
+        if (dao.ownLog()?.backupsHeld == true) return@withLock null
         target.list("").filter { it.startsWith(TEMP_PREFIX + FILE_PREFIX) }.forEach { target.delete(it) }
 
         val rows = StringBuilder()

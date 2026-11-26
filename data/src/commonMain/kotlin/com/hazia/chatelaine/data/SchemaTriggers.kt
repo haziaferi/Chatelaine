@@ -49,7 +49,7 @@ internal class SchemaTriggers(private val tables: List<String> = SYNCED_TABLES) 
      * device whose log is in the folder reads it before anything compacts that log.
      */
     override fun onCreate(connection: SQLiteConnection) {
-        connection.execSQL("INSERT INTO sync_own_log(id, recovered) VALUES (0, 0)")
+        connection.execSQL("INSERT INTO sync_own_log(id, recovered, backups_held) VALUES (0, 0, 0)")
         DEFAULT_KINDS.forEachIndexed { position, (id, name) ->
             connection.execSQL(
                 "INSERT INTO tag_kind(id, name, name_hlc, name_device, position, order_hlc, order_device) " +

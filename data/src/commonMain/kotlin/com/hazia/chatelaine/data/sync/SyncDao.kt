@@ -31,15 +31,17 @@ internal data class ClockEntity(
  * Present while this database has not read its own log back from the folder (R59); one row, local only, kept in the
  * database so it outlives the process. Every new database starts with it (`SchemaTriggers.onCreate`); it is set again
  * when an import or a restore takes back a purge. [recovered] marks a database made anew after a corrupt one was set
- * aside: its own log is surely in the folder, so it waits until that log is there and read, and meanwhile exports
- * nothing and makes no backup; restoring a backup lifts the mark ([backupRestored]), which is the way back for a device
- * with no sync folder. Without it, a device with no log of its own in the folder (a new device) has nothing to read back, and
- * the mark goes on its first import or export.
+ * aside: its own log is surely in the folder, so it waits until that log is there and read. Without it, a device with
+ * no log of its own in the folder (a new device) has nothing to read back, and the mark goes on its first import or
+ * export. [backupsHeld] keeps backups off meanwhile, as the near-empty database would rotate out the good ones; set
+ * with [recovered], it goes when the own log is read or a backup is restored ([backupRestored]), which is the way back
+ * for a device with no sync folder.
  */
 @Entity(tableName = "sync_own_log")
 internal data class OwnLogEntity(
     @PrimaryKey val id: Int = 0,
     val recovered: Boolean,
+    @ColumnInfo(name = "backups_held") val backupsHeld: Boolean = false,
 )
 
 /** The last stamp both sides agreed on for an asking group; local only. */
@@ -225,14 +227,14 @@ internal suspend fun SyncDao.rereadOwnLog() {
 }
 
 /** The database was made anew after a corrupt one was set aside: it waits for its own log ([OwnLogEntity.recovered]). */
-internal suspend fun SyncDao.markRecovered() = putOwnLog(OwnLogEntity(recovered = true))
+internal suspend fun SyncDao.markRecovered() = putOwnLog(OwnLogEntity(recovered = true, backupsHeld = true))
 
 /**
- * A backup was restored into the database: it is no longer the near-empty one a recovery left, so the recovered mark
- * goes; the own log, if any, is still read back on the next import.
+ * A backup was restored into the database: it is no longer the near-empty one a recovery left, so backups go on. The
+ * wait for the own log stays as it is ([OwnLogEntity.recovered]).
  */
 internal suspend fun SyncDao.backupRestored() {
-    if (ownLog()?.recovered == true) putOwnLog(OwnLogEntity(recovered = false))
+    ownLog()?.takeIf { it.backupsHeld }?.let { putOwnLog(it.copy(backupsHeld = false)) }
 }
 
 internal fun BaseEntity.stamp() = Stamp(hlc, device)

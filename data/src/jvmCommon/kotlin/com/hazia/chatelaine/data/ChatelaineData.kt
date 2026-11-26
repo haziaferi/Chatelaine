@@ -65,7 +65,7 @@ class ChatelaineData(
 
     /**
      * Today's backup in [folder], the last seven kept; its name, or null while a database made anew after a corrupt one
-     * has not read its own log back.
+     * has neither read its own log back nor had a backup restored.
      */
     suspend fun backup(folder: SyncFolder): String? = backup.daily(folder, wallMillis())
 

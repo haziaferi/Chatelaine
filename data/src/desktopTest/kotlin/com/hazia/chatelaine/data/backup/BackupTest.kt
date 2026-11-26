@@ -194,7 +194,8 @@ class BackupTest {
 
     /**
      * A recovered device with no sync folder has only its backups to come back from: once one is restored, daily
-     * backups go on; its own log is still read back if it syncs later.
+     * backups go on. The wait for its own log is untouched: an import that finds none of it keeps waiting, so a log
+     * that arrives later is still read back.
      */
     @Test
     fun restoringABackupLetsARecoveredDatabaseBackUpAgain() {
@@ -206,7 +207,8 @@ class BackupTest {
         run { a.backup.restore(target.read(name)!!) }
 
         assertNotNull(run { a.backup.daily(target, day) }, "backups go on from the restored database")
-        assertTrue(run { a.device.sync.readingOwnLog() }, "its own log is still read back on its next import")
+        a.device.import()
+        assertTrue(run { a.device.sync.readingOwnLog() }, "an import before its own log is there keeps waiting for it")
     }
 
     /** A restore that takes back a purge has the next import read every folder file again, this device's own too (R59). */
