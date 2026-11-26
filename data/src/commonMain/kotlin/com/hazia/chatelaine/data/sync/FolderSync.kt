@@ -54,32 +54,26 @@ internal class FolderSync(
      * wrote. It runs whether or not this import changed anything, so a step a crash cut short is done next time.
      */
     private val afterImport: suspend () -> Unit = {},
-    /**
-     * The database was just made anew after a corrupt one was set aside (`DatabaseOpen.recovered`):
-     * the first import reads this device's own files too, so what it wrote comes
-     * back from the folder even with no peer.
-     */
-    recovered: Boolean = false,
     /** Shared with the database's `Backup`, so an import and a restore never overlap. */
     private val importLock: ImportLock = ImportLock(),
 ) {
-    private var readOwn = recovered
     private val dao = db.syncDao()
     private val writes = LocalWrites(db, clock)
     private val importer = RecordImport(db, tables, clock, Merger(clock, ASK_GROUPS, KEEP_LOSER_GROUPS), seal, wallMillis)
 
     /**
-     * Reads what peers wrote since the last import. When it takes back a purge (a row edited after
-     * it), the rows under that row, which the purge took here through the foreign keys, are
-     * in files already read: every file, this device's own too, is read again from its start, which
-     * the merge takes without change for what it already holds.
+     * Reads what peers wrote since the last import, and this device's own files too while the database has not read
+     * them back ([OwnLogEntity]): so what a database made anew wrote before comes back from the folder even with no
+     * peer. When it takes back a purge (a row edited after it), the rows under that row, which the purge took here
+     * through the foreign keys, are in files already read: every file, this device's own too, is read again from its
+     * start, which the merge takes without change for what it already holds.
      */
     suspend fun import(): ImportReport = importLock.mutex.withLock {
         importer.undidPurge = false
         var report = readFiles()
         if (importer.undidPurge) {
             dao.clearReads()
-            readOwn = true
+            dao.rereadOwnLog()
             // The second pass reads every line again: what it skipped or set aside is the import's
             // count, not an addition to the first pass's.
             val again = readFiles()
@@ -93,6 +87,8 @@ internal class FolderSync(
 
     private suspend fun readFiles(): ImportReport {
         forgetReadsIfTablesChanged()
+        val ownLog = dao.ownLog()
+        val readOwn = ownLog != null
         val held = dao.reads().associate { it.path to it.readBytes }
         val present = mutableListOf<String>()
         var report = ImportReport(0, 0)
@@ -128,14 +124,15 @@ internal class FolderSync(
             }
         }
         dao.keepReads(present)
-        // The own log counts as read back only when some of it was there and every file of it opened: an empty or
-        // partial listing (not arrived yet, a storage hiccup) keeps the device reading it, and compaction waiting.
-        if (ownFiles > 0 && !ownMissed) readOwn = false
+        // The own log counts as read back when every file of it opened, and, for a database made anew after a corrupt
+        // one, only once some of it was there: an empty or partial listing (not arrived yet, a storage hiccup) keeps it
+        // reading the log, and compaction waiting. Any other new database with no own log here is a new device.
+        if (ownLog != null && !ownMissed && (ownFiles > 0 || !ownLog.recovered)) dao.ownLogRead()
         return report
     }
 
-    /** True while a database made anew has not yet read its own log back ([recovered]); compaction waits meanwhile. */
-    val readingOwnLog: Boolean get() = readOwn
+    /** True while the database has not yet read its own log back ([OwnLogEntity]); compaction waits meanwhile. */
+    suspend fun readingOwnLog(): Boolean = dao.ownLog() != null
 
     private suspend fun forgetReadsIfTablesChanged() {
         val names = tables.keys.sorted().joinToString(",")
@@ -153,6 +150,13 @@ internal class FolderSync(
         names.filter { it.startsWith(TEMP_PREFIX) }.forEach { folder.delete("$dir/$it") }
         val segments = names.mapNotNull(FolderLayout::segmentSeq).sorted()
         val snapshots = names.mapNotNull(FolderLayout::snapshotSeq)
+        var ownLog = dao.ownLog()
+        // A new database, not one made anew after a corrupt one, with no log of its own here yet: a new device, with
+        // nothing to read back. Settled before its first lines go in, or it would read them back as an old log.
+        if (ownLog != null && !ownLog.recovered && segments.isEmpty() && snapshots.isEmpty()) {
+            dao.ownLogRead()
+            ownLog = null
+        }
 
         val first = segments.lastOrNull() ?: snapshots.maxOrNull()?.plus(1) ?: 0
         var seq = first
@@ -172,9 +176,9 @@ internal class FolderSync(
         dao.clearOutbox(upTo = pending.maxOf { it.n })
 
         val held = segments.toSet() + (first..seq)
-        // A database made anew has not read its own files back yet ([readOwn]): a snapshot of it now would
-        // replace the segments that hold its history, so compaction waits for the first import.
-        if (held.size >= snapshotEvery && !readOwn) {
+        // A database that has not read its own files back yet ([OwnLogEntity]): a snapshot of it now would replace the
+        // segments that hold its history, so compaction waits for the import that reads them.
+        if (held.size >= snapshotEvery && ownLog == null) {
             folder.replace(FolderLayout.snapshot(device, seq), snapshotOfEverything())
             held.forEach { folder.delete(FolderLayout.segment(device, it)) }
             // Not [seq] itself: after a crash mid-compaction the new snapshot can take the old one's name.

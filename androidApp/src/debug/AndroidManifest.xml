@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: the stage 1 debug harness (HarnessActivity). Release builds merge no debug manifest. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application
-        android:label="Chatelaine spike"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+    <application>
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".HarnessActivity"
+            android:exported="true"
+            android:label="Chatelaine harness">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

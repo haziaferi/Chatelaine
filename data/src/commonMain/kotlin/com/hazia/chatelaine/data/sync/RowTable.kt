@@ -16,6 +16,12 @@ internal interface RowTable {
 
     suspend fun delete(ids: Collection<String>)
 
+    /**
+     * Whether rows of other tables name this table's rows through a foreign key, so a purge here takes them too: when an
+     * import takes such a purge back, those rows are in files already read, and every file is read again.
+     */
+    val hasChildren: Boolean get() = false
+
     /** Whether [row] has this table's groups, fields and value types; one that does not is skipped on import. */
     fun fits(row: Row): Boolean
 
@@ -34,6 +40,13 @@ internal interface RowTable {
      * Unlike a parent, one that is not here yet is no reason to wait: the id reads as none until the row arrives.
      */
     fun owners(row: Row): List<String> = emptyList()
+
+    /**
+     * The other ids [row] names with no foreign key and outlives the loss of, such as an item's place or a tag's
+     * parent: one that is gone reads as none. Writing an earlier value back (a roll back, a restore from History)
+     * skips a value that names one purged since, as R152's delete moved the row off it.
+     */
+    fun refs(row: Row): List<String> = emptyList()
 }
 
 /**
@@ -49,6 +62,8 @@ internal class EntityTable<E>(
     private val fromRow: (Row) -> E,
     private val upgradeRow: (Row) -> Row = { it },
     private val ownersOf: (E) -> List<String> = { emptyList() },
+    private val refsOf: (E) -> List<String> = { emptyList() },
+    override val hasChildren: Boolean = false,
     private val parentsOf: (E) -> List<Pair<String, String>>,
 ) : RowTable {
     override fun upgrade(row: Row) = upgradeRow(row)
@@ -59,4 +74,5 @@ internal class EntityTable<E>(
     override fun fits(row: Row) = runCatching { fromRow(row) }.isSuccess
     override fun parents(row: Row) = parentsOf(fromRow(row))
     override fun owners(row: Row) = ownersOf(fromRow(row))
+    override fun refs(row: Row) = refsOf(fromRow(row))
 }

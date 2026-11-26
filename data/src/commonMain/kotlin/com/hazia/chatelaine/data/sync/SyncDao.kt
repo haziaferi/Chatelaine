@@ -27,6 +27,23 @@ internal data class ClockEntity(
     @ColumnInfo(name = "last_hlc") val lastHlc: Long,
 )
 
+/**
+ * Present while this database has not read its own log back from the folder (R59); one row, local only, kept in the
+ * database so it outlives the process. Every new database starts with it (`SchemaTriggers.onCreate`); it is set again
+ * when an import or a restore takes back a purge. [recovered] marks a database made anew after a corrupt one was set
+ * aside: its own log is surely in the folder, so it waits until that log is there and read. Without it, a device with
+ * no log of its own in the folder (a new device) has nothing to read back, and the mark goes on its first import or
+ * export. [backupsHeld] keeps backups off meanwhile, as the near-empty database would rotate out the good ones; set
+ * with [recovered], it goes when the own log is read or a backup is restored ([backupRestored]), which is the way back
+ * for a device with no sync folder.
+ */
+@Entity(tableName = "sync_own_log")
+internal data class OwnLogEntity(
+    @PrimaryKey val id: Int = 0,
+    val recovered: Boolean,
+    @ColumnInfo(name = "backups_held") val backupsHeld: Boolean = false,
+)
+
 /** The last stamp both sides agreed on for an asking group; local only. */
 @Entity(tableName = "sync_base", primaryKeys = ["id", "grp"])
 internal data class BaseEntity(
@@ -132,6 +149,16 @@ internal interface SyncDao {
     @Upsert
     suspend fun saveClock(clock: ClockEntity)
 
+    @Query("SELECT * FROM sync_own_log WHERE id = 0")
+    suspend fun ownLog(): OwnLogEntity?
+
+    @Upsert
+    suspend fun putOwnLog(state: OwnLogEntity)
+
+    /** The own log was read back: the mark goes. */
+    @Query("DELETE FROM sync_own_log")
+    suspend fun ownLogRead()
+
     @Query("SELECT * FROM sync_base WHERE id IN (:ids)")
     suspend fun bases(ids: List<String>): List<BaseEntity>
 
@@ -193,6 +220,22 @@ internal suspend fun SyncDao.loadClock(device: String, wallMillis: () -> Long) =
     HybridClock(device, wallMillis, last = lastHlc() ?: 0)
 
 internal suspend fun SyncDao.saveClock(clock: HybridClock) = saveClock(ClockEntity(lastHlc = clock.last))
+
+/** The own log is to be read again from its start on the next import ([OwnLogEntity]); a recovered mark is kept as it is. */
+internal suspend fun SyncDao.rereadOwnLog() {
+    if (ownLog() == null) putOwnLog(OwnLogEntity(recovered = false))
+}
+
+/** The database was made anew after a corrupt one was set aside: it waits for its own log ([OwnLogEntity.recovered]). */
+internal suspend fun SyncDao.markRecovered() = putOwnLog(OwnLogEntity(recovered = true, backupsHeld = true))
+
+/**
+ * A backup was restored into the database: it is no longer the near-empty one a recovery left, so backups go on. The
+ * wait for the own log stays as it is ([OwnLogEntity.recovered]).
+ */
+internal suspend fun SyncDao.backupRestored() {
+    ownLog()?.takeIf { it.backupsHeld }?.let { putOwnLog(it.copy(backupsHeld = false)) }
+}
 
 internal fun BaseEntity.stamp() = Stamp(hlc, device)
 

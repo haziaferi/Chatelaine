@@ -12,6 +12,7 @@ import com.hazia.chatelaine.data.sync.ClockEntity
 import com.hazia.chatelaine.data.sync.KnownTablesEntity
 import com.hazia.chatelaine.data.sync.LostEntity
 import com.hazia.chatelaine.data.sync.OutboxEntity
+import com.hazia.chatelaine.data.sync.OwnLogEntity
 import com.hazia.chatelaine.data.sync.PurgeEntity
 import com.hazia.chatelaine.data.sync.ReadEntity
 import com.hazia.chatelaine.data.sync.SyncDao
@@ -19,14 +20,16 @@ import com.hazia.chatelaine.data.sync.RowTable
 import com.hazia.chatelaine.data.sync.WaitingEntity
 
 /**
- * Chatelaine's one database. For now it holds the sync tables and the first records (items, tags, tag kinds and their
- * links), each with a stamp per field group. It starts at version 1, so there are no migrations yet.
+ * Chatelaine's one database. It holds the local sync tables (purge registry, clock, bases, outbox, read positions,
+ * waiting lines, lost versions, the own-log mark, seen photo files) and the synced records of [SYNCED_TABLES] (items,
+ * tags, tag kinds, places, photos, photo regions, custom fields and their links), each with a stamp per field group. It
+ * starts at version 1, so there are no migrations yet.
  */
 @Database(
     entities = [
         PurgeEntity::class, ClockEntity::class,
         BaseEntity::class, AskEntity::class, ReadEntity::class, OutboxEntity::class, KnownTablesEntity::class,
-        WaitingEntity::class, LostEntity::class, BlobSeenEntity::class,
+        WaitingEntity::class, LostEntity::class, BlobSeenEntity::class, OwnLogEntity::class,
         TagKindEntity::class, TagEntity::class, ItemEntity::class, ItemTagEntity::class,
         PlaceEntity::class, PlaceTagEntity::class, PhotoEntity::class, PhotoRegionEntity::class,
         FieldDefEntity::class, FieldOptionEntity::class, FieldAttachEntity::class, FieldValueEntity::class,

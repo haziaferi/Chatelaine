@@ -79,6 +79,25 @@ class PlaceTest {
         assertTrue(inventory.contents(box).items.isEmpty())
     }
 
+    /** R30: an item in use / away is placed again by placing it, back in its own place or in another. */
+    @Test
+    fun placingAnAwayItemMakesItPlacedAgain() = run {
+        val box = inventory.addPlace("box")
+        val shelf = inventory.addPlace("shelf")
+        val clip = inventory.addItem("paper clip")
+        val pin = inventory.addItem("pin")
+        inventory.moveItems(listOf(clip, pin), box)
+        inventory.setAway(clip, true)
+        inventory.setAway(pin, true)
+
+        inventory.placeItem(clip, box) // back where it was
+        inventory.placeItem(pin, shelf) // somewhere else
+
+        assertEquals(ItemState.PLACED, inventory.state(clip))
+        assertEquals(ItemState.PLACED, inventory.state(pin))
+        assertEquals(shelf, inventory.getItem(pin)?.placeId)
+    }
+
     /** R31: moving an item into or out of a place raises the flag on the item and on the place, when each has a photo. */
     @Test
     fun movingIntoOrOutOfPlaceRaisesOutdated() = run {

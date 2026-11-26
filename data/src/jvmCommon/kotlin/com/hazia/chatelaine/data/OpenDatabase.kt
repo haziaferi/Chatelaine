@@ -4,6 +4,7 @@ import androidx.room.RoomDatabase
 import androidx.room.useReaderConnection
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.SQLiteDriver
+import com.hazia.chatelaine.data.sync.markRecovered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -32,7 +33,11 @@ internal fun openDatabase(
         },
         setAside = { setAsideDatabaseFiles(file.path, now()) },
         isUnopenable = ::isCorruptDatabase,
-    )
+    ).also { open ->
+        // In the database, not only in [DatabaseOpen.recovered]: a process that ends before its first sync must not
+        // leave the next one to compact the own log, or back up the near-empty database, before reading it back.
+        if (open.recovered) runBlocking { open.database.syncDao().markRecovered() }
+    }
 }
 
 /**

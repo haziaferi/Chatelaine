@@ -37,16 +37,35 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
 
     suspend fun rename(itemId: String, name: String) {
         require(name.isNotBlank()) { "an item needs a name" }
-        writes.edit(ITEM, itemId, NAME) { mapOf("name" to name) }
+        editItem(itemId, NAME, mapOf("name" to name))
     }
 
-    suspend fun setNotes(itemId: String, notes: String) = writes.edit(ITEM, itemId, NOTES) { mapOf("notes" to notes) }
+    suspend fun setNotes(itemId: String, notes: String) = editItem(itemId, NOTES, mapOf("notes" to notes))
 
     /** How many; [approx] makes it "about N" (R26). A null [count] is not counted. */
     suspend fun setQuantity(itemId: String, count: Long?, approx: Boolean) {
         require(count == null || count >= 0) { "a quantity is not negative" }
         require(count != null || !approx) { "\"about\" needs a number" }
-        writes.edit(ITEM, itemId, QUANTITY) { mapOf("count" to count, "approx" to approx) }
+        editItem(itemId, QUANTITY, mapOf("count" to count, "approx" to approx))
+    }
+
+    /**
+     * Changes [group] of the item, in one write with its "photo outdated" flag: an edit that changes something on an
+     * item with a photo raises it (R31).
+     */
+    private suspend fun editItem(itemId: String, group: String, changes: Map<String, Any?>) {
+        var photographed = false
+        writes.write({
+            requireNotNull(items.item(itemId)) { "no item $itemId" }
+            photographed = photos.itemIdsWithPhotos(listOf(itemId)).isNotEmpty()
+            mapOf(ITEM to listOf(itemId))
+        }) { store, _ ->
+            val s = writes.clock.tick()
+            val row = requireNotNull(store.row(itemId)) { "no $ITEM row $itemId" }
+            val edited = row.edit(group, s, changes)
+            val changed = edited.groups.getValue(group).values != row.groups.getValue(group).values
+            store.put(if (photographed && changed) edited.raisedOutdated(s) else edited)
+        }
     }
 
     /**
@@ -58,11 +77,13 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         require(parts >= 2) { "splitting makes at least two items" }
         val copies = mutableListOf<String>()
         val linkCopies = mutableListOf<LinkCopy>()
+        var photographed = false
         writes.write({
             val item = requireNotNull(items.item(itemId)) { "no item $itemId" }
             require(item.quantityCount == null || item.quantityCount == parts.toLong()) {
                 "the quantity ${item.quantityCount} does not split into $parts"
             }
+            photographed = photos.itemIdsWithPhotos(listOf(itemId)).isNotEmpty()
             repeat(parts - 1) { copies += Ids.new() }
             val own = links.linksOfItem(itemId)
             copies.forEach { copy -> own.forEach { linkCopies += LinkCopy(copy, it.tagId, it.suggested) } }
@@ -70,7 +91,9 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         }) { store, _ ->
             val s = writes.clock.tick()
             val original = requireNotNull(store.row(itemId))
-            store.put(original.edit(QUANTITY, s, mapOf("count" to 1L, "approx" to false)))
+            // The item's quantity changed after its photo (R31); the copies have no photo and copy the flag as it was.
+            val split = original.edit(QUANTITY, s, mapOf("count" to 1L, "approx" to false))
+            store.put(if (photographed) split.raisedOutdated(s) else split)
             val one = Group(s, mapOf("count" to 1L, "approx" to false))
             for (copy in copies) {
                 val groups = original.groups.mapValues { (_, g) -> Group(s, g.values) } + (QUANTITY to one)
@@ -90,7 +113,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
         }
     }
 
-    suspend fun setAway(itemId: String, away: Boolean) = writes.edit(ITEM, itemId, AWAY) { mapOf("away" to away) }
+    suspend fun setAway(itemId: String, away: Boolean) = editItem(itemId, AWAY, mapOf("away" to away))
 
     /** Removes the item, its tag links, its photos with their regions, and the regions that point to it, for good (R152). */
     suspend fun deleteItem(itemId: String) {
@@ -129,20 +152,34 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     // ---- tags ----
 
     /** A new tag, top-level or under [parentId] (R34, R35). */
-    suspend fun addTag(name: String, parentId: String? = null): String = createTag(name, parentId, null)
-
-    /** A module's tag (R151), carrying the module's [moduleKey]. */
-    internal suspend fun addModuleTag(name: String, moduleKey: String, parentId: String? = null): String =
-        createTag(name, parentId, moduleKey)
-
-    private suspend fun createTag(name: String, parentId: String?, moduleKey: String?): String {
+    suspend fun addTag(name: String, parentId: String? = null): String {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "a tag needs a name" }
         val id = Ids.new()
         writes.write({
             if (parentId != null) requireNotNull(tags.tag(parentId)) { "no tag $parentId" }
             mapOf(TAG to listOf(id))
-        }) { store, _ -> writes.merger.created(store, tagRow(id, writes.clock.tick(), trimmed, parentId, moduleKey)) }
+        }) { store, _ -> writes.merger.created(store, tagRow(id, writes.clock.tick(), trimmed, parentId)) }
+        return id
+    }
+
+    /**
+     * A module's tag (R151), carrying the module's [moduleKey]. Its id comes from the key, as a preset field's does, so
+     * two devices that turn the module on make one tag; made again, it is left as it is. Like any id derived from what
+     * it stands for, it has no base: the two first versions meet as a clash, and the earlier goes to History (R54).
+     */
+    internal suspend fun addModuleTag(name: String, moduleKey: String, parentId: String? = null): String {
+        val trimmed = name.trim()
+        require(trimmed.isNotEmpty()) { "a tag needs a name" }
+        val id = moduleTagId(moduleKey)
+        var fresh = false
+        writes.write({
+            if (parentId != null) requireNotNull(tags.tag(parentId)) { "no tag $parentId" }
+            fresh = tags.tag(id) == null
+            mapOf(TAG to if (fresh) listOf(id) else emptyList())
+        }) { store, _ ->
+            if (fresh) writes.createDerived(store, tagRow(id, writes.clock.tick(), trimmed, parentId, moduleKey))
+        }
         return id
     }
 
@@ -377,29 +414,37 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
      * Puts every item in [itemIds] in [placeId] at once, or takes them out of their places for null. An item
      * moved into or out of a place raises its "photo outdated" flag, and so does each place it left or entered (R31);
      * an item or place with no photo has nothing to be out of date and keeps its flag down.
+     *
+     * Placing an item that is in use / away puts it back (R30), in its own place or another: it is placed again. One
+     * put back where it already is moves nothing, so only the item's own flag can rise, as for any edit of it.
      */
     suspend fun moveItems(itemIds: List<String>, placeId: String?) {
         val ids = itemIds.distinct()
         val moving = mutableListOf<String>()
-        val photographed = mutableSetOf<String>() // the moving items that have a photo
+        val back = mutableSetOf<String>() // the items that were away and are placed again
+        val photographed = mutableSetOf<String>() // the moving or returning items that have a photo
         writes.write({
             if (placeId != null) requireNotNull(places.place(placeId)) { "no place $placeId" }
             val found = readChunked(ids) { items.items(it) }
             require(found.size == ids.size) { "no item ${ids.first { id -> found.none { it.id == id } }}" }
             val shifting = found.filter { it.placeId != placeId }
             moving += shifting.map { it.id }
-            photographed += readChunked(moving.toList()) { photos.itemIdsWithPhotos(it) }
+            if (placeId != null) back += found.filter { it.away }.map { it.id }
+            val written = (moving + back).distinct()
+            photographed += readChunked(written) { photos.itemIdsWithPhotos(it) }
             val touched = shifting.mapNotNull { it.placeId }.toMutableSet()
             if (placeId != null && shifting.isNotEmpty()) touched += placeId
             val touchedPlaces = readChunked(touched.toList()) { places.places(it) }.map { it.id }
-            mapOf(ITEM to moving.toList(), PLACE_TABLE to readChunked(touchedPlaces) { photos.placeIdsWithPhotos(it) })
+            mapOf(ITEM to written, PLACE_TABLE to readChunked(touchedPlaces) { photos.placeIdsWithPhotos(it) })
         }) { store, targets ->
             val s = writes.clock.tick()
-            for (id in moving) {
-                val moved = requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to placeId))
-                store.put(if (id in photographed) moved.raised(s) else moved)
+            for (id in targets.getValue(ITEM)) {
+                var row = requireNotNull(store.row(id))
+                if (id in moving) row = row.edit(PLACE, s, mapOf("placeId" to placeId))
+                if (id in back) row = row.edit(AWAY, s, mapOf("away" to false))
+                store.put(if (id in photographed) row.raisedOutdated(s) else row)
             }
-            for (id in targets.getValue(PLACE_TABLE)) store.put(requireNotNull(store.row(id)).raised(s))
+            for (id in targets.getValue(PLACE_TABLE)) store.put(requireNotNull(store.row(id)).raisedOutdated(s))
         }
     }
 
@@ -466,13 +511,13 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             photoIds.forEach { writes.merger.purge(store, it) }
             for (id in itemIds) {
                 val moved = requireNotNull(store.row(id)).edit(PLACE, s, mapOf("placeId" to parent))
-                store.put(if (id in photographed) moved.raised(s) else moved)
+                store.put(if (id in photographed) moved.raisedOutdated(s) else moved)
             }
             for (id in childIds) {
                 store.put(requireNotNull(store.row(id)).edit(PARENT, s, mapOf("parentId" to parent.takeIf { it != id && id !in siteIds })))
             }
             if (parent != null && parent in photographed && (itemIds.isNotEmpty() || childIds.isNotEmpty())) {
-                store.put(requireNotNull(store.row(parent)).raised(s))
+                store.put(requireNotNull(store.row(parent)).raisedOutdated(s))
             }
             for (id in homeTagIds) store.put(requireNotNull(store.row(id)).edit(HOME, s, mapOf("homePlaceId" to null)))
             linkIds.forEach { writes.merger.purge(store, it) }
@@ -631,10 +676,6 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
     /** The link of a place and a tag: its id never equals an item-tag link's, whatever the ids. */
     private fun placeLinkId(placeId: String, tagId: String) = linkId("place:$placeId", tagId)
 
-    /** This item or place with its "photo outdated" flag raised; as it was when already raised. */
-    private fun Row.raised(s: Stamp): Row =
-        if (groups.getValue(PHOTO_OUTDATED).values["outdated"] == true) this else edit(PHOTO_OUTDATED, s, mapOf("outdated" to true))
-
     private fun placeRow(id: String, s: Stamp, name: String, parentId: String?, isSite: Boolean) = Row(PLACE_TABLE, id, mapOf(
         NAME to Group(s, mapOf("name" to name)),
         PARENT to Group(s, mapOf("parentId" to parentId)),
@@ -699,3 +740,7 @@ class Inventory internal constructor(private val db: ChatelaineDatabase, private
             SUGGESTED to Group(s, mapOf("suggested" to suggested)),
         ))
 }
+
+/** This item or place with its "photo outdated" flag raised (R31); as it was when already raised. */
+internal fun Row.raisedOutdated(s: Stamp): Row =
+    if (groups.getValue(PHOTO_OUTDATED).values["outdated"] == true) this else edit(PHOTO_OUTDATED, s, mapOf("outdated" to true))

@@ -4,8 +4,12 @@ package com.hazia.chatelaine.data.blob
 internal class MemoryBlobStore : BlobStore {
     val files = mutableMapOf<String, ByteArray>()
 
+    /** How many times [write] was called. */
+    var writes = 0
+        private set
+
     override fun read(name: String): ByteArray? = files[check(name)]?.copyOf()
-    override fun write(name: String, bytes: ByteArray) { files[check(name)] = bytes.copyOf() }
+    override fun write(name: String, bytes: ByteArray) { writes++; files[check(name)] = bytes.copyOf() }
     override fun size(name: String): Long? = files[check(name)]?.size?.toLong()
     override fun delete(name: String) { files.remove(check(name)) }
     override fun list() = files.keys.toList()

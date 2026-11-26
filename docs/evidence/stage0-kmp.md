@@ -10,7 +10,7 @@ R102 also asks for the model spike timings; those are recorded in `stage0-recogn
 
 ## What was built
 
-A throwaway project in `spike/kmp/`, kept apart from the app's future layout:
+A throwaway project in `spike/kmp/` (removed in stage 1; its code is in git history), kept apart from the app's future layout:
 
 | Module | Holds |
 |---|---|
@@ -53,7 +53,7 @@ The first launch's ANR came while the restored emulator was still settling; the 
 
 ## Running it
 
-- Desktop: `./gradlew :desktopApp:run` in `spike/kmp/`.
+- Desktop: `./gradlew :desktopApp:run` in `spike/kmp/` (removed in stage 1; check out an earlier commit to run it).
 - Android: `./gradlew :androidApp:assembleDebug`, then `adb install` the APK from `androidApp/build/outputs/apk/debug/`.- `local.properties` (git-ignored) must name the Android SDK with `sdk.dir`, in forward slashes.
 - On this PC the emulator quits at boot with "too many emulator instances are running" when started with its default ports. Windows reserves TCP ports 5495 to 5594 (its dynamic range starts at 1024, and Hyper-V's reservations fall there), which covers the emulator's whole default range of 5554 to 5585. Starting it with `-port 5600` and then `adb connect localhost:5601` works, without changing any system setting.
 

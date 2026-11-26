@@ -1,6 +1,8 @@
 package com.hazia.chatelaine.data.sync
 
 import androidx.sqlite.SQLiteException
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.hazia.chatelaine.data.SYNCED_TABLES
 import com.hazia.chatelaine.core.sync.Group
 import com.hazia.chatelaine.core.sync.Row
 import com.hazia.chatelaine.core.sync.Stamp
@@ -350,10 +352,10 @@ class FolderSyncTest {
         val again = w.Device("A")
 
         assertTrue(again.rows().isEmpty(), "the new database starts empty")
-        assertTrue(again.sync.readingOwnLog)
+        assertTrue(runBlocking { again.sync.readingOwnLog() })
         again.import()
         assertEquals(ids, again.rows().keys)
-        assertFalse(again.sync.readingOwnLog)
+        assertFalse(runBlocking { again.sync.readingOwnLog() })
     }
 
     /** R59: the outbox, not a stamp cursor, says what to export; exporting empties it. */
@@ -1049,10 +1051,10 @@ class FolderSyncTest {
 
         val after = w.Device("A-new", id = "A", recovered = true)
         after.import() // the own log has not arrived in A-new's folder yet
-        assertTrue(after.sync.readingOwnLog, "nothing of the own log was read: still waiting")
+        assertTrue(runBlocking { after.sync.readingOwnLog() }, "nothing of the own log was read: still waiting")
         w.syncthing.session("A", "A-new")
         after.import()
-        assertFalse(after.sync.readingOwnLog, "the own log was read back")
+        assertFalse(runBlocking { after.sync.readingOwnLog() }, "the own log was read back")
         assertEquals(setOf(old), after.rows().keys)
     }
 
@@ -1291,6 +1293,139 @@ class FolderSyncTest {
         assertEquals(ImportReport(changed = 1, skipped = 1), b.import())
         assertEquals(setOf("x"), table.rows.keys)
         assertEquals(emptyList(), b.waiting(), "a refused line with no missing parent does not wait")
+    }
+
+    /**
+     * A peer that untags and tags an item again takes back the purge of the link, whose id is derived from the pair. A
+     * link has no rows under it, so this device does not read every file of the folder again for it.
+     */
+    @Test
+    fun aRetagOnAPeerDoesNotMakeThisDeviceReadTheWholeFolderAgain() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = a.create("lamp")
+        val tag = runBlocking { a.inventory.addTag("light").also { a.inventory.tag(listOf(item), it) } }
+        w.settle(listOf(a, b))
+        w.syncthing.now = 10
+        runBlocking { b.inventory.untag(listOf(item), tag) }
+        w.settle(listOf(a, b)) // A holds the link's purge
+        w.syncthing.now = 20
+        runBlocking { b.inventory.tag(listOf(item), tag) }
+        w.meet(b, a)
+
+        val before = w.syncthing.bytesRead
+        a.import()
+
+        assertEquals(listOf(tag), runBlocking { a.inventory.tagsOf(item) }.map { it.id }, "the link is back")
+        val grown = w.syncthing.folder("A").size(FolderLayout.segment("B", 0))
+        assertEquals(grown, w.syncthing.bytesRead - before, "only the peer's grown file is read, once")
+    }
+
+    /** The tables marked as having rows under them are exactly those a foreign key names. */
+    @Test
+    fun theTablesWithChildrenAreTheOnesForeignKeysName() {
+        val w = world()
+        val a = w.Device("A")
+        a.db.close()
+        val named = BundledSQLiteDriver().open(File(tmp.root, "A.db").path).use { c ->
+            SYNCED_TABLES.flatMap { t ->
+                c.prepare("PRAGMA foreign_key_list($t)").use { s -> buildList { while (s.step()) add(s.getText(2)) } }
+            }.toSet()
+        }
+        val db = openChatelaineDatabase(File(tmp.root, "check.db")).database
+        try {
+            assertEquals(named, db.syncedTables().filterValues { it.hasChildren }.keys)
+        } finally {
+            db.close()
+        }
+    }
+
+    /** R151: two devices that each turn one module on make one tag for it between them, not two. */
+    @Test
+    fun twoDevicesTurningAModuleOnMakeOneTag() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val onA = runBlocking { a.inventory.addModuleTag("pantry", "pantry") }
+        w.syncthing.now = 5
+        val onB = runBlocking { b.inventory.addModuleTag("pantry", "pantry") }
+        w.settle(listOf(a, b))
+
+        for (d in listOf(a, b)) assertEquals(listOf<String?>("pantry"), runBlocking { d.inventory.tags() }.map { it.moduleKey }, d.name)
+        assertEquals(onA, onB)
+    }
+
+    // ---- a recovered database across a restart (R59) ----
+
+    /**
+     * The process that set the corrupt file aside ends before its first sync: the next one opens the new database as
+     * it is, and still reads the own log back before its exports compact it.
+     */
+    @Test
+    fun aRecoveredDatabaseReopenedBeforeItsFirstSyncReadsItsOwnLogBack() {
+        val w = world(segmentBytes = 200, snapshotEvery = 2)
+        val a = w.Device("A")
+        val old = a.create()
+        repeat(2) { a.edit(old, NAME); a.export() }
+        a.db.close()
+        File(tmp.root, "A.db").writeBytes(Random(7).nextBytes(4096))
+        w.Device("A").db.close() // made anew here, then closed with no sync
+
+        val again = w.Device("A")
+        val fresh = again.create()
+        repeat(3) { again.edit(fresh, NAME); again.export() } // enough for a compaction, before the first import
+        again.import()
+
+        assertEquals(setOf(old, fresh), again.rows().keys, "the history written before the database was made anew is back")
+    }
+
+    // ---- the clock across a restart (R51, R54) ----
+
+    /** A peer whose clock runs fast (within the day the guard allows) edits a name that this device then sees. */
+    private fun World.aheadPeerEdit(a: World.Device, b: World.Device): String {
+        b.skew = 6 * hour
+        val item = a.create("lamp")
+        settle(listOf(a, b))
+        syncthing.now = 1_000
+        b.edit(item, NAME, "B's name")
+        settle(listOf(a, b))
+        return item
+    }
+
+    /** A device restarted after seeing a stamp ahead of its wall clock still stamps its next edit above it. */
+    @Test
+    fun aRestartedDevicesEditOutranksAStampItSawAheadOfItsClock() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = w.aheadPeerEdit(a, b)
+        a.db.close()
+
+        val again = w.Device("A") // the same database, opened again
+        w.syncthing.now = 2_000
+        again.edit(item, NAME, "A's later name")
+        w.settle(listOf(again, b))
+
+        for (d in listOf(again, b)) {
+            assertEquals("A's later name", d.rows().getValue(item).groups.getValue(NAME).values["name"], "${d.name} holds the later edit")
+        }
+    }
+
+    /** With no stored clock at all (a fresh clock over the rows), a local edit still outranks the version it replaces. */
+    @Test
+    fun aLocalEditOutranksTheVersionItReplacesWithAFreshClock() {
+        val w = world()
+        val a = w.Device("A")
+        val b = w.Device("B")
+        val item = w.aheadPeerEdit(a, b)
+        val seen = a.rows().getValue(item).groups.getValue(NAME).stamp
+
+        val fresh = HybridClock("A", wallMillis = { w.syncthing.now })
+        runBlocking { Inventory(a.db, LocalWrites(a.db, fresh)).rename(item, "A's later name") }
+
+        val written = a.rows().getValue(item).groups.getValue(NAME).stamp
+        assertTrue(written > seen, "the edit's stamp $written is above the one it replaced, $seen")
     }
 
     /** A table that refuses to save the row [refused] as a foreign key would, and saves nothing of that call. */

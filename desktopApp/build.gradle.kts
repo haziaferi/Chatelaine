@@ -20,3 +20,12 @@ compose.desktop {
         mainClass = "com.hazia.chatelaine.MainKt"
     }
 }
+
+// The stage 1 debug harness (Harness.kt): `./gradlew :desktopApp:harness --args="--data build/harness-data list"`.
+tasks.register<JavaExec>("harness") {
+    group = "verification"
+    description = "Runs the provisional stage 1 debug harness; pass the action with --args."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "com.hazia.chatelaine.HarnessKt"
+    workingDir = rootProject.projectDir
+}

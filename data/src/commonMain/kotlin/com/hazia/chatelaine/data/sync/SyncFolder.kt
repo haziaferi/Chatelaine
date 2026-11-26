@@ -5,7 +5,7 @@ package com.hazia.chatelaine.data.sync
  * Blocking: call it off the main thread.
  */
 interface SyncFolder {
-    /** The names of the files and directories directly under [dir]; empty when [dir] does not exist. */
+    /** The names of the files and directories directly under [dir], temporary files included; empty when [dir] does not exist. */
     fun list(dir: String): List<String>
 
     /** The file's length in bytes, or null when it does not exist. */
@@ -17,7 +17,7 @@ interface SyncFolder {
     /**
      * Replaces the file at [path] with [bytes] in one step: readers see the old file or the new one, never a mix.
      * The bytes go first to `TEMP_PREFIX + name` beside it, which a crash can leave behind; the exporter clears
-     * those in its own directory.
+     * those in its own directory, the backup those of its files, and the photo exchange those beside a whole file.
      */
     fun replace(path: String, bytes: ByteArray)
 

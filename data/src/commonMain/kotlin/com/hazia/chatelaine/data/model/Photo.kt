@@ -87,7 +87,10 @@ internal interface PhotoDao {
 }
 
 internal fun photoTable(dao: PhotoDao) =
-    EntityTable(dao::photos, dao::allPhotos, dao::putPhotos, dao::deletePhotos, PhotoEntity::toRow, Row::toPhotoEntity) {
+    EntityTable(
+        dao::photos, dao::allPhotos, dao::putPhotos, dao::deletePhotos, PhotoEntity::toRow, Row::toPhotoEntity,
+        hasChildren = true, // its regions
+    ) {
         listOfNotNull(it.itemId?.let { id -> ITEM to id }, it.placeId?.let { id -> PLACE_TABLE to id })
     }
 

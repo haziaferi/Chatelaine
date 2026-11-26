@@ -11,8 +11,8 @@ import java.io.IOException
  * previous copy is deleted. The target is never deleted first, so a crash leaves the last complete content
  * somewhere: when a name is missing and its `.tmp-old-` copy exists, [list], [read], [size] and [replace]
  * rename the copy back (a copy beside a name that stands again is dropped). All of these begin with that
- * recovery, so it runs before anything can clear temporary files. [list] leaves temporary files out. The bytes
- * are written as they are: encryption is a later layer.
+ * recovery, so it runs before anything can clear temporary files. [list] shows `.tmp-` files, as a directory does,
+ * so leftovers can be cleared. The bytes are written as they are: encryption is a later layer.
  *
  * Blocking: call it off the main thread.
  */
@@ -25,7 +25,10 @@ class SafSyncFolder(context: Context, tree: Uri) : SyncFolder {
 
     override fun list(dir: String): List<String> {
         val id = docs.dir(segments(dir), create = false) ?: return emptyList()
-        return recover(id).map { it.name }.filter { !it.startsWith(TEMP_PREFIX) }
+        // Temporary files are listed, as a directory lists them, so the code that clears leftovers (the exporter, the
+        // backup, the photo exchange) sees them; every reader ignores names outside its own patterns. A previous copy
+        // cannot be among them: [recover] has dealt with each one.
+        return recover(id).map { it.name }.filter { !it.startsWith(OLD_PREFIX) }
     }
 
     override fun size(path: String): Long? {

@@ -914,13 +914,13 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Each user-visible field is its own sync group, and every user-visible group keeps the losing value, so that the history of R54 holds.
 
-**Evidence:** Not checked: the change-log size with one group per field; it is measured in stage 1's sync test.
+**Evidence:** Stage 1 sync run, 2026-11-26 (`docs/evidence/stage1-sync.md`): a change writes the whole row, about 640 bytes per changed item at six groups; 20 items with 5 conflicting renames on two devices came to 40 KB of logs.
 
 **Acceptance:** When the two devices edit different fields of one item at the same time, both edits survive. The losing value of a same-field conflict is in history.
 
 **Not:** One group per row, and discarding the losing value except in a few groups, as the earlier app does by default: the history of R54 would not hold.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-26 · owner · own words
 
 ### D-R56 · Photos in the sync folder
 
@@ -934,11 +934,11 @@ The app is working when all the scenarios below succeed. The stage plan (R100) n
 
 **Rule:** Sync works with any folder-sync tool. The app does not talk to Syncthing itself; its only tool-specific code is the list of conflict-copy file-name patterns (R58).
 
-**Evidence:** Not checked: the official Syncthing Android app was discontinued in late 2024, and Syncthing-Fork is the maintained one.
+**Evidence:** Stage 1 sync run, 2026-11-26 (`docs/evidence/stage1-sync.md`): two-device sync with conflicts passed with Syncthing on the PC and Syncthing-Fork on the phone. Not checked: the official Syncthing Android app was discontinued in late 2024, and Syncthing-Fork is the maintained one; a second folder-sync tool.
 
 **Acceptance:** Stage 1's sync test passes with Syncthing (Syncthing-Fork on the phone), and the app has no code specific to one sync tool beyond the conflict-copy patterns. Before release, the test passes once with a second folder-sync tool.
 
-**Since:** 2026-11-22 · owner · own words
+**Since:** 2026-11-26 · owner · own words
 
 ### D-R58 · Sync code from the earlier app
 

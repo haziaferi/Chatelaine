@@ -3,6 +3,7 @@ package com.hazia.chatelaine.data.blob
 import com.hazia.chatelaine.data.ChatelaineDatabase
 import com.hazia.chatelaine.data.sync.ConflictCopies
 import com.hazia.chatelaine.data.sync.SyncFolder
+import com.hazia.chatelaine.data.sync.TEMP_PREFIX
 
 /**
  * Carries photo files through the sync folder, as `blobs/<sha256>` beside `devices/` (R56): the folder only carries
@@ -16,7 +17,7 @@ import com.hazia.chatelaine.data.sync.SyncFolder
  * - **Collect**: the folder's copy goes once this device has seen it unreferenced for 30 days, so a photo whose row
  *   arrives up to 30 days after its file is not left without it. This device's copy goes once no photo names it, for
  *   as long. Syncthing's conflict copies go at once: a file's name is its bytes' hash, so the copy is the same file or
- *   a damaged one.
+ *   a damaged one. So does a temporary file a write cut short left beside the file it was for.
  *
  * A known limit: a device away longer than the 30-day grace period can lose a file the others collected, and gets it
  * back only from a device that still holds it.
@@ -35,6 +36,9 @@ internal class BlobSync(
         val listed = folder.list(BLOBS)
         listed.filter { ConflictCopies.isCopy(it) }.forEach { folder.delete("$BLOBS/$it") }
         val inFolder = listed.filter { BlobName.isValid(it) }.toSet()
+        // A temporary file beside its whole file is what a write cut short left: the file it was for stands. One with no
+        // file beside it may be a write still going on, and is left alone.
+        listed.filter { it.startsWith(TEMP_PREFIX) && it.removePrefix(TEMP_PREFIX) in inFolder }.forEach { folder.delete("$BLOBS/$it") }
         val held = store.list().filter { BlobName.isValid(it) }.toMutableSet()
         for (name in referenced - held) {
             if (name !in inFolder) continue

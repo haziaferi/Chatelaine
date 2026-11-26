@@ -23,9 +23,11 @@ import com.hazia.chatelaine.data.sync.RowRecord
 import com.hazia.chatelaine.data.sync.StagedStore
 import com.hazia.chatelaine.data.sync.SyncFolder
 import com.hazia.chatelaine.data.sync.TEMP_PREFIX
+import com.hazia.chatelaine.data.sync.backupRestored
 import com.hazia.chatelaine.data.sync.completeLines
 import com.hazia.chatelaine.data.sync.plus
 import com.hazia.chatelaine.data.sync.repairParentCycles
+import com.hazia.chatelaine.data.sync.rereadOwnLog
 import com.hazia.chatelaine.data.sync.stamp
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.TimeZone
@@ -66,8 +68,6 @@ data class RollBackReport(val written: Int, val missingParent: Int, val purgedOw
  * @param archive packs the entries into a zip (`ZipBackup`).
  * @param wallMillis this device's wall clock in epoch milliseconds, against which [restore] checks stamps.
  * @param afterImport runs at the end of every [restore], as `FolderSync`'s step of that name does after an import.
- * @param readingOwnLog true while the database re-reads its own folder files after a recovery
- *   (`FolderSync.readingOwnLog`): [write] makes no backup then, as it would miss what those files hold.
  * @param importLock the database's one lock for imports; pass the one given to its `FolderSync`.
  */
 class Backup(
@@ -77,7 +77,6 @@ class Backup(
     private val archive: BackupArchive,
     private val wallMillis: () -> Long,
     private val afterImport: suspend () -> Unit = {},
-    private val readingOwnLog: () -> Boolean = { false },
     private val importLock: ImportLock = ImportLock(),
 ) {
     private val dao = db.syncDao()
@@ -90,14 +89,16 @@ class Backup(
 
     /**
      * Writes the backup of everything held now to [target] as `chatelaine-backup-<date of [now]>.zip` and returns its
-     * name; null, and nothing written, while the database re-reads its own folder files ([readingOwnLog]). Rows,
+     * name; null, and nothing written, while a database made anew after a corrupt one has not read its own folder
+     * files back nor had a backup restored (`OwnLogEntity.backupsHeld`, kept in the database): it would miss what those
+     * hold, and seven such days would rotate out every good backup. Rows,
      * purges and photo hashes are read in one transaction, so the backup is one moment of the database; the photo
      * files are read after it. The file takes its name only through [SyncFolder.replace], so a crash leaves the old
      * file of that name or the whole new one; temp files an earlier crash left in [target] are deleted first.
      * Writing on the same day again replaces the day's file.
      */
     suspend fun write(target: SyncFolder, now: Long): String? = importLock.mutex.withLock {
-        if (readingOwnLog()) return@withLock null
+        if (dao.ownLog()?.backupsHeld == true) return@withLock null
         target.list("").filter { it.startsWith(TEMP_PREFIX + FILE_PREFIX) }.forEach { target.delete(it) }
 
         val rows = StringBuilder()
@@ -144,7 +145,8 @@ class Backup(
      * Merges the backup in [zip] into this database as a peer's changes: per group the newer stamp wins, and a version
      * that loses is kept in History, so an edit made after the backup survives, here and, through sync, on every
      * device. Rows the backup lacks are kept. A row purged here stays purged unless the backup holds a newer edit of
-     * it. Photo files the backup holds and this device lacks are stored first (each checked against its hash).
+     * it. Photo files the backup holds and this device lacks are stored first (each checked against its hash). A
+     * database made anew after a corrupt one backs up again once a restore is done (`SyncDao.backupRestored`).
      *
      * @throws IllegalArgumentException when [zip] is not a complete backup.
      * @throws IllegalStateException before anything is written, when a record is stamped more than a day past this
@@ -167,13 +169,15 @@ class Backup(
         var report = importer.merge(lines, path = null, from = 0)
         if (importer.undidPurge) {
             // A purge taken back: rows under it went with it here, and are in the same backup. Read it all again, and
-            // peers' files too, as FolderSync does.
+            // every folder file on the next import, this device's own too, as FolderSync does.
             val again = importer.merge(lines, path = null, from = 0)
             report = ImportReport(report.changed + again.changed, again.skipped, again.waiting)
             dao.clearReads()
+            dao.rereadOwnLog()
         }
         report = report + importer.retryWaiting()
         importer.finish(writes)
+        dao.backupRestored()
         afterImport()
         report
     }
@@ -184,8 +188,9 @@ class Backup(
      * where it can be restored. One transaction.
      *
      * Not undone by this: rows that exist now and not in the backup are left alone, not deleted; a row purged since
-     * the backup is not brought back; a value is skipped when it names a row that is gone, or one whose owner was
-     * purged (counted in the result). Photo files are not touched.
+     * the backup is not brought back; a value is skipped when it names a row that is gone (a parent, or a place, tag
+     * or kind purged since, [com.hazia.chatelaine.data.sync.RowTable.refs]), or one whose owner was purged (counted in
+     * the result). Photo files are not touched.
      *
      * @throws IllegalArgumentException when [zip] is not a complete backup.
      */
@@ -235,7 +240,12 @@ class Backup(
                 val mine = held.groups[group] ?: continue
                 if (mine.values == theirs.values) continue
                 val candidate = held.set(group, mine.stamp, theirs.values)
-                if (table.parents(candidate).any { (t, id) -> tables.getValue(t).load(listOf(id)).isEmpty() }) {
+                // A place, parent tag, home or kind the value names that was deleted since is as gone as a parent:
+                // the delete moved the row off it (R152). Only ids the value brings back count, not ones held now.
+                val named = table.refs(candidate) - table.refs(held).toSet()
+                if (table.parents(candidate).any { (t, id) -> tables.getValue(t).load(listOf(id)).isEmpty() } ||
+                    (named.isNotEmpty() && dao.purges(named).isNotEmpty())
+                ) {
                     missingParent++
                     continue
                 }

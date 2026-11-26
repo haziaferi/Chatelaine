@@ -38,7 +38,10 @@ internal class RecordImport(
 ) {
     private val dao = db.syncDao()
 
-    /** Set when a merge took back a purge (a row edited after it); the caller resets it before an import. */
+    /**
+     * Set when a merge took back a purge (a row edited after it) of a row others hang from through a foreign key
+     * ([RowTable.hasChildren]); the caller resets it before an import.
+     */
     var undidPurge = false
 
     /**
@@ -141,7 +144,7 @@ internal class RecordImport(
                 position?.let { dao.putRead(it) }
                 dao.wait(waiting.map { WaitingEntity(line = it) })
                 dao.saveClock(clock)
-                if (store.undidPurge) undidPurge = true
+                if (store.undidPurge(tables)) undidPurge = true
                 store.changed.size
             }
         }
