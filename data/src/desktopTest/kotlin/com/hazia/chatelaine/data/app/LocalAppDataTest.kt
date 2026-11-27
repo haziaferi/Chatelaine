@@ -251,6 +251,33 @@ class LocalAppDataTest {
         }
     }
 
+    /** Recovered twice before the first old id's log arrived: the wait is for that log, and reading it ends it. */
+    @Test
+    fun twoRenewalsBeforeTheReadBackWaitForTheFirstOldLog() {
+        val dir = tmp.newFolder("a")
+        val syncDir = tmp.newFolder("sync")
+        val folder = DirectorySyncFolder(syncDir.toPath())
+        val old = device(dir).use { a ->
+            runBlocking { a.inventory.addItem("pins"); a.sync(folder) }
+            a.deviceId
+        }
+        val oldDir = File(syncDir, "devices/$old")
+        val away = File(tmp.root, "away")
+        assertTrue(oldDir.renameTo(away))
+        corrupt(dir)
+        device(dir).use { a -> runBlocking { a.sync(folder) } }
+        corrupt(dir)
+
+        device(dir).use { a ->
+            runBlocking { a.sync(folder) }
+            assertTrue(runBlocking { a.recovery() }.backupsHeld, "still waiting for the first old log")
+            assertTrue(away.renameTo(oldDir))
+            runBlocking { a.sync(folder) }
+            assertEquals(listOf("pins"), names(a))
+            assertFalse(runBlocking { a.recovery() }.backupsHeld, "the first old id's log ended the wait")
+        }
+    }
+
     @Test
     fun backupsStayHeldUntilTheOldLogIsRead() {
         val dir = tmp.newFolder("a")

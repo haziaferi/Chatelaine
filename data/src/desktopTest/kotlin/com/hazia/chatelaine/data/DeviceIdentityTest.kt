@@ -29,6 +29,7 @@ class DeviceIdentityTest {
 
     private val kept = KeptFile("chatelaine.db$UNOPENABLE_SUFFIX", size = 4096, modified = 1_700_000_000_000)
     private val keptJson = """{"name": "${kept.name}", "size": ${kept.size}, "modified": ${kept.modified}}"""
+    private val laterKept = KeptFile("chatelaine.db$UNOPENABLE_SUFFIX-1700000000000", 4096, 1_700_000_100_000)
 
     private fun renew(kept: List<KeptFile>, ownLogPending: Boolean = true): String =
         runBlocking { renewDeviceIdIfRecovered(identity, kept, ownLogPending, markRecovered = { marked += it }) }
@@ -61,8 +62,9 @@ class DeviceIdentityTest {
     fun aNewKeptFileRenewsAgain() {
         val old = deviceId(idFile)
         val first = renew(listOf(kept))
+        renew(listOf(kept), ownLogPending = false) // the old log was read back
 
-        val second = renew(listOf(kept, KeptFile("chatelaine.db$UNOPENABLE_SUFFIX-1700000000000", 4096, 1_700_000_100_000)))
+        val second = renew(listOf(kept, laterKept))
 
         assertNotEquals(first, second)
         assertNotEquals(old, second)
@@ -74,12 +76,49 @@ class DeviceIdentityTest {
     fun aReusedKeptFileNameRenewsAgain() {
         val old = deviceId(idFile)
         val first = renew(listOf(kept))
+        renew(listOf(kept), ownLogPending = false) // the old log was read back
 
         val second = renew(listOf(kept.copy(size = 8192, modified = kept.modified + 86_400_000)))
 
         assertNotEquals(first, second)
         assertNotEquals(old, second)
         assertEquals(listOf(old, first), marked)
+    }
+
+    /** A second renewal before the first old id's log was read back still waits for that log, not the second id's. */
+    @Test
+    fun aSecondRenewalBeforeTheReadBackStillOwesTheFirstId() {
+        val old = deviceId(idFile)
+        renew(listOf(kept))
+
+        renew(listOf(kept, laterKept))
+
+        assertEquals(listOf(old, old), marked)
+    }
+
+    /** Once a start finds the read-back ended, the next renewal waits for the id it replaces. */
+    @Test
+    fun aRenewalAfterTheReadBackOwesTheIdItReplaces() {
+        val old = deviceId(idFile)
+        val first = renew(listOf(kept))
+        assertEquals(first, renew(listOf(kept), ownLogPending = false), "the read-back ended: a start with nothing owed")
+
+        renew(listOf(kept, laterKept))
+
+        assertEquals(listOf(old, first), marked)
+    }
+
+    /** A renewal file written before `owed` existed still loads: its kept file renews nothing again. */
+    @Test
+    fun aRenewalFileWithoutOwedLoads() {
+        val old = deviceId(idFile)
+        val retired = "3f0c8a52-0d5e-4d43-9f55-1b6a0e0b7c11"
+        renewalFile.writeText("""{"old": "$retired", "kept": [$keptJson], "marked": true}""")
+
+        assertEquals(old, renew(listOf(kept)))
+        assertEquals(emptyList(), marked)
+        renew(listOf(kept, laterKept))
+        assertEquals(listOf(old), marked)
     }
 
     /** A kept file beside a database whose own log was read back long ago: no new id, nothing held. */

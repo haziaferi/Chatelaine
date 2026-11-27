@@ -49,20 +49,22 @@ data class KeptFile(val name: String, val size: Long, val modified: Long)
  *
  * Otherwise, when [ownLogPending] (the database has not read its own log back: one made anew after a corrupt one, or
  * a new one a crash left before it was marked), it renews, in steps each of which a crash may cut short:
- * 1. writes `identity/renewal`: the current id as `old`, every kept file, and `marked` false;
+ * 1. writes `identity/renewal`: the current id as `old`, every kept file, `marked` false, and as `owed` the oldest id
+ *    whose log is still to be read back: the last renewal's `owed` while it is set, else the current id;
  * 2. writes a new id into `identity/device-id`;
- * 3. calls [markRecovered] with the old id, so the database reads that id's log back as a peer's
- *    (`OwnLogEntity.previousDevice`) and holds backups until it has;
+ * 3. calls [markRecovered] with `owed`, so the database reads that id's log back as a peer's
+ *    (`OwnLogEntity.previousDevice`) and holds backups until it has: a second recovery before that log arrived still
+ *    waits for it, not for the log of an id that may never have written;
  * 4. rewrites `renewal` with `marked` true.
  *
- * Beside an established database (not [ownLogPending]: its log was read back long ago, the kept file is an old one)
- * it only notes the kept files, in a `renewal` with no `old` and `marked` true: the id stays, and nothing is held,
- * which with no sync folder would be for ever.
+ * A start not [ownLogPending] (the read-back ended) clears `owed`. Beside an established database (its log was read
+ * back long ago, the kept file is an old one) it also only notes the kept files, in a `renewal` with no `old` and
+ * `marked` true: the id stays, and nothing is held, which with no sync folder would be for ever.
  *
- * Both files are written to a temporary file and moved into place. A start that finds a `renewal` with an `old` id
- * not marked finishes it first: it writes the new id if `device-id` still holds `renewal.old`, then calls
- * [markRecovered] again, which puts the same row. An unreadable `renewal` counts as none. [now] stamps an unreadable
- * id file set aside.
+ * Both files are written to a temporary file, forced to disk and moved into place. A start that finds a `renewal`
+ * with an `old` id not marked finishes it first: it writes the new id if `device-id` still holds `renewal.old`, then
+ * calls [markRecovered] again with `owed` (or `old`, in a file written before `owed`), which puts the same row. An
+ * unreadable `renewal` counts as none. [now] stamps an unreadable id file set aside.
  */
 suspend fun renewDeviceIdIfRecovered(
     identityDir: File,
@@ -74,11 +76,14 @@ suspend fun renewDeviceIdIfRecovered(
     val idFile = File(identityDir, DEVICE_ID_FILE)
     val renewalFile = File(identityDir, RENEWAL_FILE)
     var id = deviceId(idFile, now)
-    val last = readRenewal(renewalFile)
+    var last = readRenewal(renewalFile)
     if (last?.old != null && !last.marked) {
         if (id == last.old) id = writeNewId(idFile)
-        markRecovered(last.old)
-        writeRenewal(renewalFile, last.copy(marked = true))
+        markRecovered(last.owed ?: last.old)
+        last = last.copy(marked = true).also { writeRenewal(renewalFile, it) }
+    } else if (!ownLogPending && last?.owed != null) {
+        // The database read its own log back since the last renewal: no older id is owed any more.
+        last = last.copy(owed = null).also { writeRenewal(renewalFile, it) }
     }
     if (keptFiles.all { it in last?.kept.orEmpty() }) return id
     if (!ownLogPending) {
@@ -86,20 +91,24 @@ suspend fun renewDeviceIdIfRecovered(
         return id
     }
 
-    val renewal = Renewal(old = id, kept = keptFiles, marked = false)
+    // The oldest id whose log is still to be read back: the one this renewal retires, unless an earlier one still is.
+    val owed = last?.owed ?: id
+    val renewal = Renewal(old = id, kept = keptFiles, marked = false, owed = owed)
     writeRenewal(renewalFile, renewal)
     val renewed = writeNewId(idFile)
-    markRecovered(id)
+    markRecovered(owed)
     writeRenewal(renewalFile, renewal.copy(marked = true))
     return renewed
 }
 
 /**
  * The last renewal of the device id: the id it replaced ([old]; null when it only noted kept files beside an
- * established database), the kept files it was made for, and whether the database was marked.
+ * established database), the kept files it was made for, whether the database was marked, and the oldest id whose log
+ * the database waits for ([owed]; absent from a file written before it existed, and cleared once a start finds the
+ * read-back ended).
  */
 @Serializable
-private data class Renewal(val old: String?, val kept: List<KeptFile>, val marked: Boolean)
+private data class Renewal(val old: String?, val kept: List<KeptFile>, val marked: Boolean, val owed: String? = null)
 
 private fun writeRenewal(file: File, renewal: Renewal) = replaceText(file, RENEWAL_JSON.encodeToString(Renewal.serializer(), renewal))
 
