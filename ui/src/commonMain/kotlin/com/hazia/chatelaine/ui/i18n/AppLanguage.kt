@@ -6,12 +6,14 @@ enum class AppLanguage(val tag: String) {
     IT("it");
 
     companion object {
+        private val italianCodes = setOf("it", "ita")
+
         /**
-         * The owner's stored [choice] wins when it names a known language; otherwise the device decides:
-         * a [deviceTag] starting with `it` gives Italian, anything else English.
+         * The owner's stored [choice] wins when it names a known language (in any case); otherwise the device decides:
+         * Italian when the [deviceTag]'s first subtag (split on `-` or `_`) is `it` or `ita`, English for anything else.
          */
         fun resolve(choice: String?, deviceTag: String): AppLanguage =
-            entries.firstOrNull { it.tag == choice }
-                ?: if (deviceTag.lowercase().startsWith("it")) IT else EN
+            entries.firstOrNull { it.tag.equals(choice, ignoreCase = true) }
+                ?: if (deviceTag.split('-', '_').first().lowercase() in italianCodes) IT else EN
     }
 }

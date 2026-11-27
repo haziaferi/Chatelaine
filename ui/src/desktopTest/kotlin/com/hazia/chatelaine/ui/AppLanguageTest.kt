@@ -26,4 +26,29 @@ class AppLanguageTest {
     fun unknownChoiceFollowsTheDevice() {
         assertEquals(AppLanguage.IT, AppLanguage.resolve("fr", "it"))
     }
+
+    @Test
+    fun deviceTagCaseDoesNotMatter() {
+        assertEquals(AppLanguage.IT, AppLanguage.resolve(null, "IT-it"))
+    }
+
+    @Test
+    fun underscoreSeparatedDeviceTagIsRead() {
+        assertEquals(AppLanguage.IT, AppLanguage.resolve(null, "it_IT"))
+    }
+
+    @Test
+    fun anotherLanguageStartingWithItIsEnglish() {
+        assertEquals(AppLanguage.EN, AppLanguage.resolve(null, "itl"))
+    }
+
+    @Test
+    fun threeLetterItalianCodeIsItalian() {
+        assertEquals(AppLanguage.IT, AppLanguage.resolve(null, "ita"))
+    }
+
+    @Test
+    fun choiceCaseDoesNotMatter() {
+        assertEquals(AppLanguage.IT, AppLanguage.resolve("IT", "de-DE"))
+    }
 }

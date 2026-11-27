@@ -23,6 +23,8 @@ kotlin {
             api(libs.compose.runtime)
             api(libs.compose.ui)
             api(libs.compose.foundation)
+            // Navigator exposes StateFlow.
+            api(libs.kotlinx.coroutines.core)
         }
         getByName("desktopTest").dependencies {
             implementation(kotlin("test"))

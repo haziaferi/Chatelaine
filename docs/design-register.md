@@ -13,6 +13,9 @@ rule, in the code for anything else.
   old log", which ends the wait so backups go on.
 - **Daily backup.** `BackupWorker` is not scheduled yet. It must build its folder from a stored URI.
 - **Roll back.** A roll back leaves one history entry per value, with no single undo.
+- **Language names.** The Settings language list could show each language in its own name ("English", "Italiano") or
+  in the interface language ("Inglese"); own names let someone who switched by mistake find the way back.
+  `languageName` uses the interface language for now.
 
 ## Stage 3 (places, photos and fields)
 

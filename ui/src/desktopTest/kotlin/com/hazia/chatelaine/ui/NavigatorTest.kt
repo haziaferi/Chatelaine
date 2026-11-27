@@ -38,4 +38,12 @@ class NavigatorTest {
         nav.open(Route.Tags)
         assertEquals(listOf(Route.Search, Route.Tags), nav.stack.value)
     }
+
+    @Test
+    fun replaceTopSwapsTheTopAndKeepsTheSize() {
+        val nav = Navigator()
+        nav.open(Route.QuickAdd)
+        nav.replaceTop(Route.Item("a"))
+        assertEquals(listOf(Route.Search, Route.Item("a")), nav.stack.value)
+    }
 }

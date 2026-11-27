@@ -6,7 +6,8 @@ agp = "9.3.2"
 kotlin = "2.4.10"
 ksp = "2.3.11"
 composeMultiplatform = "1.12.0"
-# The androidx.compose.ui:ui version CMP 1.12.0 resolves on Android (`:ui:dependencies --configuration androidRuntimeClasspath`).
+# Raise together with composeMultiplatform: this must be the androidx.compose.ui:ui version that CMP resolves on
+# Android. Read it with `./gradlew :ui:dependencies --configuration androidRuntimeClasspath` (androidx.compose.ui:ui).
 androidxComposeUi = "1.12.0"
 room = "2.8.4"
 sqlite = "2.7.0"
@@ -25,7 +26,7 @@ compose-foundation = { group = "org.jetbrains.compose.foundation", name = "found
 compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "composeMultiplatform" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "androidxComposeUi" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "androidxComposeUi" }
-androidx-activity-compose ={ group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "sqlite" }
