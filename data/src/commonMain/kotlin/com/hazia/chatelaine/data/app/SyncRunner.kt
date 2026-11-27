@@ -73,8 +73,9 @@ class SyncRunner(
     }
 
     /**
-     * Asks for a round after each quiet period of [localWrites]. A failing flow is subscribed again after
-     * [quietMillis] (the pause keeps one that fails at once from spinning); it ends no other round.
+     * Asks for a round after each quiet period of [localWrites]. A failing flow is shown as [SyncStatus.failure], as
+     * a failed round is (the next good round clears it), and subscribed again after [quietMillis] (the pause keeps one
+     * that fails at once from spinning); it ends no other round.
      */
     private suspend fun watchWrites() {
         while (true) {
@@ -83,7 +84,9 @@ class SyncRunner(
                 return
             } catch (e: CancellationException) {
                 currentCoroutineContext().ensureActive()
-            } catch (_: Exception) {
+                failed(e)
+            } catch (e: Exception) {
+                failed(e)
             }
             delay(quietMillis)
         }

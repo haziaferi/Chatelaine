@@ -102,6 +102,18 @@ suspend fun renewDeviceIdIfRecovered(
 }
 
 /**
+ * The database has read its own log back (its own-log row is gone): the renewal in [identityDir] owes no id any more,
+ * so a later renewal waits for the id it replaces. Called after a sync that ended the read-back; a renewal that owes
+ * nothing is left as it is, not rewritten. The next start clears it too ([renewDeviceIdIfRecovered]); this covers a
+ * database corrupted again before that start.
+ */
+fun clearOwedId(identityDir: File) {
+    val file = File(identityDir, RENEWAL_FILE)
+    val last = readRenewal(file)?.takeIf { it.owed != null } ?: return
+    writeRenewal(file, last.copy(owed = null))
+}
+
+/**
  * The last renewal of the device id: the id it replaced ([old]; null when it only noted kept files beside an
  * established database), the kept files it was made for, whether the database was marked, and the oldest id whose log
  * the database waits for ([owed]; absent from a file written before it existed, and cleared once a start finds the

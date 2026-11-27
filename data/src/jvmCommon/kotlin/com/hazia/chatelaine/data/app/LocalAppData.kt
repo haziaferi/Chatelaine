@@ -15,6 +15,7 @@ import com.hazia.chatelaine.data.backup.ZipBackup
 import com.hazia.chatelaine.data.blob.BlobStore
 import com.hazia.chatelaine.data.blob.BlobSync
 import com.hazia.chatelaine.data.blob.DirectoryBlobStore
+import com.hazia.chatelaine.data.clearOwedId
 import com.hazia.chatelaine.data.renewDeviceIdIfRecovered
 import com.hazia.chatelaine.data.sync.FolderSync
 import com.hazia.chatelaine.data.sync.ImportLock
@@ -50,6 +51,7 @@ fun keptFileRecordsBeside(dbFile: File): List<KeptFile> {
 class LocalAppData private constructor(
     private val db: ChatelaineDatabase,
     private val dbFile: File,
+    private val identityDir: File,
     override val deviceId: String,
     private val clock: HybridClock,
     private val photos: BlobStore,
@@ -77,6 +79,9 @@ class LocalAppData private constructor(
             val changed = s.import().changed
             BlobSync(db, folder, photos, wallMillis).exchange()
         } while (changed > 0 && rounds < MAX_ROUNDS)
+        // The read-back ended: should the database be corrupted before the next start, a renewal waits for this id's
+        // log, not for an older one already read.
+        if (db.syncDao().ownLog() == null) clearOwedId(identityDir)
         return rounds
     }
 
@@ -120,10 +125,11 @@ class LocalAppData private constructor(
             wallMillis: () -> Long = System::currentTimeMillis,
         ): LocalAppData {
             val db = open().database
+            val identityDir = File(filesDir, DEVICE_ID_DIR)
             try {
                 val (deviceId, clock) = runBlocking {
                     val id = renewDeviceIdIfRecovered(
-                        File(filesDir, DEVICE_ID_DIR),
+                        identityDir,
                         keptFileRecordsBeside(dbFile),
                         ownLogPending = db.syncDao().ownLog() != null,
                         markRecovered = { db.syncDao().markRecovered(it) },
@@ -132,7 +138,9 @@ class LocalAppData private constructor(
                     // from a peer whose clock runs ahead, and that edit would lose everywhere but here.
                     id to db.syncDao().loadClock(id, wallMillis)
                 }
-                return LocalAppData(db, dbFile, deviceId, clock, DirectoryBlobStore(File(filesDir, "photos").toPath()), wallMillis)
+                return LocalAppData(
+                    db, dbFile, identityDir, deviceId, clock, DirectoryBlobStore(File(filesDir, "photos").toPath()), wallMillis,
+                )
             } catch (e: Throwable) {
                 db.close()
                 throw e

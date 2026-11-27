@@ -148,6 +148,28 @@ class SyncRunnerTest {
         assertEquals(listOf(0L, 6_000L, 300_000L, 600_000L), started, "start, the write seen on the second subscription, every 5 min")
     }
 
+    /** A write flow that fails is shown as a failure, as a failed round is, until a round goes well. */
+    @Test
+    fun aLocalWritesErrorIsShown() = runTest {
+        var subscriptions = 0
+        val writes = flow<Unit> {
+            if (subscriptions++ == 0) {
+                delay(1_000)
+                throw IOException("the change feed broke")
+            }
+            awaitCancellation()
+        }
+        val runner = runner(writes = writes)
+        runner.start()
+        advanceTimeBy(2_000)
+        runCurrent()
+
+        assertEquals("the change feed broke", runner.status.value.failure)
+        advanceTimeBy(300_000)
+        runCurrent()
+        assertNull(runner.status.value.failure, "the round at 5 min went well")
+    }
+
     @Test
     fun stopStopsTheRunner() = runTest {
         val writes = MutableSharedFlow<Unit>()

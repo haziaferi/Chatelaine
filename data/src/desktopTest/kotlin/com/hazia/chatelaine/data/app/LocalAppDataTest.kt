@@ -278,6 +278,36 @@ class LocalAppDataTest {
         }
     }
 
+    /**
+     * The old log read back during a run, then the database corrupt again before the next open: the new renewal waits
+     * for the id it just replaced, whose log holds what that run did, not for the first one, already read.
+     */
+    @Test
+    fun aReadBackDuringARunOwesNothingOlder() {
+        val dir = tmp.newFolder("a")
+        val syncDir = tmp.newFolder("sync")
+        val folder = DirectorySyncFolder(syncDir.toPath())
+        device(dir).use { a -> runBlocking { a.inventory.addItem("pins"); a.sync(folder) } }
+        corrupt(dir)
+        val second = device(dir).use { a ->
+            runBlocking { a.sync(folder) }
+            assertFalse(runBlocking { a.recovery() }.backupsHeld, "the first old log was read back in this run")
+            a.deviceId
+        }
+        corrupt(dir)
+        val secondDir = File(syncDir, "devices/$second")
+        val away = File(tmp.root, "away")
+        assertTrue(secondDir.renameTo(away))
+
+        device(dir).use { a ->
+            runBlocking { a.sync(folder) }
+            assertTrue(runBlocking { a.recovery() }.backupsHeld, "waiting for the log of the id just replaced")
+            assertTrue(away.renameTo(secondDir))
+            runBlocking { a.sync(folder) }
+            assertFalse(runBlocking { a.recovery() }.backupsHeld)
+        }
+    }
+
     @Test
     fun backupsStayHeldUntilTheOldLogIsRead() {
         val dir = tmp.newFolder("a")

@@ -89,11 +89,24 @@ class DeviceIdentityTest {
     @Test
     fun aSecondRenewalBeforeTheReadBackStillOwesTheFirstId() {
         val old = deviceId(idFile)
-        renew(listOf(kept))
+        val first = renew(listOf(kept))
 
-        renew(listOf(kept, laterKept))
+        val second = renew(listOf(kept, laterKept))
 
+        assertNotEquals(old, second)
+        assertNotEquals(first, second, "the second renewal takes an id of its own")
         assertEquals(listOf(old, old), marked)
+    }
+
+    /** Clearing what is owed leaves a renewal that owes nothing as it was, not even rewritten. */
+    @Test
+    fun clearingNothingOwedLeavesTheRenewal() {
+        val text = """{"old": "3f0c8a52-0d5e-4d43-9f55-1b6a0e0b7c11", "kept": [$keptJson], "marked": true}"""
+        renewalFile.writeText(text)
+
+        clearOwedId(identity)
+
+        assertEquals(text, renewalFile.readText())
     }
 
     /** Once a start finds the read-back ended, the next renewal waits for the id it replaces. */
