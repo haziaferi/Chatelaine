@@ -1,6 +1,6 @@
 name: build
 
-# Builds and tests the Gradle project (core, data, Android app). The Android SDK is
+# Builds and tests the Gradle project (core, data, ui, Android and desktop apps). The Android SDK is
 # preinstalled on the runner with ANDROID_HOME set, so no local.properties is needed.
 
 on:
@@ -30,4 +30,4 @@ jobs:
           path: ~/.m2/repository/org/robolectric
           key: robolectric-${{ hashFiles('gradle/libs.versions.toml') }}
           restore-keys: robolectric-
-      - run: ./gradlew --no-daemon :core:desktopTest :data:desktopTest :data:testAndroidHostTest :androidApp:testDebugUnitTest :androidApp:assembleDebug
+      - run: ./gradlew --no-daemon :core:desktopTest :data:desktopTest :data:testAndroidHostTest :ui:desktopTest :androidApp:testDebugUnitTest :desktopApp:test :androidApp:assembleDebug :desktopApp:jar

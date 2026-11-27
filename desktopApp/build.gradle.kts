@@ -11,8 +11,10 @@ kotlin {
 
 dependencies {
     implementation(project(":data"))
+    implementation(project(":ui"))
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutines.swing)
+    testImplementation(kotlin("test"))
 }
 
 compose.desktop {
