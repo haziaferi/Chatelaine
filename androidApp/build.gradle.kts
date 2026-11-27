@@ -20,12 +20,19 @@ android {
     kotlin {
         jvmToolchain(21)
     }
+
+    // Robolectric UI tests need the merged manifest (the test activity from ui-test-manifest).
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {
     implementation(project(":data"))
+    implementation(project(":ui"))
     implementation(libs.compose.foundation)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

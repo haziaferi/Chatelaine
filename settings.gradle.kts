@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "chatelaine"
 
-include(":core", ":data", ":androidApp", ":desktopApp")
+include(":core", ":data", ":ui", ":androidApp", ":desktopApp")
