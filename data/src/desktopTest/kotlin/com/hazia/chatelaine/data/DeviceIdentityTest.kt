@@ -10,6 +10,7 @@ import org.junit.rules.TemporaryFolder
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
@@ -92,6 +93,16 @@ class DeviceIdentityTest {
 
         assertEquals(id, renew(listOf(kept), ownLogPending = true), "the noted file is known: nothing to do")
         assertEquals(emptyList(), marked)
+    }
+
+    /** A write whose move fails (here a folder holds the renewal's name) leaves no temporary file behind. */
+    @Test
+    fun aFailedWriteLeavesNoTempFile() {
+        deviceId(idFile)
+        File(renewalFile, "in the way").apply { parentFile.mkdirs(); writeText("x") }
+
+        assertFails { renew(listOf(kept)) }
+        assertEquals(setOf("device-id", "renewal"), identity.list()!!.toSet())
     }
 
     @Test

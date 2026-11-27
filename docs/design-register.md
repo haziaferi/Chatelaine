@@ -8,7 +8,9 @@ rule, in the code for anything else.
 
 - **Recovery notice.** A database made anew after a corrupt one waits for its own log before backing up again. The
   notice should key on the set-aside file being there, not on a flag. On a device with no sync folder it should offer
-  restoring a backup, as that is what lets backups go on.
+  restoring a backup, as that is what lets backups go on. It also needs a way out when the old log never arrives (the
+  device never synced, the sync folder changed, or the old device folder was deleted): for example "Go on without the
+  old log", which ends the wait so backups go on.
 - **Daily backup.** `BackupWorker` is not scheduled yet. It must build its folder from a stored URI.
 - **Roll back.** A roll back leaves one history entry per value, with no single undo.
 

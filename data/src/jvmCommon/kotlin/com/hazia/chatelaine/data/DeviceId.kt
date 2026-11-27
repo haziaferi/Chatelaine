@@ -4,10 +4,6 @@ import com.hazia.chatelaine.core.sync.Ids
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.nio.file.FileAlreadyExistsException
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption.ATOMIC_MOVE
-import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -34,15 +30,7 @@ fun deviceId(file: File, now: () -> Long = System::currentTimeMillis): String {
         if (Uuid.parseOrNull(id) != null) return id
         setAsideDatabaseFiles(file.path, now())
     }
-    val dir = requireNotNull(file.absoluteFile.parentFile) { "no directory for ${file.path}" }.apply { mkdirs() }
-    val tmp = Files.createTempFile(dir.toPath(), file.name, ".tmp")
-    // Files.write, not Files.writeString: Android before API 33 has no writeString.
-    Files.write(tmp, Ids.new().encodeToByteArray())
-    try {
-        Files.move(tmp, file.toPath())
-    } catch (_: FileAlreadyExistsException) {
-        Files.delete(tmp)
-    }
+    writeThroughTemp(file, Ids.new().encodeToByteArray(), replace = false)
     return file.readText().trim()
 }
 
@@ -126,10 +114,6 @@ private fun readRenewal(file: File): Renewal? {
 
 private fun writeNewId(file: File): String = Ids.new().also { replaceText(file, it) }
 
-/** Writes [text] to a temporary file beside [file] and moves it into place, so a crash leaves the old file or the new one. */
 private fun replaceText(file: File, text: String) {
-    val dir = requireNotNull(file.absoluteFile.parentFile) { "no directory for ${file.path}" }.apply { mkdirs() }
-    val tmp = Files.createTempFile(dir.toPath(), file.name, ".tmp")
-    Files.write(tmp, text.encodeToByteArray())
-    Files.move(tmp, file.toPath(), ATOMIC_MOVE, REPLACE_EXISTING)
+    writeThroughTemp(file, text.encodeToByteArray())
 }

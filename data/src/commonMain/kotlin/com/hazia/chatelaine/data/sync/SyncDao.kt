@@ -214,6 +214,9 @@ internal interface SyncDao {
     @Query("SELECT * FROM sync_outbox ORDER BY n")
     suspend fun outbox(): List<OutboxEntity>
 
+    @Query("SELECT COUNT(*) FROM sync_outbox")
+    suspend fun outboxCount(): Int
+
     @Query("DELETE FROM sync_outbox WHERE n <= :upTo")
     suspend fun clearOutbox(upTo: Long)
 }

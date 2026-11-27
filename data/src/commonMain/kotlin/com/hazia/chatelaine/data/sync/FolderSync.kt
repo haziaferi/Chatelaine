@@ -180,8 +180,10 @@ internal class FolderSync(
 
         val held = segments.toSet() + (first..seq)
         // A database that has not read its own files back yet ([OwnLogEntity]): a snapshot of it now would replace the
-        // segments that hold its history, so compaction waits for the import that reads them.
-        if (held.size >= snapshotEvery && ownLog == null) {
+        // segments that hold its history, so compaction waits for the import that reads them. After a recovery gave the
+        // device a new id, the files to read back are the old id's ([OwnLogEntity.previousDevice]): the new id's log
+        // holds no older history of its own, so it compacts even while the old log has not arrived.
+        if (held.size >= snapshotEvery && (ownLog == null || ownLog.previousDevice != null)) {
             folder.replace(FolderLayout.snapshot(device, seq), snapshotOfEverything())
             held.forEach { folder.delete(FolderLayout.segment(device, it)) }
             // Not [seq] itself: after a crash mid-compaction the new snapshot can take the old one's name.

@@ -80,7 +80,7 @@ class LocalAppData private constructor(
         return rounds
     }
 
-    override suspend fun pendingExport(): Int = db.syncDao().outbox().size
+    override suspend fun pendingExport(): Int = db.syncDao().outboxCount()
 
     override suspend fun backup(folder: SyncFolder, now: Long): String? = backups.daily(folder, now)
 
@@ -95,7 +95,13 @@ class LocalAppData private constructor(
         )
     }
 
-    override fun close() = db.close()
+    /** Closes the database; closing the [shared] instance lets the next [shared] call open it anew. */
+    override fun close() {
+        synchronized(sharedLock) {
+            if (sharedOne?.second === this) sharedOne = null
+        }
+        db.close()
+    }
 
     companion object {
         private const val MAX_ROUNDS = 10
@@ -135,8 +141,8 @@ class LocalAppData private constructor(
 
         /**
          * The one [LocalAppData] of this process: opened by the first call, the same instance for every later call
-         * with the same [dbFile]. Another file is refused (`IllegalStateException`): two openers of one database in
-         * one process would each hold a clock and an import lock of their own.
+         * with the same [dbFile] until it is closed. Another file is refused (`IllegalStateException`): two openers of
+         * one database in one process would each hold a clock and an import lock of their own.
          */
         fun shared(dbFile: File, filesDir: File, open: () -> DatabaseOpen<ChatelaineDatabase>): LocalAppData = synchronized(sharedLock) {
             val key = dbFile.absoluteFile

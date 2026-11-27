@@ -19,6 +19,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNotSame
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
@@ -47,13 +48,28 @@ class LocalAppDataTest {
         val dir = tmp.newFolder("shared")
         val file = File(dir, DATABASE_NAME)
         var opens = 0
-        val first = LocalAppData.shared(file, dir) { opens++; openChatelaineDatabase(file) }
+        LocalAppData.shared(file, dir) { opens++; openChatelaineDatabase(file) }.use { first ->
+            assertSame(first, LocalAppData.shared(file, dir) { opens++; openChatelaineDatabase(file) })
+            assertEquals(1, opens)
+            val other = File(tmp.newFolder("other"), DATABASE_NAME)
+            assertFailsWith<IllegalStateException> { LocalAppData.shared(other, other.parentFile) { openChatelaineDatabase(other) } }
+            assertEquals(1, opens)
+        }
+    }
 
-        assertSame(first, LocalAppData.shared(file, dir) { opens++; openChatelaineDatabase(file) })
-        assertEquals(1, opens)
-        val other = File(tmp.newFolder("other"), DATABASE_NAME)
-        assertFailsWith<IllegalStateException> { LocalAppData.shared(other, other.parentFile) { openChatelaineDatabase(other) } }
-        assertEquals(1, opens)
+    /** A closed shared instance is not handed out again: the next call opens the database anew. */
+    @Test
+    fun aClosedSharedInstanceIsOpenedAgain() {
+        val dir = tmp.newFolder("shared")
+        val file = File(dir, DATABASE_NAME)
+        val first = LocalAppData.shared(file, dir) { openChatelaineDatabase(file) }
+        runBlocking { first.inventory.addItem("pins") }
+        first.close()
+
+        LocalAppData.shared(file, dir) { openChatelaineDatabase(file) }.use { again ->
+            assertNotSame(first, again)
+            assertEquals(listOf("pins"), names(again))
+        }
     }
 
     @Test

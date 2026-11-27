@@ -1058,6 +1058,21 @@ class FolderSyncTest {
         assertEquals(setOf(old), after.rows().keys)
     }
 
+    // A device that took a new id after a recovery reads its old id's log back, not its new one's, which holds no
+    // older history to lose: the new log compacts even while the old one never arrives.
+    @Test
+    fun aRenewedDeviceCompactsItsNewLogWhileTheOldOneIsMissing() {
+        val w = world(segmentBytes = 200, snapshotEvery = 2)
+        val renewed = w.Device("A-new", id = "A2")
+        runBlocking { renewed.db.syncDao().markRecovered(previousDevice = "A") }
+        val item = renewed.create()
+        repeat(3) { renewed.edit(item, NAME); renewed.export() }
+        renewed.import()
+
+        assertTrue(runBlocking { renewed.sync.readingOwnLog() }, "the old id's log never arrived")
+        assertTrue(w.syncthing.paths("A-new").any { "/snapshot-" in it }, "the new log compacted")
+    }
+
     @Test
     fun aPurgeReachesAPeerAndOutlivesCompaction() {
         // Segments of one line, compacted every two, so three edits compact.

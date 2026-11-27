@@ -5,7 +5,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,7 +68,24 @@ class SyncRunner(
                     delay(everyMillis)
                 }
             }
-            launch { quiet(localWrites).collect { ask(IF_PENDING) } }
+            launch { watchWrites() }
+        }
+    }
+
+    /**
+     * Asks for a round after each quiet period of [localWrites]. A failing flow is subscribed again after
+     * [quietMillis] (the pause keeps one that fails at once from spinning); it ends no other round.
+     */
+    private suspend fun watchWrites() {
+        while (true) {
+            try {
+                quiet(localWrites).collect { ask(IF_PENDING) }
+                return
+            } catch (e: CancellationException) {
+                currentCoroutineContext().ensureActive()
+            } catch (_: Exception) {
+            }
+            delay(quietMillis)
         }
     }
 
@@ -85,21 +104,25 @@ class SyncRunner(
     private fun quiet(writes: Flow<Unit>) = writes.debounce(quietMillis)
 
     private suspend fun round(onlyIfPending: Boolean) {
-        val target = folder() ?: return
         try {
+            val target = folder() ?: return
             // Asked when the round starts: a round that just ran may have exported what the write queued.
             if (onlyIfPending && pending() == 0) return
             state.update { it.copy(running = true) }
             sync(target)
             state.value = SyncStatus(lastDoneMillis = wallMillis())
         } catch (e: CancellationException) {
-            throw e
+            // The runner stopped: the cancellation goes on. One the sync threw while the runner runs is a failure.
+            currentCoroutineContext().ensureActive()
+            failed(e)
         } catch (e: Exception) {
-            state.update { it.copy(failure = e.message ?: e.toString()) }
+            failed(e)
         } finally {
             state.update { it.copy(running = false) }
         }
     }
+
+    private fun failed(e: Exception) = state.update { it.copy(failure = e.message ?: e.toString()) }
 
     private companion object {
         const val NONE = 0

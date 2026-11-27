@@ -1,11 +1,14 @@
 package com.hazia.chatelaine.data.app
 
 import com.hazia.chatelaine.data.sync.SyncFolder
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -111,6 +114,55 @@ class SyncRunnerTest {
         assertEquals(2, calls)
         assertNull(runner.status.value.failure, "the next round cleared it")
         assertEquals(300_000L, runner.status.value.lastDoneMillis)
+    }
+
+    /** A cancellation thrown by the sync itself, not by stopping the runner, is a failed round like any other. */
+    @Test
+    fun aCancellationFromTheSyncIsAFailedRound() = runTest {
+        var calls = 0
+        val runner = runner(sync = { if (calls++ == 0) throw CancellationException("the folder went away") else 1 })
+        runner.start()
+        runCurrent()
+
+        assertEquals("the folder went away", runner.status.value.failure)
+        advanceTimeBy(300_000)
+        runCurrent()
+        assertEquals(2, calls, "the runner went on")
+        assertNull(runner.status.value.failure)
+    }
+
+    /** A failing write flow is subscribed again; the start-up and periodic rounds go on meanwhile. */
+    @Test
+    fun aLocalWritesErrorEndsNoRounds() = runTest {
+        var subscriptions = 0
+        val writes = flow {
+            if (subscriptions++ == 0) throw IOException("the database closed")
+            emit(Unit)
+            awaitCancellation()
+        }
+        runner(writes = writes).start()
+        advanceTimeBy(600_000)
+        runCurrent()
+
+        assertEquals(2, subscriptions)
+        assertEquals(listOf(0L, 6_000L, 300_000L, 600_000L), started, "start, the write seen on the second subscription, every 5 min")
+    }
+
+    @Test
+    fun stopStopsTheRunner() = runTest {
+        val writes = MutableSharedFlow<Unit>()
+        val runner = runner(writes = writes)
+        runner.start()
+        runCurrent()
+        writes.emit(Unit)
+        advanceTimeBy(1_000)
+
+        runner.stop()
+        runner.syncNow()
+        advanceTimeBy(600_000)
+        runCurrent()
+
+        assertEquals(listOf(0L), started, "neither the write waiting for quiet nor any later round ran")
     }
 
     @Test
