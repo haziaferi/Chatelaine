@@ -1,10 +1,8 @@
 package com.hazia.chatelaine
 
-import com.hazia.chatelaine.data.ChatelaineData
 import com.hazia.chatelaine.data.DATABASE_NAME
-import com.hazia.chatelaine.data.DEVICE_ID_DIR
-import com.hazia.chatelaine.data.blob.DirectoryBlobStore
-import com.hazia.chatelaine.data.deviceId
+import com.hazia.chatelaine.data.ITEM
+import com.hazia.chatelaine.data.app.LocalAppData
 import com.hazia.chatelaine.data.openChatelaineDatabase
 import com.hazia.chatelaine.data.sync.DirectorySyncFolder
 import kotlinx.coroutines.runBlocking
@@ -33,30 +31,33 @@ fun main(args: Array<String>) {
     val action = rest.firstOrNull() ?: usage("no action")
     val operands = rest.drop(1)
 
-    val data = ChatelaineData(
-        open = openChatelaineDatabase(File(dataDir, DATABASE_NAME)),
-        deviceId = deviceId(File(dataDir, "$DEVICE_ID_DIR/device-id")),
-        photos = DirectoryBlobStore(File(dataDir, "photos").toPath()),
-    )
-    data.use {
+    val dbFile = File(dataDir, DATABASE_NAME)
+    LocalAppData.shared(dbFile, dataDir, open = { openChatelaineDatabase(dbFile) }).use {
         runBlocking {
             when (action) {
-                "add" -> println(it.add(operands.singleOrNull() ?: usage("add <name>")))
+                "add" -> println(it.inventory.addItem(operands.singleOrNull() ?: usage("add <name>")))
                 "edit" -> {
                     if (operands.size != 2) usage("edit <id> <name>")
-                    it.edit(operands[0], operands[1])
+                    it.inventory.rename(operands[0], operands[1])
                     println("ok")
                 }
-                "list" -> it.list().forEach { item ->
-                    println("${item.id}  ${item.name}" + if (item.lost.isEmpty()) "" else "  (History: ${item.lost.joinToString(", ")})")
+                "list" -> it.inventory.items().sortedBy { item -> item.name }.forEach { item ->
+                    val lost = it.history.overwritten(ITEM, item.id, NAME_GROUP).mapNotNull { v -> v.values["name"] as? String }
+                    println("${item.id}  ${item.name}" + if (lost.isEmpty()) "" else "  (History: ${lost.joinToString(", ")})")
                 }
                 "sync" -> println("synced in ${it.sync(DirectorySyncFolder(folderArg(operands).toPath()))} round(s)")
-                "backup" -> println(it.backup(DirectorySyncFolder(folderArg(operands).toPath())) ?: "no backup now: the database is re-reading its own log")
+                "backup" -> println(
+                    it.backup(DirectorySyncFolder(folderArg(operands).toPath()), System.currentTimeMillis())
+                        ?: "no backup now: the database is re-reading its own log",
+                )
                 else -> usage("unknown action $action")
             }
         }
     }
 }
+
+/** The field group of an item's name, as History keys it. */
+private const val NAME_GROUP = "name"
 
 private fun folderArg(operands: List<String>): File = File(operands.singleOrNull() ?: usage("a folder is needed")).also { it.mkdirs() }
 
